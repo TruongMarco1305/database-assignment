@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+
+  constructor(
+    private readonly tokenService: TokenService,
+    private readonly userService: UserService,
+  ) {}
+
+  public async signup(signupDto: SignupDto) {
+    const { firstName, lastName, email, password } = signupDto;
+    const user = await this.userService.createUser(signupDto);
+    const token = await this.tokenService.generateToken(user);
+    return { token };
   }
 
   findAll() {

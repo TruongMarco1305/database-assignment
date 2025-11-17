@@ -1,5 +1,6 @@
 import { Controller, Post, Body, Param, Delete } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
+import { LoginDto } from './auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -7,21 +8,21 @@ export class AuthController {
 
   @Post('/signup')
   public async signup(@Body() signupDto: SignupDto) {
-    return this.authService.signup(createAuthDto);
+    return this.authService.signup(signupDto);
   }
 
   @Post('/login')
   public async login(@Body() loginDto: LoginDto) {
-    return this.authService.create(createAuthDto);
+    return this.authService.login(loginDto);
   }
 
   @Post('/google-login')
   public async googleLogin(@Body() googleLoginDto: GoogleLoginDto) {
-    return this.authService.create(createAuthDto);
+    return this.authService.googleLogin(googleLoginDto);
   }
 
   @Delete('/logout')
   public async logout(@Param('id') id: string) {
-    return this.authService.remove(+id);
+    return this.authService.logout(+id);
   }
 }
