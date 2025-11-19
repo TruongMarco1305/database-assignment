@@ -1,22 +1,26 @@
 import { Global, Module } from '@nestjs/common';
 import { DatabaseService } from './database.service';
-import { Pool } from 'pg';
 import { commonConfig, CommonConfigType } from 'src/config';
 import { TableService } from './table.service';
+import mysql from 'mysql2/promise';
 
 @Global()
 @Module({
   providers: [
     {
-      provide: Pool,
-      useFactory: (appCommonConfig: CommonConfigType) => {
-        return new Pool({
+      provide: 'DATABASE_POOL',
+      useFactory: async (appCommonConfig: CommonConfigType) => {
+        return mysql.createPool({
           host: appCommonConfig.dbHost,
-          port: appCommonConfig.dbPort,
           user: appCommonConfig.dbUser,
+          database: appCommonConfig.dbName,
           password: appCommonConfig.dbPassword,
-          connectionTimeoutMillis: 2000,
-          maxLifetimeSeconds: 60,
+          port: appCommonConfig.dbPort,
+          maxIdle: 10, // max idle connections, the default value is the same as `connectionLimit`
+          idleTimeout: 60000, // idle connections timeout, in milliseconds, the default value 60000
+          queueLimit: 0,
+          enableKeepAlive: true,
+          keepAliveInitialDelay: 0,
         });
       },
       inject: [commonConfig.KEY],

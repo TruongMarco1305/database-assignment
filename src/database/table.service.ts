@@ -1,5 +1,6 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { DatabaseService } from './database.service';
+import { RowDataPacket } from 'mysql2/promise';
 
 @Injectable()
 export abstract class TableService implements OnModuleInit {
@@ -22,7 +23,7 @@ export abstract class TableService implements OnModuleInit {
    */
   protected readonly postCreationQuery?: string;
 
-  // Inject the pool in the base constructor
+  // Inject the DatabaseService which holds the Pool
   constructor(private readonly databaseService: DatabaseService) {}
 
   /**
@@ -34,24 +35,32 @@ export abstract class TableService implements OnModuleInit {
     await this.checkAndCreateTable();
   }
 
+  // --- Core Table Management Logic ---
+
   /**
    * A generic method to check for and create a table.
    * It uses the abstract properties defined by the subclass.
    */
   private async checkAndCreateTable() {
-    const client = await this.databaseService.getClient();
+    // Get a dedicated connection from the pool (required for sequential operations)
+    const connection = await this.databaseService.getConnection();
     try {
-      // Query to check if the table exists in the public schema
+      // 1. Query to check if the table exists
+      // In MySQL, we query information_schema.tables using the placeholder '?'
       const checkTableQuery = `
-        SELECT EXISTS (
-          SELECT FROM information_schema.tables 
-          WHERE  table_schema = 'public'
-          AND    table_name   = $1
-        );
+        SELECT COUNT(*) AS tableCount
+        FROM information_schema.tables
+        WHERE table_schema = DATABASE()
+        AND table_name = ?;
       `;
 
-      const res = await client.query(checkTableQuery, [this.tableName]);
-      const tableExists = res.rows[0].exists;
+      // connection.execute returns [rows, fields]
+      const [rows] = await connection.execute(checkTableQuery, [
+        this.tableName,
+      ]);
+
+      // MySQL results are RowDataPacket arrays. We check the tableCount property.
+      const tableExists = (rows as RowDataPacket[])[0]['tableCount'] > 0;
 
       if (!tableExists) {
         // --- Table does not exist, so create it ---
@@ -60,7 +69,7 @@ export abstract class TableService implements OnModuleInit {
         );
 
         // Run the creation query defined by the subclass
-        await client.query(this.createTableQuery);
+        await connection.execute(this.createTableQuery);
         this.logger.log(`Successfully created "${this.tableName}" table.`);
 
         // Run post-creation query if it exists
@@ -68,7 +77,7 @@ export abstract class TableService implements OnModuleInit {
           this.logger.log(
             `Running post-creation query for "${this.tableName}"...`,
           );
-          await client.query(this.postCreationQuery);
+          await connection.execute(this.postCreationQuery);
           this.logger.log(
             `Successfully ran post-creation query for "${this.tableName}".`,
           );
@@ -82,11 +91,12 @@ export abstract class TableService implements OnModuleInit {
     } catch (error) {
       this.logger.error(
         `Error during table check/creation for "${this.tableName}":`,
-        error.stack,
+        (error as Error).stack,
       );
       throw error;
     } finally {
-      client.release();
+      // IMPORTANT: Release the connection back to the pool
+      connection.release();
     }
   }
 }
