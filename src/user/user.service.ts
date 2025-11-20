@@ -3,7 +3,7 @@ import { DatabaseService } from 'src/database/database.service';
 import { TableService } from 'src/database/table.service';
 
 @Injectable()
-export class UserService extends TableService{
+export class UserService extends TableService {
   protected readonly logger = new Logger(UserService.name);
   protected readonly tableName = 'users';
   protected readonly createTableQuery = `
@@ -24,10 +24,8 @@ export class UserService extends TableService{
   protected readonly postCreationQuery = `
     CREATE INDEX idx_users_email ON users(email);
   `;
-  
+
   constructor(databaseService: DatabaseService) {
     super(databaseService);
   }
-
-  public async createUser(userData:
 }

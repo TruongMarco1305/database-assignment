@@ -1,15 +1,15 @@
 import { Global, Module } from '@nestjs/common';
 import { DatabaseService } from './database.service';
 import { commonConfig, CommonConfigType } from 'src/config';
-import { TableService } from './table.service';
-import mysql from 'mysql2/promise';
+import * as mysql from 'mysql2/promise';
 
 @Global()
 @Module({
   providers: [
     {
       provide: 'DATABASE_POOL',
-      useFactory: async (appCommonConfig: CommonConfigType) => {
+      useFactory: (appCommonConfig: CommonConfigType) => {
+        console.log(appCommonConfig.dbPassword);
         return mysql.createPool({
           host: appCommonConfig.dbHost,
           user: appCommonConfig.dbUser,
@@ -27,6 +27,6 @@ import mysql from 'mysql2/promise';
     },
     DatabaseService,
   ],
-  exports: [DatabaseService, TableService],
+  exports: [DatabaseService],
 })
 export class DatabaseModule {}
