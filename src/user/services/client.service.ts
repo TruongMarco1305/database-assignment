@@ -13,7 +13,7 @@ export class ClientService extends TableService {
         slug VARCHAR(10) NOT NULL UNIQUE,
         membership_points INT DEFAULT 0,
         membership_tier VARCHAR(20) DEFAULT 'BRONZE',
-        FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
   `;
 

@@ -13,7 +13,7 @@ export class UserService extends TableService {
   protected readonly createTableQuery = `
     CREATE TABLE ${this.tableName} (
         id VARCHAR(255) PRIMARY KEY,
-        email VARCHAR(100) NOT NULL UNIQUE CHECK (email LIKE '%_@__%.__%')
+        email VARCHAR(100) NOT NULL UNIQUE CHECK (email LIKE '%_@__%.__%'),
         password VARCHAR(255) NOT NULL,
         firstName VARCHAR(50),
         lastName VARCHAR(50),

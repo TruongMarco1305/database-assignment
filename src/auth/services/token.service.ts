@@ -9,7 +9,6 @@ export class TokenService {
     const payload = {
       user: userId,
       iat: Date.now(),
-      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365,
     };
     return this.jwtService.signAsync(payload);
   }
