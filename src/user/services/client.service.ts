@@ -26,7 +26,12 @@ export class ClientService extends TableService {
     await this.databaseService.execute(
       `INSERT INTO ${this.tableName} (user_id, slug, membership_points, membership_tier)
        VALUES (?, ?, ?, ?)`,
-      [{ ...client }],
+      [
+        client.userId,
+        client.slug,
+        client.membership_points,
+        client.membership_tier,
+      ],
     );
     return client;
   }

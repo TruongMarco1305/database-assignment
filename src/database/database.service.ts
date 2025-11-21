@@ -5,7 +5,7 @@ import {
   Logger,
   OnModuleDestroy,
 } from '@nestjs/common';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 import { Pool, RowDataPacket } from 'mysql2/promise';
 
 // Define the injection token for the Pool
@@ -33,7 +33,7 @@ export class DatabaseService implements OnModuleDestroy {
       this.logger.log(`Executed query in ${duration} ms: ${sql}`);
       return results as QueryResult<T>;
     } catch (error) {
-      this.logger.error('Database query failed:', error);
+      this.logger.error(`Database query failed for ${sql}`, error);
       // Re-throw a custom error to maintain service layer abstraction
       throw new InternalServerErrorException('Database operation failed.');
     }

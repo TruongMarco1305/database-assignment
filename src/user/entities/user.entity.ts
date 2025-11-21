@@ -1,6 +1,6 @@
 import { BaseEntity } from 'src/database/base.entity';
 import { CreateUserInterface } from '../user.interface';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 export class User extends BaseEntity {
   public email: string;
@@ -13,14 +13,10 @@ export class User extends BaseEntity {
 
   constructor(data: CreateUserInterface) {
     super();
-    const { email, password, firstName, lastName, phoneNo, avatarURL, DoB } =
-      data;
+    const { email, password, firstName, lastName } = data;
     this.email = email;
     this.password = bcrypt.hashSync(password, 10);
     this.firstName = firstName;
     this.lastName = lastName;
-    this.phoneNo = phoneNo;
-    this.avatarURL = avatarURL;
-    this.DoB = DoB;
   }
 }

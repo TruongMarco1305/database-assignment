@@ -4,7 +4,7 @@ import { TableService } from 'src/database/table.service';
 import { CreateUserInterface } from '../user.interface';
 import { User } from '../entities/user.entity';
 import { LoginDto } from 'src/auth/auth.dto';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService extends TableService {
@@ -36,9 +36,9 @@ export class UserService extends TableService {
   public async createUser(userData: CreateUserInterface) {
     const user = new User(userData);
     await this.databaseService.execute(
-      `INSERT INTO ${this.tableName} (id, email, password, firstName, lastName, phoneNo, avatarURL, DoB, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [{ ...user }],
+      `INSERT INTO ${this.tableName} (id, email, password, firstName, lastName)
+       VALUES (?, ?, ?, ?, ?)`,
+      [user.id, user.email, user.password, user.firstName, user.lastName],
     );
     return user;
   }

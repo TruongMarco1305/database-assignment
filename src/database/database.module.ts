@@ -9,13 +9,15 @@ import * as mysql from 'mysql2/promise';
     {
       provide: 'DATABASE_POOL',
       useFactory: (appCommonConfig: CommonConfigType) => {
-        console.log(appCommonConfig.dbPassword);
         return mysql.createPool({
           host: appCommonConfig.dbHost,
           user: appCommonConfig.dbUser,
           database: appCommonConfig.dbName,
           password: appCommonConfig.dbPassword,
           port: appCommonConfig.dbPort,
+          compress: false,
+          waitForConnections: true,
+          connectionLimit: 10,
           maxIdle: 10, // max idle connections, the default value is the same as `connectionLimit`
           idleTimeout: 60000, // idle connections timeout, in milliseconds, the default value 60000
           queueLimit: 0,
