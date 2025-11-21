@@ -22,7 +22,8 @@ export class ClientService extends TableService {
   }
 
   public async createNewClient(userId: string) {
-    const client = new Client(userId);
+    const slug = `${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    const client = new Client(userId, slug, 0, 'BRONZE');
     await this.databaseService.execute(
       `INSERT INTO ${this.tableName} (user_id, slug, membership_points, membership_tier)
        VALUES (?, ?, ?, ?)`,

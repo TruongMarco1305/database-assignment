@@ -5,36 +5,26 @@ import { CreateUserInterface } from '../user.interface';
 import { User } from '../entities/user.entity';
 import { LoginDto } from 'src/auth/auth.dto';
 import * as bcrypt from 'bcrypt';
+import {
+  CREATE_USER_EMAIL_INDEX_QUERY,
+  CREATE_USER_TABLE_QUERY,
+} from 'src/database/queries';
 
 @Injectable()
 export class UserService extends TableService {
   protected readonly logger = new Logger(UserService.name);
   protected readonly tableName = 'users';
-  protected readonly createTableQuery = `
-    CREATE TABLE ${this.tableName} (
-        id VARCHAR(255) PRIMARY KEY,
-        email VARCHAR(100) NOT NULL UNIQUE CHECK (email LIKE '%_@__%.__%'),
-        password VARCHAR(255) NOT NULL,
-        firstName VARCHAR(50),
-        lastName VARCHAR(50),
-        phoneNo VARCHAR(15) CHECK (LENGTH(phoneNo) = 10),
-        avatarURL VARCHAR(255),
-        DoB DATE,
-        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-  `;
+  protected readonly createTableQuery = CREATE_USER_TABLE_QUERY;
 
-  protected readonly postCreationQuery = `
-    CREATE INDEX idx_users_email ON users(email);
-  `;
+  protected readonly postCreationQuery = CREATE_USER_EMAIL_INDEX_QUERY;
 
   constructor(databaseService: DatabaseService) {
     super(databaseService);
   }
 
   public async createUser(userData: CreateUserInterface) {
-    const user = new User(userData);
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    const user = new User({ ...userData, password: hashedPassword });
     await this.databaseService.execute(
       `INSERT INTO ${this.tableName} (id, email, password, firstName, lastName)
        VALUES (?, ?, ?, ?, ?)`,
