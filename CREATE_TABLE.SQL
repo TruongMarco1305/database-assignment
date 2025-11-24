@@ -53,6 +53,7 @@ CREATE TABLE venue_types (
     description TEXT,
     pricePerHour DECIMAL(10, 2) NOT NULL,
     capacity INT,
+    area DECIMAL(10, 1) NOT NULL,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -103,6 +104,8 @@ CREATE TABLE orders (
     startHour DATETIME NOT NULL,
     endHour DATETIME NOT NULL,
     bookingDate DATETIME, -- > current
+    points INT NOT NULL,
+    expiredAt DATETIME NOT NULL,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     CHECK (endHour > startHour),
