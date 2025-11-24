@@ -33,23 +33,18 @@ CREATE TABLE LOCATIONS (
     owner_id VARCHAR(255) NOT NULL,
     name VARCHAR(150) NOT NULL,
     description TEXT,
-    addrNo VARCHAR(20) NOT NULL UNIQUE,
+    addrNo VARCHAR(20) NOT NULL,
     ward VARCHAR(50) NOT NULL,
     city VARCHAR(50) NOT NULL,
     avgRating DECIMAL(2,1) DEFAULT 0,
     policy TEXT,
     phoneNo VARCHAR(15), -- == 10
+    mapURL VARCHAR(255) NOT NULL UNIQUE,
+    thumbnailURL VARCHAR(255) NOT NULL UNIQUE,
     isActive BOOLEAN DEFAULT 1,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (owner_id) REFERENCES OWNERS(user_id) ON DELETE CASCADE
-);
-
-CREATE TABLE Location_Images (
-    location_id VARCHAR(255) NOT NULL,
-    locationImgURL VARCHAR(255) NOT NULL,
-    PRIMARY KEY (location_id, locationImgURL),
-    FOREIGN KEY (location_id) REFERENCES LOCATIONS(location_id) ON DELETE CASCADE
 );
 
 CREATE TABLE VENUE_TYPES (
@@ -63,8 +58,8 @@ CREATE TABLE VENUE_TYPES (
 );
 
 CREATE TABLE VENUES (
-    name VARCHAR(100) NOT NULL,
     location_id VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
     venueType_id VARCHAR(255),
     floor VARCHAR(10),
     isActive BOOLEAN DEFAULT 1,
@@ -75,32 +70,27 @@ CREATE TABLE VENUES (
     FOREIGN KEY (venueType_id) REFERENCES VENUE_TYPES(venueType_id) ON DELETE SET NULL
 );
 
+CREATE TABLE Venue_Images (
+    location_id VARCHAR(255) NOT NULL,
+    venueName VARCHAR(100) NOT NULL,
+    locationImgURL VARCHAR(255) NOT NULL,
+    PRIMARY KEY (location_id, venueName, locationImgURL),
+    FOREIGN KEY (location_id, venueName) REFERENCES VENUES(location_id, name) ON DELETE CASCADE
+);
+
 CREATE TABLE AMENITIES (
     amenity_id VARCHAR(255) PRIMARY KEY,
-    
-    -- 1. Cột xác định vị trí (Dùng chung)
     location_id VARCHAR(255) NOT NULL, 
-    
-    -- 2. Tên phòng (Cho phép NULL nếu ở trong kho)
     venueName VARCHAR(100), 
-    
     name VARCHAR(100) NOT NULL,
+    category VARCHAR(50),
+    description TEXT,
+    icon VARCHAR(255),
     status VARCHAR(50) NOT NULL, -- STORAGE, FIXING, USED
-    
-    -- ... các cột khác ...
-
-    -- RÀNG BUỘC 1: Đảm bảo Amenity luôn thuộc về một Location hợp lệ
-    CONSTRAINT FK_Amenity_Location 
-        FOREIGN KEY (location_id) 
-        REFERENCES LOCATIONS(location_id) 
-        ON DELETE CASCADE,
-
-    -- RÀNG BUỘC 2: Đảm bảo nếu có gán phòng, phòng đó phải thuộc CÙNG Location
-    CONSTRAINT FK_Amenity_Venue 
-        FOREIGN KEY (location_id, venueName) 
-        REFERENCES VENUES(location_id, name) 
-        ON DELETE SET NULL 
-        ON UPDATE CASCADE
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (location_id) REFERENCES LOCATIONS(location_id) ON DELETE CASCADE,
+    FOREIGN KEY (location_id, venueName) REFERENCES VENUES(location_id, name) ON DELETE RESTRICT
 );
 
 CREATE TABLE ORDERS (
@@ -157,7 +147,7 @@ CREATE TABLE INVOICES (
 
 CREATE TABLE RATES (
     client_id VARCHAR(255),
-    location_id VARCHAR(255) NOT NULL,
+    location_id VARCHAR(255),
     stars INT CHECK (stars BETWEEN 1 AND 5),
     comment TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -181,6 +171,6 @@ CREATE TABLE CHATS (
     receiver_id VARCHAR(255) NOT NULL,
     content TEXT,
     sentAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (sender_id) REFERENCES USER(user_id),
-    FOREIGN KEY (receiver_id) REFERENCES USER(user_id)
+    FOREIGN KEY (sender_id) REFERENCES USERS(user_id),
+    FOREIGN KEY (receiver_id) REFERENCES USERS(user_id)
 );
