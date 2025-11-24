@@ -83,7 +83,7 @@ CREATE TABLE amenities (
     amenity_id VARCHAR(255) PRIMARY KEY,
     location_id VARCHAR(255) NOT NULL, 
     venueName VARCHAR(100), 
-    category VARCHAR(50), -- Air_Conditioner, Cooling_Fan, Heater, Stage_Platform, Sound_System, Banquet_Furniture, Projector_Kit, Smartboard_Kit, Studio_Gear
+    category VARCHAR(50), -- Audience_Chairs, Table_Chairs, Cooling_Fan, Stage_Platform, Sound_System, Heater, Banquet_Furniture, Birthday_Furniture, Projector_Kit, Smartboard_Kit, Studio_Gear
     description TEXT,
     icon VARCHAR(255),
     status VARCHAR(50) NOT NULL, -- STORAGE, FIXING, USED
