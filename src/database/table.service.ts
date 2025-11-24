@@ -24,7 +24,7 @@ export abstract class TableService implements OnModuleInit {
   protected readonly postCreationQuery?: string;
 
   // Inject the DatabaseService which holds the Pool
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(protected databaseService: DatabaseService) {}
 
   /**
    * This method is automatically called by NestJS

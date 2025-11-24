@@ -1,6 +1,6 @@
-import { Controller, Post, Body, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
-import { LoginDto } from './auth.dto';
+import { LoginDto, SignupDto } from './auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -14,15 +14,5 @@ export class AuthController {
   @Post('/login')
   public async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
-  }
-
-  @Post('/google-login')
-  public async googleLogin(@Body() googleLoginDto: GoogleLoginDto) {
-    return this.authService.googleLogin(googleLoginDto);
-  }
-
-  @Delete('/logout')
-  public async logout(@Param('id') id: string) {
-    return this.authService.logout(+id);
   }
 }
