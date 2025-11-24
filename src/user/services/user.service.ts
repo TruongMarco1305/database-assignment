@@ -23,8 +23,7 @@ export class UserService extends TableService {
   }
 
   public async createUser(userData: CreateUserInterface) {
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
-    const user = new User({ ...userData, password: hashedPassword });
+    const user = new User({ ...userData });
     await this.databaseService.execute(
       `INSERT INTO ${this.tableName} (id, email, password, firstName, lastName)
        VALUES (?, ?, ?, ?, ?)`,
@@ -43,7 +42,7 @@ export class UserService extends TableService {
       throw new BadRequestException('User not found');
     }
     const user = result[0];
-    const validatePassword = await bcrypt.compare(password, user.password);
+    const validatePassword = password === user.password;
     if (!validatePassword) {
       throw new BadRequestException('Invalid credentials');
     }

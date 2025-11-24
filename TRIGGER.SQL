@@ -19,3 +19,18 @@ END$$ -- 3. Gặp dấu '$$', MySQL hiểu là "Hết bài", giờ mới bắt �
 
 -- 4. Đổi dấu kết thúc trở lại thành ';' như bình thường để chạy các lệnh khác sau này
 DELIMITER ;
+
+-- rate
+
+CREATE TRIGGER trg_Rate_Insert
+AFTER INSERT ON rates
+FOR EACH ROW
+BEGIN
+    UPDATE locations
+    SET avgRating = (
+        SELECT IFNULL(AVG(stars), 0) 
+        FROM rates 
+        WHERE location_id = NEW.location_id
+    )
+    WHERE location_id = NEW.location_id;
+END

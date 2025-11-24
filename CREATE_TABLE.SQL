@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    user_id VARCHAR(255) PRIMARY KEY,
+    id VARCHAR(255) PRIMARY KEY,
     email VARCHAR(100) NOT NULL UNIQUE CHECK (email LIKE '%_@__%.__%'), -- Basic regex check
     password VARCHAR(255) NOT NULL,
     firstName VARCHAR(50),
@@ -83,8 +83,7 @@ CREATE TABLE amenities (
     amenity_id VARCHAR(255) PRIMARY KEY,
     location_id VARCHAR(255) NOT NULL, 
     venueName VARCHAR(100), 
-    name VARCHAR(100) NOT NULL,
-    category VARCHAR(50),
+    category VARCHAR(50), -- Air_Conditioner, Cooling_Fan, Heater, Stage_Platform, Sound_System, Banquet_Furniture, Projector_Kit, Smartboard_Kit, Studio_Gear
     description TEXT,
     icon VARCHAR(255),
     status VARCHAR(50) NOT NULL, -- STORAGE, FIXING, USED

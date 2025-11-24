@@ -1,5 +1,5 @@
 -- 1.1 Tạo 5 Users cho Owners
-INSERT INTO users (user_id, email, password, firstName, lastName, phoneNo, DoB) VALUES
+INSERT INTO users (id, email, password, firstName, lastName, phoneNo, DoB) VALUES
 ('u_owner_01', 'owner1@business.com', 'pass123', 'Nguyen', 'Van A', '0901000001', '1990-01-01'),
 ('u_owner_02', 'owner2@business.com', 'pass123', 'Tran', 'Thi B', '0901000002', '1992-05-15'),
 ('u_owner_03', 'owner3@business.com', 'pass123', 'Le', 'Van C', '0901000003', '1988-11-20'),
@@ -15,7 +15,7 @@ INSERT INTO owners (user_id, bankId, bankName, accountName, accountNo) VALUES
 ('u_owner_05', 'BIDV', 'BIDV', 'HOANG VAN E', '0011005');
 
 -- 1.3 Tạo 10 Users cho Clients
-INSERT INTO users (user_id, email, password, firstName, lastName, phoneNo, DoB) VALUES
+INSERT INTO users (id, email, password, firstName, lastName, phoneNo, DoB) VALUES
 ('u_client_01', 'client1@gmail.com', 'pass123', 'Khach', 'Mot', '0912000001', '2000-01-01'),
 ('u_client_02', 'client2@gmail.com', 'pass123', 'Khach', 'Hai', '0912000002', '2001-02-02'),
 ('u_client_03', 'client3@gmail.com', 'pass123', 'Khach', 'Ba', '0912000003', '2002-03-03'),
@@ -144,3 +144,142 @@ INSERT INTO venues (location_id, name, venueType_id, floor, isActive) VALUES
 ('loc_10', 'Family Room', 'vt_meeting', '1', 1);
 
 -- rating
+-- =============================================
+-- KHÁCH HÀNG 1 (u_client_01) ĐÁNH GIÁ 10 ĐỊA ĐIỂM
+-- =============================================
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_01', 'loc_01', 5, 'Dịch vụ tuyệt vời, sẽ quay lại!');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_01', 'loc_02', 4, 'Studio đẹp nhưng hơi xa trung tâm.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_01', 'loc_03', 5, 'Không gian ven sông cực kỳ thoáng mát.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_01', 'loc_04', 3, 'Phòng họp ổn nhưng wifi đôi lúc chập chờn.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_01', 'loc_05', 4, 'Sân vườn rộng rãi, rất thích hợp tiệc ngoài trời.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_01', 'loc_06', 5, 'Kiến trúc cổ kính rất ấn tượng.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_01', 'loc_07', 5, 'Bãi biển sạch, nhân viên nhiệt tình.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_01', 'loc_08', 4, 'View cầu rồng đẹp, văn phòng hiện đại.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_01', 'loc_09', 2, 'Đường đi khó tìm, buổi tối hơi vắng.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_01', 'loc_10', 5, 'Săn mây buổi sáng là trải nghiệm không thể quên.');
+
+-- =============================================
+-- KHÁCH HÀNG 2 (u_client_02) ĐÁNH GIÁ 10 ĐỊA ĐIỂM
+-- =============================================
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_02', 'loc_01', 4, 'Sảnh tiệc sang trọng, âm thanh tốt.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_02', 'loc_02', 5, 'Ánh sáng studio rất chuyên nghiệp.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_02', 'loc_03', 4, 'Đồ ăn ngon, phục vụ chu đáo.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_02', 'loc_04', 4, 'Thiết bị họp hiện đại, dễ kết nối.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_02', 'loc_05', 3, 'Nhiều muỗi vào buổi tối, cần khắc phục.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_02', 'loc_06', 5, 'Không gian ấm cúng, decor đẹp.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_02', 'loc_07', 5, 'Team building ở đây rất vui.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_02', 'loc_08', 4, 'Vị trí thuận tiện đi lại.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_02', 'loc_09', 5, 'Không khí Đà Lạt tuyệt vời.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_02', 'loc_10', 4, 'Homestay dễ thương, chủ nhà thân thiện.');
+
+-- =============================================
+-- KHÁCH HÀNG 3 (u_client_03) ĐÁNH GIÁ 10 ĐỊA ĐIỂM
+-- =============================================
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_03', 'loc_01', 3, 'Giá hơi cao so với mặt bằng chung.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_03', 'loc_02', 4, 'Phong cách tối giản rất hợp gu mình.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_03', 'loc_03', 5, 'Hoàng hôn ở đây đẹp xuất sắc.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_03', 'loc_04', 4, 'Ghế ngồi thoải mái, làm việc lâu không mỏi.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_03', 'loc_05', 5, 'Cây xanh nhiều, không khí trong lành.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_03', 'loc_06', 4, 'Vị trí trung tâm phố cổ rất tiện.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_03', 'loc_07', 4, 'Gió biển mát rượi, đồ uống ngon.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_03', 'loc_08', 5, 'Văn phòng xịn xò, view triệu đô.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_03', 'loc_09', 3, 'Phòng cách âm chưa tốt lắm.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_03', 'loc_10', 5, 'Sáng sớm mở cửa ra là thấy mây bay.');
+
+-- =============================================
+-- KHÁCH HÀNG 4 (u_client_04) ĐÁNH GIÁ 10 ĐỊA ĐIỂM
+-- =============================================
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_04', 'loc_01', 5, 'Chuyên nghiệp từ khâu gửi xe.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_04', 'loc_02', 3, 'Diện tích hơi nhỏ so với ảnh chụp.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_04', 'loc_03', 5, 'Địa điểm cưới trong mơ.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_04', 'loc_04', 4, 'Phòng sạch sẽ, thơm tho.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_04', 'loc_05', 4, 'Rất chill, thích hợp tụ tập bạn bè.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_04', 'loc_06', 5, 'Món ăn đậm chất Hà Nội.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_04', 'loc_07', 3, 'Hơi đông đúc vào cuối tuần.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_04', 'loc_08', 4, 'Không gian làm việc yên tĩnh.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_04', 'loc_09', 5, 'Rừng thông đẹp như phim.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_04', 'loc_10', 4, 'Tiệc nướng BBQ buổi tối rất vui.');
+
+-- =============================================
+-- KHÁCH HÀNG 5 (u_client_05) ĐÁNH GIÁ 10 ĐỊA ĐIỂM
+-- =============================================
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_05', 'loc_01', 4, 'Sảnh chờ rộng, nhân viên lịch sự.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_05', 'loc_02', 5, 'Concept chụp ảnh đa dạng.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_05', 'loc_03', 4, 'Trang trí tiệc cưới rất tinh tế.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_05', 'loc_04', 5, 'Mạng internet tốc độ cao.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_05', 'loc_05', 4, 'Thoáng đãng, gần gũi thiên nhiên.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_05', 'loc_06', 3, 'Chỗ để xe hơi bất tiện.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_05', 'loc_07', 5, 'Biển xanh cát trắng nắng vàng.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_05', 'loc_08', 4, 'Tiện nghi văn phòng đầy đủ.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_05', 'loc_09', 5, 'Sẽ quay lại vào mùa đông.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_05', 'loc_10', 5, 'View đồi chè Cầu Đất siêu đẹp.');
+
+-- =============================================
+-- KHÁCH HÀNG 6 (u_client_06) ĐÁNH GIÁ 10 ĐỊA ĐIỂM
+-- =============================================
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_06', 'loc_01', 5, 'Tổ chức sự kiện rất chuyên nghiệp.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_06', 'loc_02', 4, 'Giá cả hợp lý cho sinh viên.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_06', 'loc_03', 5, 'Không gian lãng mạn vô cùng.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_06', 'loc_04', 3, 'Điều hòa hơi lạnh.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_06', 'loc_05', 5, 'Rất thích hồ cá Koi ở đây.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_06', 'loc_06', 4, 'Nhân viên mặc áo dài rất đẹp.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_06', 'loc_07', 4, 'Hải sản tươi ngon.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_06', 'loc_08', 5, 'Văn phòng đáng mơ ước.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_06', 'loc_09', 4, 'Phòng ốc sạch sẽ, ấm cúng.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_06', 'loc_10', 3, 'Nước nóng hơi yếu.');
+
+-- =============================================
+-- KHÁCH HÀNG 7 (u_client_07) ĐÁNH GIÁ 10 ĐỊA ĐIỂM
+-- =============================================
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_07', 'loc_01', 4, 'Hệ thống ánh sáng sân khấu tốt.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_07', 'loc_02', 5, 'Chụp lookbook ở đây bao đẹp.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_07', 'loc_03', 4, 'Bãi cỏ xanh mướt, rất đẹp.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_07', 'loc_04', 5, 'Book phòng nhanh chóng, tiện lợi.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_07', 'loc_05', 4, 'Không gian yên bình giữa lòng phố.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_07', 'loc_06', 5, 'Cảm giác như trở về Hà Nội xưa.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_07', 'loc_07', 5, 'Tuyệt vời cho kỳ nghỉ hè.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_07', 'loc_08', 4, 'Pantry có nhiều đồ ăn vặt.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_07', 'loc_09', 5, 'Thức dậy giữa rừng thông là cảm giác rất chill.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_07', 'loc_10', 4, 'Săn mây thành công, ảnh đẹp lung linh.');
+
+-- =============================================
+-- KHÁCH HÀNG 8 (u_client_08) ĐÁNH GIÁ 10 ĐỊA ĐIỂM
+-- =============================================
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_08', 'loc_01', 5, 'Dịch vụ 5 sao chuẩn chỉnh.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_08', 'loc_02', 4, 'Nhân viên hỗ trợ setup nhiệt tình.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_08', 'loc_03', 5, 'View sông Sài Gòn về đêm cực đẹp.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_08', 'loc_04', 4, 'Phòng cách âm tốt, tập trung làm việc hiệu quả.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_08', 'loc_05', 3, 'Giá đồ uống hơi đắt.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_08', 'loc_06', 5, 'Sảnh tiệc lộng lẫy, sang trọng.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_08', 'loc_07', 4, 'Bãi biển riêng tư, sạch sẽ.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_08', 'loc_08', 5, 'Cơ sở vật chất hiện đại bậc nhất Đà Nẵng.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_08', 'loc_09', 4, 'Buổi tối nướng khoai bắp rất vui.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_08', 'loc_10', 5, 'Chắc chắn sẽ giới thiệu cho bạn bè.');
+
+-- =============================================
+-- KHÁCH HÀNG 9 (u_client_09) ĐÁNH GIÁ 10 ĐỊA ĐIỂM
+-- =============================================
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_09', 'loc_01', 4, 'Giao thông khu vực này hơi kẹt xe giờ cao điểm.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_09', 'loc_02', 5, 'Thiết kế thông minh, tận dụng ánh sáng tốt.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_09', 'loc_03', 4, 'Nhân viên phục vụ hơi chậm khi đông khách.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_09', 'loc_04', 5, 'Rất hài lòng về dịch vụ.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_09', 'loc_05', 4, 'Không gian xanh mát, dễ chịu.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_09', 'loc_06', 5, 'Ẩm thực tinh tế, ngon miệng.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_09', 'loc_07', 5, 'Biển đẹp, cát trắng, nắng vàng.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_09', 'loc_08', 3, 'Thang máy tòa nhà hơi chậm.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_09', 'loc_09', 5, 'Không khí trong lành, yên tĩnh.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_09', 'loc_10', 4, 'Phòng ốp gỗ rất thơm.');
+
+-- =============================================
+-- KHÁCH HÀNG 10 (u_client_10) ĐÁNH GIÁ 10 ĐỊA ĐIỂM
+-- =============================================
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_10', 'loc_01', 5, 'Không gian hội nghị đẳng cấp.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_10', 'loc_02', 4, 'Nhiều góc sống ảo đẹp.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_10', 'loc_03', 5, 'Tiệc cưới ngoài trời quá tuyệt.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_10', 'loc_04', 4, 'Bàn ghế ergonomic ngồi rất sướng.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_10', 'loc_05', 5, 'Địa điểm check-in không thể bỏ qua.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_10', 'loc_06', 4, 'Giá hơi chát nhưng xứng đáng.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_10', 'loc_07', 5, 'Resort ven biển tuyệt đẹp.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_10', 'loc_08', 5, 'View nhìn ra sông Hàn cực chill.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_10', 'loc_09', 4, 'Đường vào hơi dốc nhưng cảnh đẹp bù lại.');
+INSERT INTO rates (client_id, location_id, stars, comment) VALUES ('u_client_10', 'loc_10', 5, 'Săn mây thành công mỹ mãn.');
