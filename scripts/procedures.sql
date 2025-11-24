@@ -102,3 +102,41 @@ ORDER BY
     END DESC;
 
 END
+
+CREATE PROCEDURE CreateLocation @Owner nvarchar(255), @Name nvarchar(150), @Description text, 
+    @AddrNo nvarchar(20), @Ward nvarchar(50), @City nvarchar(50), @Policy text,
+    @PhoneNo nvarchar(15), @MapURL nvarchar(255), @ThumbnailURL nvarchar(255)
+AS
+BEGIN
+    INSERT INTO locations (location_id, owner_id, name, description, addrNo, ward, city, policy, phoneNo, mapURL, thumbnailURL)
+    VALUES (uuid(), @Owner, @Name, @Description, @AddrNo, @Ward, @City, @Policy, @PhoneNo, @MapURL, @ThumbnailURL);
+END
+GO;
+
+CREATE PROCEDURE UpdateLocation @LocationId nvarchar(255), @Name nvarchar(150) = NULL, @Description text = NULL, 
+    @AddrNo nvarchar(20) = NULL, @Ward nvarchar(50) = NULL, @City nvarchar(50) = NULL, @Policy text = NULL,
+    @PhoneNo nvarchar(15) = NULL, @MapURL nvarchar(255) = NULL, @ThumbnailURL nvarchar(255) = NULL
+AS
+BEGIN
+    UPDATE locations
+    SET 
+        name = COALESCE(@Name, name),
+        description = COALESCE(@Description, description),
+        addrNo = COALESCE(@AddrNo, addrNo),
+        ward = COALESCE(@Ward, ward),
+        city = COALESCE(@City, city),
+        policy = COALESCE(@Policy, policy),
+        phoneNo = COALESCE(@PhoneNo, phoneNo),
+        mapURL = COALESCE(@MapURL, mapURL),
+        thumbnailURL = COALESCE(@ThumbnailURL, thumbnailURL)
+    WHERE location_id = @LocationId;
+END
+GO;
+
+CREATE PROCEDURE DeleteLocation @LocationId nvarchar(255)
+AS
+BEGIN
+    DELETE FROM locations
+    WHERE location_id = @LocationId;
+END
+GO;
