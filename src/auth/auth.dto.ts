@@ -3,6 +3,7 @@ export class SignupDto {
   readonly password: string;
   readonly lastName: string;
   readonly firstName: string;
+  readonly DoB: string;
 }
 
 export class LoginDto {

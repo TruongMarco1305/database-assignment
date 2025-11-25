@@ -1,7 +1,7 @@
-import { BaseEntity } from 'src/database/base.entity';
 import { CreateUserInterface } from '../user.interface';
 
-export class User extends BaseEntity {
+export class User {
+  public id: string;
   public email: string;
   public password: string;
   public firstName: string;
@@ -9,13 +9,15 @@ export class User extends BaseEntity {
   public phoneNo: string;
   public avatarURL: string;
   public DoB: Date;
+  public createdAt: Date;
+  public updatedAt: Date;
 
   constructor(data: CreateUserInterface) {
-    super();
-    const { email, password, firstName, lastName } = data;
+    const { email, password, firstName, lastName, DoB } = data;
     this.email = email;
     this.password = password;
     this.firstName = firstName;
     this.lastName = lastName;
+    this.DoB = new Date(DoB);
   }
 }

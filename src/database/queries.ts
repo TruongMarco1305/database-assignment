@@ -1,40 +1,37 @@
 export const CREATE_USER_TABLE_QUERY = `    
     CREATE TABLE users (
-        id VARCHAR(255) PRIMARY KEY,
-        email VARCHAR(100) NOT NULL UNIQUE CHECK (email LIKE '%_@__%.__%'),
+        id BINARY(16) PRIMARY KEY,
+        email VARCHAR(100) NOT NULL UNIQUE CHECK (email REGEXP '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$'),
         password VARCHAR(255) NOT NULL,
-        firstName VARCHAR(50),
-        lastName VARCHAR(50),
-        phoneNo VARCHAR(15) CHECK (LENGTH(phoneNo) = 10),
-        avatarURL VARCHAR(255),
-        DoB DATE,
+        firstName VARCHAR(50) CHECK (firstName REGEXP '^[A-Za-z]+$'),
+        lastName VARCHAR(50) CHECK (lastName REGEXP '^[A-Za-z]+$'),
+        phoneNo VARCHAR(15) CHECK (phoneNo REGEXP '^[0-9]+$'),
+        avatarURL TEXT,
+        DoB DATE NOT NULL,
+        isActive BOOLEAN DEFAULT 1,
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+        updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     );
-`;
-
-export const CREATE_USER_EMAIL_INDEX_QUERY = `
-    CREATE INDEX idx_users_email ON users(email);
 `;
 
 export const CREATE_CLIENT_TABLE_QUERY = `
     CREATE TABLE clients (
-        user_id VARCHAR(255) PRIMARY KEY,
+        user_id BINARY(16) PRIMARY KEY,
         slug VARCHAR(10) NOT NULL UNIQUE,
         membership_points INT DEFAULT 0,
-        membership_tier VARCHAR(20) DEFAULT 'BRONZE',
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        membership_tier ENUM('BRONZE', 'SILVER', 'GOLD', 'PLATINUM') DEFAULT 'BRONZE',
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT
     );
 `;
 
 export const CREATE_OWNER_TABLE_QUERY = `
     CREATE TABLE owners (
-        user_id VARCHAR(255) PRIMARY KEY,
-        bankId VARCHAR(50) NOT NULL,
-        bankName VARCHAR(100) NOT NULL,
-        accountName VARCHAR(100) NOT NULL,
-        accountNo VARCHAR(50) NOT NULL UNIQUE,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        user_id BINARY(16) PRIMARY KEY,
+        bankId VARCHAR(50) NOT NULL, -- limited set
+        bankName VARCHAR(100) NOT NULL, -- limited set
+        accountName VARCHAR(50) NOT NULL,
+        accountNo VARCHAR(50) NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT
     );
 `;
 

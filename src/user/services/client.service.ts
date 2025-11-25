@@ -2,20 +2,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { TableService } from 'src/database/table.service';
 import { Client } from '../entities';
+import { CREATE_CLIENT_TABLE_QUERY } from 'src/database/queries';
 
 @Injectable()
 export class ClientService extends TableService {
   protected readonly logger = new Logger(ClientService.name);
   protected readonly tableName = 'clients';
-  protected readonly createTableQuery = `
-    CREATE TABLE ${this.tableName} (
-        user_id VARCHAR(255) PRIMARY KEY,
-        slug VARCHAR(10) NOT NULL UNIQUE,
-        membership_points INT DEFAULT 0,
-        membership_tier VARCHAR(20) DEFAULT 'BRONZE',
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    );
-  `;
+  protected readonly createTableQuery = CREATE_CLIENT_TABLE_QUERY;
 
   constructor(databaseService: DatabaseService) {
     super(databaseService);

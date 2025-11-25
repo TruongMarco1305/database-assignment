@@ -5,5 +5,5 @@ export interface CreateUserInterface {
   lastName?: string;
   phoneNo?: string;
   avatarURL?: string;
-  DoB?: Date;
+  DoB: string;
 }
