@@ -14,6 +14,83 @@ export const CREATE_USER_TABLE_QUERY = `
     );
 `;
 
+export const CREATE_USER_PROCEDURE = `
+    DELIMITER //
+
+    CREATE PROCEDURE CreateUser(
+        IN p_id BINARY(16),
+        IN p_email VARCHAR(100),
+        IN p_password VARCHAR(255),
+        IN p_firstName VARCHAR(50),
+        IN p_lastName VARCHAR(50),
+        IN p_DoB DATE
+    )
+    BEGIN
+        INSERT INTO users (
+            id, email, password, firstName, lastName, DoB
+        )
+        VALUES (
+            p_id, p_email, p_password, p_firstName, p_lastName, p_DoB
+        );
+    END //
+
+    CREATE PROCEDURE UpdateUser(
+        IN p_id BINARY(16),
+        IN p_firstName VARCHAR(50),
+        IN p_lastName VARCHAR(50),
+        IN p_phoneNo VARCHAR(15),
+        IN p_avatarUrl TEXT,
+        IN p_DoB DATE
+    )
+    BEGIN
+        UPDATE users
+        SET 
+            firstName = COALESCE(p_firstName, firstName),
+            lastName  = COALESCE(p_lastName, lastName),
+            phoneNo   = COALESCE(p_phoneNo, phoneNo),
+            avatarUrl = COALESCE(p_avatarUrl, avatarUrl),
+            DoB       = COALESCE(p_DoB, DoB) -- REMOVED COMMA HERE
+        WHERE id = p_id;
+    END //
+
+    CREATE PROCEDURE DeleteUser(
+        IN p_id BINARY(16)
+    )
+    BEGIN
+        UPDATE users
+        SET isActive = 0
+        WHERE id = p_id;
+    END //
+
+    CREATE PROCEDURE FindUserByEmail(
+        IN p_email VARCHAR(100)
+    )
+    BEGIN
+        SELECT *
+        FROM users
+        WHERE email = p_email;
+    END //
+
+    CREATE PROCEDURE FindUserById(
+        IN p_id BINARY(16)
+    )
+    BEGIN
+        SELECT 
+            id
+            email, 
+            firstName, 
+            lastName, 
+            DoB, 
+            isActive, 
+            phoneNo, 
+            avatarUrl
+        FROM users
+        WHERE id = p_id;
+    END //
+
+    DELIMITER ;
+`;
+
 export const CREATE_CLIENT_TABLE_QUERY = `
     CREATE TABLE clients (
         user_id BINARY(16) PRIMARY KEY,

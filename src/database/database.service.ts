@@ -32,7 +32,7 @@ export class DatabaseService implements OnModuleDestroy {
       const endTime = dayjs().toDate();
       const duration = dayjs(endTime).diff(dayjs(startTime), 'millisecond');
       this.logger.log(`Executed query in ${duration} ms: ${sql}`);
-      return results as QueryResult<T>;
+      return results[0] as QueryResult<T>;
     } catch (error) {
       this.logger.error(`Database query failed for ${sql}`, error.sqlMessage);
       if (callback[error.code]) {
