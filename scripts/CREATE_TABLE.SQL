@@ -16,7 +16,6 @@ CREATE TABLE clients (
     user_id BINARY(16) PRIMARY KEY,
     slug VARCHAR(10) NOT NULL UNIQUE,
     membership_points INT DEFAULT 0,
-    membership_tier ENUM('BRONZE', 'SILVER', 'GOLD', 'PLATINUM') DEFAULT 'BRONZE',
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT
 );
 
@@ -52,10 +51,12 @@ CREATE TABLE venue_types (
     venueType_id BINARY(16) PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
     description TEXT,
-    capacity INT NOT NULL CHECK (capacity > 0),
+    minCapacity INT NOT NULL CHECK (minCapacity > 0),
+    maxCapacity INT NOT NULL CHECK (maxCapacity > 0),
     area DECIMAL(10, 1) NOT NULL CHECK (area > 0),
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CHECK (maxCapacity >= minCapacity)
 );
 
 CREATE TABLE venues (
@@ -97,7 +98,7 @@ CREATE TABLE orders (
     order_id BINARY(16) PRIMARY KEY,
     client_id BINARY(16),
     venue_loc_id BINARY(16),
-    venueName VARCHAR(50),
+    venueName VARCHAR(100),
     totalPrice DECIMAL(12, 2) NOT NULL CHECK (totalPrice > 0),
     status ENUM('PENDING', 'CONFIRMED', 'CANCELLED') DEFAULT 'PENDING',
     startHour DATETIME NOT NULL,
@@ -141,11 +142,11 @@ CREATE TABLE invoices (
     invoice_id BINARY(16) PRIMARY KEY,
     order_id BINARY(16),
     amount DECIMAL(12, 2) NOT NULL CHECK (amount > 0),
-    status ENUM('PENDING', 'SUCCEEDED', 'FAILED', 'REFUNDED'),
-    senderBankAccount VARCHAR(50) NOT NULL,
-    receiverBankAccount VARCHAR(50) NOT NULL,
-    transaction_id VARCHAR(50) NOT NULL,
-    paidOn DATETIME NOT NULL,
+    status ENUM('PENDING', 'SUCCEEDED', 'FAILED', 'REFUNDED') DEFAULT 'PENDING',
+    senderBankAccount VARCHAR(50),
+    receiverBankAccount VARCHAR(50),
+    transaction_id VARCHAR(50),
+    paidOn DATETIME,
     description TEXT,
     FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE SET NULL
 );
