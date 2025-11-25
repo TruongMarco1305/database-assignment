@@ -24,6 +24,7 @@ export class DatabaseService implements OnModuleDestroy {
   public async execute<T>(
     sql: string,
     values?: any[],
+    callback?: Record<string, () => void>,
   ): Promise<QueryResult<T>> {
     try {
       const startTime = dayjs().toDate();
@@ -33,9 +34,13 @@ export class DatabaseService implements OnModuleDestroy {
       this.logger.log(`Executed query in ${duration} ms: ${sql}`);
       return results as QueryResult<T>;
     } catch (error) {
-      this.logger.error(`Database query failed for ${sql}`, error);
-      // Re-throw a custom error to maintain service layer abstraction
-      throw new InternalServerErrorException('Database operation failed.');
+      this.logger.error(`Database query failed for ${sql}`, error.sqlMessage);
+      if (callback[error.code]) {
+        callback[error.code]();
+      } else {
+        // Re-throw a custom error to maintain service layer abstraction
+        throw new InternalServerErrorException('Database operation failed.');
+      }
     }
   }
 

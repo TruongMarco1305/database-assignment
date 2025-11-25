@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { TableService } from 'src/database/table.service';
-import { Owner } from '../entities';
 import { CREATE_OWNER_TABLE_QUERY } from 'src/database/queries';
+import { OwnerSignupDto } from 'src/auth/auth.dto';
+import { convertUUIDtoBinaryHex } from 'src/utils';
 
 @Injectable()
 export class OwnerService extends TableService {
@@ -14,13 +15,18 @@ export class OwnerService extends TableService {
     super(databaseService);
   }
 
-  public async createNewOwner(userId: string) {
-    const owner = new Owner(userId);
+  public async createNewOwner(userId: string, ownerSignupDto: OwnerSignupDto) {
+    const { bankId, bankName, accountName, accountNumber } = ownerSignupDto;
     await this.databaseService.execute(
       `INSERT INTO ${this.tableName} (user_id, bankId, bankName, accountName, accountNo)
        VALUES (?, ?, ?, ?, ?)`,
-      [{ ...owner }],
+      [
+        convertUUIDtoBinaryHex(userId),
+        bankId,
+        bankName,
+        accountName,
+        accountNumber,
+      ],
     );
-    return owner;
   }
 }

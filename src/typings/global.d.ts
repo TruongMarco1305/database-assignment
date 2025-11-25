@@ -1,5 +1,3 @@
-import { Token } from '@/auth/entities';
-
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
@@ -20,8 +18,12 @@ declare global {
   }
 
   namespace Express {
+    interface Request {
+      customProps: object;
+    }
+
     interface User {
-      token: Token;
+      userId: string;
     }
   }
 }

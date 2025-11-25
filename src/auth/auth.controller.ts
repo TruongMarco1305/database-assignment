@@ -1,6 +1,8 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
-import { LoginDto, SignupDto } from './auth.dto';
+import { LoginDto, OwnerSignupDto, SignupDto } from './auth.dto';
+import { AuthGuard } from './guards/user.guard';
+import { User } from './decorators';
 
 @Controller('auth')
 export class AuthController {
@@ -9,6 +11,15 @@ export class AuthController {
   @Post('/signup')
   public async signup(@Body() signupDto: SignupDto) {
     return this.authService.signup(signupDto);
+  }
+
+  @Post('/owner/signup')
+  @UseGuards(AuthGuard)
+  public async ownerSignup(
+    @User() user: Express.User,
+    @Body() ownerSignupDto: OwnerSignupDto,
+  ) {
+    return this.authService.ownerSignup(user.userId, ownerSignupDto);
   }
 
   @Post('/login')

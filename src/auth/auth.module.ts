@@ -10,6 +10,7 @@ import { commonConfig, CommonConfigType } from 'src/config';
 @Module({
   imports: [
     JwtModule.registerAsync({
+      global: true,
       useFactory: (appCommonConfig: CommonConfigType) => ({
         secret: appCommonConfig.jwtSecret,
         signOptions: { expiresIn: '1y' },
@@ -21,5 +22,6 @@ import { commonConfig, CommonConfigType } from 'src/config';
   ],
   controllers: [AuthController],
   providers: [AuthService, TokenService],
+  exports: [TokenService],
 })
 export class AuthModule {}

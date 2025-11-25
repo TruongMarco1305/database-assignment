@@ -14,3 +14,10 @@ export class LoginDto {
 export class GoogleLoginDto {
   readonly tokenId: string;
 }
+
+export class OwnerSignupDto {
+  bankId: string;
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+}

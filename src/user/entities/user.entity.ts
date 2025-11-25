@@ -1,23 +1,13 @@
-import { CreateUserInterface } from '../user.interface';
-
 export class User {
-  public id: string;
+  public id: Buffer;
   public email: string;
   public password: string;
   public firstName: string;
   public lastName: string;
-  public phoneNo: string;
-  public avatarURL: string;
+  public phoneNo: string | null;
+  public avatarURL: string | null;
   public DoB: Date;
+  public isActive: number;
   public createdAt: Date;
   public updatedAt: Date;
-
-  constructor(data: CreateUserInterface) {
-    const { email, password, firstName, lastName, DoB } = data;
-    this.email = email;
-    this.password = password;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.DoB = new Date(DoB);
-  }
 }
