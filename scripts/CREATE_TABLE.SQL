@@ -7,6 +7,7 @@ CREATE TABLE users (
     phoneNo VARCHAR(15) CHECK (LENGTH(phoneNo) = 10),
     avatarURL VARCHAR(255),
     DoB DATE, -- valid
+    isActive BOOLEAN DEFAULT 1,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
