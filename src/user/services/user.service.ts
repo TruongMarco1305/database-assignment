@@ -9,7 +9,10 @@ import { TableService } from 'src/database/table.service';
 import { CreateUserInterface } from '../user.interface';
 import { LoginDto } from 'src/auth/auth.dto';
 import * as bcrypt from 'bcrypt';
-import { CREATE_USER_TABLE_QUERY } from 'src/database/queries';
+import {
+  CREATE_USER_PROCEDURE,
+  CREATE_USER_TABLE_QUERY,
+} from 'src/database/queries';
 import { v4 as uuidv4 } from 'uuid';
 import { convertBinaryHexToUUID, convertUUIDtoBinaryHex } from 'src/utils';
 import { User } from '../entities';
@@ -20,7 +23,7 @@ export class UserService extends TableService {
   protected readonly logger = new Logger(UserService.name);
   protected readonly tableName = 'users';
   protected readonly createTableQuery = CREATE_USER_TABLE_QUERY;
-
+  protected readonly postCreationQuery = CREATE_USER_PROCEDURE;
   constructor(databaseService: DatabaseService) {
     super(databaseService);
   }
@@ -30,8 +33,9 @@ export class UserService extends TableService {
     const hashedPassword = bcrypt.hashSync(password, 10);
     const userId = uuidv4();
     await this.databaseService.execute(
-      `INSERT INTO ${this.tableName} (id, email, password, firstName, lastName, DoB)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `
+      CALL CreateUser(?, ?, ?, ?, ?, ?);
+      `,
       [
         convertUUIDtoBinaryHex(userId),
         email,
@@ -52,7 +56,7 @@ export class UserService extends TableService {
   public async validateLoginCredentials(loginDto: LoginDto) {
     const { email, password } = loginDto;
     const result = await this.databaseService.execute<User>(
-      `SELECT * FROM ${this.tableName} WHERE email = ?`,
+      `Call FindUserByEmail(?)`,
       [email],
     );
     if (result.length === 0) {
@@ -68,7 +72,7 @@ export class UserService extends TableService {
 
   public async findUserById(userId: string): Promise<User> {
     const result = await this.databaseService.execute<User>(
-      `SELECT * FROM ${this.tableName} WHERE id = ?`,
+      `CALL FindUserById(?)`,
       [convertUUIDtoBinaryHex(userId)],
     );
     if (result.length === 0) {
@@ -89,14 +93,8 @@ export class UserService extends TableService {
       dob = null,
     } = updateUserDto;
     await this.databaseService.execute(
-      `UPDATE ${this.tableName}
-      SET
-        firstName        = COALESCE(?, firstName),
-        lastName = COALESCE(?, lastName),
-        phoneNo      = COALESCE(?, phoneNo),
-        avatarURL        = COALESCE(?, avatarURL),
-        DoB        = COALESCE(?, DoB)
-      WHERE id = ?
+      `
+      CALL UpdateUser(?, ?, ?, ?, ?);
       `,
       [
         firstName,
