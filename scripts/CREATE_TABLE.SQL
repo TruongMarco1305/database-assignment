@@ -17,7 +17,7 @@ CREATE TABLE clients (
     slug VARCHAR(10) NOT NULL UNIQUE,
     membership_points INT DEFAULT 0,
     membership_tier ENUM('BRONZE', 'SILVER', 'GOLD', 'PLATINUM') DEFAULT 'BRONZE',
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT
 );
 
 CREATE TABLE owners (
@@ -26,7 +26,7 @@ CREATE TABLE owners (
     bankName VARCHAR(100) NOT NULL, -- limited set
     accountName VARCHAR(50) NOT NULL,
     accountNo VARCHAR(50) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT
 );
 
 CREATE TABLE locations (
@@ -45,7 +45,7 @@ CREATE TABLE locations (
     isActive BOOLEAN DEFAULT 1,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (owner_id) REFERENCES owners(user_id) ON DELETE CASCADE
+    FOREIGN KEY (owner_id) REFERENCES owners(user_id) ON DELETE RESTRICT
 );
 
 CREATE TABLE venue_types (
@@ -96,8 +96,8 @@ CREATE TABLE amenities (
 CREATE TABLE orders (
     order_id BINARY(16) PRIMARY KEY,
     client_id BINARY(16),
-    venue_loc_id BINARY(16) NOT NULL,
-    venueName VARCHAR(50) NOT NULL,
+    venue_loc_id BINARY(16),
+    venueName VARCHAR(50),
     totalPrice DECIMAL(12, 2) NOT NULL CHECK (totalPrice > 0),
     status ENUM('PENDING', 'CONFIRMED', 'CANCELLED') DEFAULT 'PENDING',
     startHour DATETIME NOT NULL,
@@ -106,7 +106,7 @@ CREATE TABLE orders (
     expiredAt DATETIME NOT NULL,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (client_id) REFERENCES clients(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (client_id) REFERENCES clients(user_id) ON DELETE RESTRICT,
     FOREIGN KEY (venue_loc_id, venueName) REFERENCES venues(location_id, name) ON DELETE SET NULL,
     CHECK (HOUR(startHour) >= 6 AND HOUR(endHour) <= 23 AND DATE(startHour) = DATE(endHour)),
     CHECK (endHour > startHour)
@@ -158,7 +158,7 @@ CREATE TABLE rates (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (client_id, location_id),
-    FOREIGN KEY (client_id) REFERENCES clients(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (client_id) REFERENCES clients(user_id) ON DELETE RESTRICT,
     FOREIGN KEY (location_id) REFERENCES locations(location_id) ON DELETE CASCADE
 );
 
@@ -167,6 +167,6 @@ CREATE TABLE favors (
     location_id BINARY(16) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (client_id, location_id),
-    FOREIGN KEY (client_id) REFERENCES clients(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (client_id) REFERENCES clients(user_id) ON DELETE RESTRICT,
     FOREIGN KEY (location_id) REFERENCES locations(location_id) ON DELETE CASCADE
 );

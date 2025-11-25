@@ -1,0 +1,14 @@
+DROP TABLE amenities;
+DROP TABLE venue_images;
+DROP TABLE applies;
+DROP TABLE invoices;
+DROP TABLE orders;
+DROP TABLE venues;
+DROP TABLE discounts;
+DROP TABLE venue_types;
+DROP TABLE favors;
+DROP TABLE rates;
+DROP TABLE locations;
+DROP TABLE owners;
+DROP TABLE clients;
+DROP TABLE users;
