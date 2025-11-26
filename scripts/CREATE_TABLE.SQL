@@ -100,7 +100,7 @@ CREATE TABLE orders (
     venue_loc_id BINARY(16),
     venueName VARCHAR(100),
     totalPrice DECIMAL(12, 2) NOT NULL CHECK (totalPrice > 0),
-    status ENUM('PENDING', 'CONFIRMED', 'CANCELLED') DEFAULT 'PENDING',
+    status ENUM('PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED') DEFAULT 'PENDING',
     startHour DATETIME NOT NULL,
     endHour DATETIME NOT NULL,
     points INT NOT NULL,
