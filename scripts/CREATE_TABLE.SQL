@@ -1,10 +1,10 @@
 CREATE TABLE users (
     id BINARY(16) PRIMARY KEY,
     email VARCHAR(100) NOT NULL UNIQUE CHECK (email REGEXP '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$'),
-    password VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL CHECK (LENGTH(password) >= 8 AND password NOT LIKE '% %'),
     firstName VARCHAR(50) CHECK (firstName REGEXP '^[A-Za-z]+$'),
     lastName VARCHAR(50) CHECK (lastName REGEXP '^[A-Za-z]+$'),
-    phoneNo VARCHAR(15) CHECK (phoneNo REGEXP '^[0-9]+$'),
+    phoneNo VARCHAR(10) CHECK (phoneNo REGEXP '^[0-9]+$'),
     avatarURL TEXT,
     DoB DATE NOT NULL,
     isActive BOOLEAN DEFAULT 1,
@@ -38,7 +38,7 @@ CREATE TABLE locations (
     city VARCHAR(50) NOT NULL,
     avgRating DECIMAL(2,1) DEFAULT 0,
     policy TEXT,
-    phoneNo VARCHAR(15) CHECK (phoneNo REGEXP '^[0-9]+$'),
+    phoneNo VARCHAR(10) CHECK (phoneNo REGEXP '^[0-9]+$'),
     mapURL VARCHAR(255) NOT NULL,
     thumbnailURL VARCHAR(255) NOT NULL,
     isActive BOOLEAN DEFAULT 1,
@@ -110,7 +110,8 @@ CREATE TABLE orders (
     FOREIGN KEY (client_id) REFERENCES clients(user_id) ON DELETE RESTRICT,
     FOREIGN KEY (venue_loc_id, venueName) REFERENCES venues(location_id, name) ON DELETE SET NULL,
     CHECK (HOUR(startHour) >= 6 AND HOUR(endHour) <= 23 AND DATE(startHour) = DATE(endHour)),
-    CHECK (endHour > startHour)
+    CHECK (endHour > startHour),
+    CHECK (startHour >= DATE_ADD(createdAt, INTERVAL 4 HOUR))
 );
 
 CREATE TABLE discounts (
