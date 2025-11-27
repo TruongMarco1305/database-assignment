@@ -36,7 +36,17 @@ CREATE PROCEDURE Location_Update(
 )
 BEGIN
     UPDATE locations 
-    SET name = p_name, description = p_desc, addrNo = p_addrNo, ward = p_ward, city = p_city, phoneNo = p_phoneNo, policy = p_policy, mapURL = p_mapURL, thumbnailURL = p_thumbURL, isActive = p_isActive
+    SET 
+        name         = COALESCE(p_name, name),
+        description  = COALESCE(p_desc, description),
+        addrNo       = COALESCE(p_addrNo, addrNo),
+        ward         = COALESCE(p_ward, ward),
+        city         = COALESCE(p_city, city),
+        phoneNo      = COALESCE(p_phoneNo, phoneNo),
+        policy       = COALESCE(p_policy, policy),
+        mapURL       = COALESCE(p_mapURL, mapURL),
+        thumbnailURL = COALESCE(p_thumbURL, thumbnailURL),
+        isActive     = COALESCE(p_isActive, isActive)
     WHERE location_id = UUID_TO_BIN(p_id);
 END$$
 
