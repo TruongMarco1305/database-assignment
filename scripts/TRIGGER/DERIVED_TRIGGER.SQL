@@ -136,9 +136,11 @@ BEGIN
     SET avgRating = (
         SELECT IFNULL(AVG(stars), 0) 
         FROM rates 
-        WHERE location_id = NEW.location_id
+        -- SỬA LỖI: Đổi NEW thành OLD
+        WHERE location_id = OLD.location_id
     )
-    WHERE location_id = NEW.location_id;
+    -- SỬA LỖI: Đổi NEW thành OLD
+    WHERE location_id = OLD.location_id;
 END$$
 
 DELIMITER ;
