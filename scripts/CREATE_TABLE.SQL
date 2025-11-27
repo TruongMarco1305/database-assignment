@@ -78,20 +78,19 @@ CREATE TABLE venue_images (
     location_id BINARY(16) NOT NULL,
     venueName VARCHAR(100) NOT NULL,
     locationImgURL VARCHAR(255) NOT NULL,
-    FOREIGN KEY (location_id, venueName) REFERENCES venues(location_id, name) ON DELETE CASCADE
+    FOREIGN KEY (location_id, venueName) REFERENCES venues(location_id, name) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE amenities (
     amenity_id BINARY(16) PRIMARY KEY,
     location_id BINARY(16) NOT NULL, 
-    venueName VARCHAR(100) NOT NULL, 
     category VARCHAR(50) NOT NULL,
     description TEXT,
-    isActive BOOLEAN DEFAULT 1,
+    isActive BOOLEAN DEFAULT 1, -- 1 là đang trong kho sẵn sàng phục vụ, 0 thì là đang dùng hoặc hỏng
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (location_id) REFERENCES locations(location_id) ON DELETE CASCADE,
-    FOREIGN KEY (location_id, venueName) REFERENCES venues(location_id, name) ON DELETE RESTRICT
+    -- FOREIGN KEY (location_id, venueName) REFERENCES venues(location_id, name) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE orders (
@@ -108,10 +107,20 @@ CREATE TABLE orders (
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (client_id) REFERENCES clients(user_id) ON DELETE RESTRICT,
-    FOREIGN KEY (venue_loc_id, venueName) REFERENCES venues(location_id, name) ON DELETE SET NULL,
+    FOREIGN KEY (venue_loc_id, venueName) REFERENCES venues(location_id, name) ON DELETE SET NULL ON UPDATE CASCADE,
     CHECK (HOUR(startHour) >= 6 AND HOUR(endHour) <= 23 AND DATE(startHour) = DATE(endHour)),
     CHECK (endHour > startHour),
-    CHECK (startHour >= DATE_ADD(createdAt, INTERVAL 4 HOUR))
+    CHECK (startHour >= DATE_ADD(createdAt, INTERVAL 4 HOUR)) -- phải được đặt trước 4 tiếng
+);
+
+CREATE TABLE order_amenities (
+    order_id BINARY(16) NOT NULL,
+    amenity_id BINARY(16) NOT NULL,
+    
+    PRIMARY KEY (order_id, amenity_id),
+    
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (amenity_id) REFERENCES amenities(amenity_id) ON DELETE RESTRICT
 );
 
 CREATE TABLE discounts (
