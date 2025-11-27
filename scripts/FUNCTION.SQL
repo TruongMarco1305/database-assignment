@@ -2,7 +2,6 @@
 DELIMITER $$
 CREATE FUNCTION Cal_Age(birthDate DATE)
 RETURNS INT
-DETERMINISTIC
 BEGIN
     -- Tính số năm chênh lệch giữa ngày sinh và ngày hiện tại
     RETURN TIMESTAMPDIFF(YEAR, birthDate, CURDATE());
@@ -16,7 +15,7 @@ CREATE FUNCTION Get_Tier(p_points INT)
 RETURNS VARCHAR(20)
 DETERMINISTIC
 BEGIN
-    -- Logic quy đổi điểm (Bạn có thể sửa mốc điểm tùy ý)
+    -- Logic quy đổi điểm (có thể sửa mốc điểm)
     IF p_points >= 5000 THEN
         RETURN 'PLATINUM';
     ELSEIF p_points >= 2000 THEN
@@ -39,12 +38,19 @@ CREATE FUNCTION Calc_TotalPrice(
     p_end DATETIME
 )
 RETURNS DECIMAL(12, 2)
-DETERMINISTIC
 READS SQL DATA
 BEGIN
     DECLARE v_pricePerHour DECIMAL(10,2);
     DECLARE v_hours INT;
     DECLARE v_total DECIMAL(12,2);
+
+    IF p_start IS NULL OR p_end IS NULL THEN 
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid dates'; 
+    END IF;
+
+    IF p_start >= p_end THEN 
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='start must be before end'; 
+    END IF;
 
     -- 1. Lấy giá phòng
     SELECT pricePerHour INTO v_pricePerHour
@@ -53,7 +59,7 @@ BEGIN
 
     -- Nếu không tìm thấy phòng (phòng sai tên hoặc id), trả về 0 hoặc báo lỗi
     IF v_pricePerHour IS NULL THEN
-        RETURN 0;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Venue not found';
     END IF;
 
     -- 2. Tính số giờ (Làm tròn logic như cũ)
@@ -70,13 +76,12 @@ DELIMITER ;
 
 -- function phức tạp
 DELIMITER $$
-CREATE FUNCTION func_CalculateOwnerRevenue(
+CREATE FUNCTION Calc_OwnerRevenue(
     p_ownerId VARCHAR(36),
     p_startDate DATETIME,
     p_endDate DATETIME
 )
 RETURNS DECIMAL(15, 2)
-DETERMINISTIC
 READS SQL DATA
 BEGIN
     -- 1. Khai báo biến
@@ -101,13 +106,22 @@ BEGIN
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
     -- 4. Validate Input
+    IF p_startDate IS NULL OR p_endDate IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: startDate and endDate must be provided.';
+    END IF;
+
     IF p_startDate >= p_endDate THEN
-        RETURN -1; -- Trả về -1 để báo lỗi logic ngày tháng
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: startDate must be earlier than endDate.';
     END IF;
 
     SET v_owner_uuid = UUID_TO_BIN(p_ownerId);
 
+    IF v_owner_uuid IS NULL OR NOT EXISTS (SELECT 1 FROM owners WHERE user_id = v_owner_uuid) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Owner not found or invalid ownerId.';
+    END IF;
+
     -- 5. Mở Cursor và lặp
+    SET done = FALSE;
     OPEN cur_invoices;
 
     read_loop: LOOP
@@ -129,11 +143,10 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE FUNCTION func_GetLocationStatusReport(
+CREATE FUNCTION GetLocationStatusReport(
     p_locationId VARCHAR(36)
 )
 RETURNS TEXT
-DETERMINISTIC
 READS SQL DATA
 BEGIN
     -- 1. Khai báo biến
@@ -148,23 +161,29 @@ BEGIN
     DECLARE cur_venues CURSOR FOR 
         SELECT name 
         FROM venues 
-        WHERE location_id = v_loc_uuid;
+        WHERE location_id = v_loc_uuid
+        ORDER BY name;
 
     -- 3. Handler kết thúc loop
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
     -- 4. Validate Input
+    IF p_locationId IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: locationId is required.';
+    END IF;
+    
     SET v_loc_uuid = UUID_TO_BIN(p_locationId);
     
-    IF NOT EXISTS (SELECT 1 FROM locations WHERE location_id = v_loc_uuid) THEN
-        RETURN 'Error: Location not found';
+    IF v_loc_uuid IS NULL OR NOT EXISTS (SELECT 1 FROM locations WHERE location_id = v_loc_uuid) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Location not found or invalid locationId.';
     END IF;
 
     -- 5. Mở Cursor
+    SET done = FALSE;
     OPEN cur_venues;
 
     -- Khởi tạo tiêu đề báo cáo
-    SET v_report = CONCAT('Status Report for Location (', NOW(), '): \n');
+    SET v_report = CONCAT('Status Report for Location (', p_locationId, ') at (', NOW(), '): \n');
 
     read_loop: LOOP
         FETCH cur_venues INTO v_venueName;
@@ -174,12 +193,12 @@ BEGIN
         END IF;
 
         -- Logic kiểm tra xem phòng có đang bận không
-        -- Phòng bận nếu có đơn hàng CONFIRMED mà (Start <= NOW <= End)
+        -- Phòng bận nếu có đơn hàng CONFIRMED hoặc PENDING mà (Start <= NOW <= End)
         SELECT COUNT(*) INTO v_isBusy
         FROM orders
         WHERE venue_loc_id = v_loc_uuid 
           AND venueName = v_venueName
-          AND status = 'CONFIRMED'
+          AND status IN ('CONFIRMED', 'PENDING')
           AND NOW() BETWEEN startHour AND endHour;
 
         IF v_isBusy > 0 THEN
