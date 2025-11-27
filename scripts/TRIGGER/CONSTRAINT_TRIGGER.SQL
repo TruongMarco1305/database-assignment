@@ -51,7 +51,6 @@ DELIMITER ;
 
 -- apply
 DELIMITER $$
-
 CREATE TRIGGER Check_ApplyDiscount
 BEFORE INSERT ON applies
 FOR EACH ROW
@@ -67,8 +66,8 @@ BEGIN
     DECLARE v_orderTotal DECIMAL(12,2);
     DECLARE v_bookingDate DATETIME;
     DECLARE v_orderVenueType BINARY(16);
-    DECLARE v_clientPoints INT;          -- Thay vì lấy Tier, ta lấy Points
-    DECLARE v_calculatedTier VARCHAR(20); -- Biến lưu Tier sau khi tính
+    DECLARE v_clientPoints INT;
+    DECLARE v_clientTier VARCHAR(20); -- SỬA: Đặt tên thống nhất là v_clientTier
 
     -- 1. Lấy thông tin Mã giảm giá
     SELECT minPrice, startedAt, expiredAt, venueTypeId, membershipTier
@@ -84,9 +83,10 @@ BEGIN
     WHERE o.order_id = NEW.order_id;
 
     -- 3. Tính hạng thành viên ngay lập tức (Dynamic Calculation)
+    -- Lưu ý: Đảm bảo bạn đã tạo function tên là 'Get_Tier' trong database
     SET v_clientTier = Get_Tier(v_clientPoints);
 
-    -- 3. Bắt đầu kiểm tra
+    -- 4. Bắt đầu kiểm tra
     -- Check 1: Thời gian hiệu lực (So với ngày tạo đơn)
     IF v_bookingDate < v_start OR v_bookingDate > v_end THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Discount code is expired or not yet active.';
@@ -103,7 +103,7 @@ BEGIN
     END IF;
 
     -- Check 4: Hạng thành viên (Nếu discount có quy định)
-    -- Dùng FIND_IN_SET vì membershipTier là kiểu SET
+    -- Dùng FIND_IN_SET vì membershipTier là kiểu SET, còn v_clientTier là chuỗi đơn
     IF v_tiers IS NOT NULL AND NOT FIND_IN_SET(v_clientTier, v_tiers) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Your membership tier is not eligible for this discount.';
     END IF;
