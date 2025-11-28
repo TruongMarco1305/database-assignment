@@ -94,15 +94,15 @@ export class UserService extends TableService {
     } = updateUserDto;
     await this.databaseService.execute(
       `
-      CALL UpdateUser(?, ?, ?, ?, ?);
+      CALL UpdateUser(?, ?, ?, ?, ?, ?);
       `,
       [
+        convertUUIDtoBinaryHex(userId),
         firstName,
         lastName,
         phoneNumber,
         avatar,
         dob,
-        convertUUIDtoBinaryHex(userId),
       ],
     );
   }

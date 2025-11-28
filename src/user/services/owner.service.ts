@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { TableService } from 'src/database/table.service';
 import { CREATE_OWNER_TABLE_QUERY } from 'src/database/queries';
@@ -28,5 +28,15 @@ export class OwnerService extends TableService {
         accountNumber,
       ],
     );
+  }
+
+  public async findOwnerByClientId(userId: string) {
+    const result = await this.databaseService.execute<{ user_id: Buffer }>(
+      `SELECT * FROM owners WHERE user_id=?`,
+      [convertUUIDtoBinaryHex(userId)],
+    );
+    if (!result) {
+      throw new NotFoundException('Owner not found');
+    }
   }
 }
