@@ -1,69 +1,78 @@
-CREATE DEFINER=`stackops`@`%` PROCEDURE `booking`.`getListLocations`(
+DELIMITER $$
+CREATE PROCEDURE getListLocations(
     IN p_city VARCHAR(50),
     IN p_minCapacity INT,
     IN p_startTime DATETIME,
     IN p_endTime DATETIME,
     IN p_minPrice DECIMAL(10, 2),
     IN p_maxPrice DECIMAL(10, 2),
-    IN p_minArea INT,
     IN p_minAvgRating DECIMAL(2, 1),
     -- IN p_clientId VARCHAR(255),
     -- IN p_onlyFavorites BOOLEAN,
+    IN p_venueTypeName VARCHAR(50),   -- VD: 'Small', 'Medium', 'Large' (Thay cho minCapacity/Area)
+    IN p_amenityCategory VARCHAR(50), -- VD: 'Projector_Kit' (Check trong kho Location)
     IN p_sort VARCHAR(4)
 )
 BEGIN
 SELECT
-    location.location_id,
-    location.name AS locationName,
-    location.description AS locationDescription,
-    location.addrNo,
-    location.ward,
-    location.city,
-    location.avgRating,
-    location.policy,
-    location.phoneNo AS locationPhone,
-    venue.name AS venueName,
-    venue.floor,
-    venue.isActive AS venueIsActive,
-    venueType.venueType_id,
-    venueType.name AS venueTypeName,
-    venueType.description AS venueTypeDescription,
-    venueType.pricePerHour,
-    venueType.capacity,
-    venueType.area
+    -- 1. Thông tin Location (Địa điểm cha)
+    BIN_TO_UUID(l.location_id) AS location_id,
+    l.name AS location_name,
+    l.addrNo,
+    l.ward,
+    l.city,
+    l.avgRating,
+    l.thumbnailURL,
+    l.mapURL,
+    l.phoneNo AS location_phone,
+    -- 2. Thông tin Venue (Phòng cụ thể)
+    v.name AS venue_name,
+    v.floor,
+    v.pricePerHour,
+    -- 3. Thông tin Venue Type (Chi tiết kỹ thuật)
+    vt.name AS type_name,
+    vt.minCapacity,
+    vt.maxCapacity,
+    vt.area
     -- CASE
     --     WHEN favourite.client_id IS NULL THEN 0
     --     ELSE 1
     -- END AS isFavoriteForUser
 FROM
-    locations location
-    JOIN venues venue ON venue.location_id = location.location_id
-    JOIN venue_types venueType ON venueType.venueType_id = venue.venueType_id
+    locations l
+    JOIN venues v ON v.location_id = l.location_id
+    LEFT JOIN venue_types vt ON v.venueType_id = vt.venueType_id
     -- LEFT JOIN FAVORS favourite ON favourite.location_id = location.location_id
     -- AND favourite.client_id = p_clientId
 WHERE
-    location.city = p_city
-    AND location.isActive = 1
-    AND venue.isActive = 1
+    l.city = p_city
+    AND l.isActive = 1
+    AND v.isActive = 1
+    -- 4. Lọc theo Venue Type (Thay thế cho Capacity/Area)
+    -- Logic: Khách chọn loại 'Medium' -> Hiện tất cả phòng thuộc loại Medium
+    AND (p_venueTypeName IS NULL OR vt.name = p_venueTypeName)
+    -- 5. Lọc theo Tiện nghi (Amenity)
+    -- Logic: Kiểm tra xem Location này có sở hữu món đồ này không (trong kho hoặc trong phòng bất kỳ)
     AND (
-        p_minCapacity IS NULL
-        OR venueType.capacity >= p_minCapacity
-    )
-    AND (
-        p_minArea IS NULL
-        OR venueType.area >= p_minArea
+        p_amenityCategory IS NULL 
+        OR EXISTS (
+            SELECT 1 FROM amenities a
+            WHERE a.location_id = l.location_id -- Chỉ cần thuộc Location này là được
+                AND a.category = p_amenityCategory
+                AND a.isActive = 1
+        )
     )
     AND (
         p_minAvgRating IS NULL
-        OR location.avgRating >= p_minAvgRating
+        OR l.avgRating >= p_minAvgRating
     )
     AND (
         p_minPrice IS NULL
-        OR venueType.pricePerHour >= p_minPrice
+        OR v.pricePerHour >= p_minPrice
     )
     AND (
         p_maxPrice IS NULL
-        OR venueType.pricePerHour <= p_maxPrice
+        OR v.pricePerHour <= p_maxPrice
     )
     -- AND (
     --     p_clientId IS NULL
@@ -71,39 +80,36 @@ WHERE
     --     OR favourite.client_id IS NOT NULL
     -- )
     AND (
-        p_startTime IS NULL
-        OR p_endTime IS NULL
-        -- OR NOT EXISTS (
-        --     SELECT
-        --         1
-        --     FROM
-        --         ORDERS o
-        --     WHERE
-        --         o.venue_loc_id = venue.location_id
-        --         AND o.venueName = venue.name
-        --         AND (
-        --             (
-        --                 o.status = 'Pending'
-        --                 AND o.expiredAt > CURRENT_TIMESTAMP
-        --             )
-        --             OR o.status = 'Confirmed'
-        --         )
-        --         AND o.startHour < p_endTime
-        --         AND o.endHour > p_startTime
-        -- )
-    )
+            p_startTime IS NULL OR p_endTime IS NULL
+            OR NOT EXISTS (
+                SELECT 1 
+                FROM orders o
+                WHERE o.venue_loc_id = v.location_id 
+                  AND o.venueName = v.name
+                  AND o.status IN ('PENDING', 'CONFIRMED') -- Không quan tâm đơn đã hủy hoặc hoàn tất
+                  AND (
+                      -- Logic trùng lịch: (StartA < EndB) AND (EndA > StartB)
+                      o.startHour < p_endTime AND o.endHour > p_startTime
+                  )
+            )
+        )
     -- Sort by price (tăng dần)
-ORDER BY
-    CASE
-        WHEN p_sort = 'ASC' THEN venueType.pricePerHour
-    END ASC,
-    CASE
-        WHEN p_sort = 'DESC' THEN venueType.pricePerHour
-    END DESC;
+-- Sắp xếp kết quả
+    ORDER BY
+        CASE 
+            WHEN p_sort = 'PRICE_ASC' THEN v.pricePerHour 
+        END ASC,
+        CASE 
+            WHEN p_sort = 'PRICE_DESC' THEN v.pricePerHour 
+        END DESC,
+        CASE 
+            WHEN p_sort = 'RATING' THEN l.avgRating 
+        END DESC,
+        -- Mặc định sắp xếp theo tên Location nếu không chọn gì
+        l.name ASC;
+END$$
 
-END
-
-DELIMITER //
+DELIMITER ;
 
 CREATE PROCEDURE ListLocations (
     IN p_city VARCHAR(50),
