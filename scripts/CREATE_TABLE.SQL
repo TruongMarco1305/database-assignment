@@ -8,6 +8,7 @@ CREATE TABLE users (
     avatarURL TEXT,
     DoB DATE NOT NULL,
     isActive BOOLEAN DEFAULT 1,
+    isAdmin BOOLEAN DEFAULT 0,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -87,7 +88,7 @@ CREATE TABLE amenities (
     category VARCHAR(50) NOT NULL,
     description TEXT,
     price DECIMAL(12, 2) NOT NULL DEFAULT 0 CHECK (price >= 0), -- THÊM CỘT GIÁ (Giá thuê niêm yết)
-    compatibleSize SET('Small', 'Medium', 'Large', 'Exclusive') DEFAULT NULL, -- NULL là cho mọi size
+    compatibleSize SET('Small', 'Medium', 'Large') DEFAULT NULL, -- NULL là cho mọi size
     isActive BOOLEAN DEFAULT 1, -- 1 là đang trong kho sẵn sàng phục vụ, 0 thì là đang dùng hoặc hỏng
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

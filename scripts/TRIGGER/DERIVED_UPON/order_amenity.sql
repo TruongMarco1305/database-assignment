@@ -1,5 +1,5 @@
 DELIMITER $$
-CREATE TRIGGER Update_AmenityPrice_Points
+CREATE TRIGGER Insert_AmenityPrice_Points
 AFTER INSERT ON order_amenities
 FOR EACH ROW
 BEGIN
