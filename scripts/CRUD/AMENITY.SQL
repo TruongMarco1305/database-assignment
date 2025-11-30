@@ -7,11 +7,25 @@ CREATE PROCEDURE Amenity_Insert(
     IN p_locId VARCHAR(36),
     IN p_category VARCHAR(50),
     IN p_desc TEXT,
-    IN p_price DECIMAL(12,2)
+    IN p_price DECIMAL(12,2),
+    IN p_compatibleSize VARCHAR(50)
 )
 BEGIN
-    INSERT INTO amenities (amenity_id, location_id, category, description, price)
-    VALUES (UUID_TO_BIN(p_id), UUID_TO_BIN(p_locId), p_category, p_desc, p_price);
+    DECLARE v_locId BINARY(16);
+    SET v_locId = UUID_TO_BIN(p_locId);
+
+    -- 1. Validate Location Existence (Foreign Key)
+    IF NOT EXISTS (SELECT 1 FROM locations WHERE location_id = v_locId) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Location does not exist.';
+    END IF;
+
+    -- 2. Validate Price
+    IF p_price < 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Price cannot be negative.';
+    END IF;
+
+    INSERT INTO amenities (amenity_id, location_id, category, description, price, compatibleSize)
+    VALUES (UUID_TO_BIN(p_id), v_locId, p_category, p_desc, p_price, p_compatibleSize);
 END$$
 
 -- Update Amenity
@@ -20,21 +34,31 @@ CREATE PROCEDURE Amenity_Update(
     IN p_category VARCHAR(50),
     IN p_desc TEXT,
     IN p_price DECIMAL(12,2),
+    IN p_compatibleSize VARCHAR(50),
     IN p_isActive BOOLEAN
 )
 BEGIN
-    -- Validate Price (Nếu có truyền vào thì mới check)
+    DECLARE v_id BINARY(16);
+    SET v_id = UUID_TO_BIN(p_id);
+
+    -- 1. Check Existence
+    IF NOT EXISTS (SELECT 1 FROM amenities WHERE amenity_id = v_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Amenity does not exist.';
+    END IF;
+
+    -- 2. Validate Price
     IF p_price IS NOT NULL AND p_price < 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Price cannot be negative.';
     END IF;
 
     UPDATE amenities 
     SET 
-        category = COALESCE(p_category, category),
-        description = COALESCE(p_desc, description),
-        price       = COALESCE(p_price, price), -- Cập nhật giá
-        isActive = COALESCE(p_isActive, isActive)
-    WHERE amenity_id = UUID_TO_BIN(p_id);
+        category       = COALESCE(p_category, category),
+        description    = COALESCE(p_desc, description),
+        price          = COALESCE(p_price, price),
+        compatibleSize = COALESCE(p_compatibleSize, compatibleSize),
+        isActive       = COALESCE(p_isActive, isActive)
+    WHERE amenity_id = v_id;
 END$$
 
 -- Delete Amenity
@@ -48,8 +72,8 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Amenity does not exist.';
     END IF;
 
-    -- 2. Constraint Check: Không xóa nếu đã có trong lịch sử đơn hàng
-    -- (Dù active hay inactive, nếu đã từng nằm trong order thì không được xóa để bảo toàn lịch sử)
+    -- 2. Constraint Check: ORDER HISTORY
+    -- Không được xóa thiết bị đã từng được thuê (để bảo toàn lịch sử đơn hàng cũ)
     IF EXISTS (SELECT 1 FROM order_amenities WHERE amenity_id = v_id) THEN
         SIGNAL SQLSTATE '45000' 
         SET MESSAGE_TEXT = 'Error: Cannot delete amenity because it is linked to existing orders. Please set isActive=0 instead.';

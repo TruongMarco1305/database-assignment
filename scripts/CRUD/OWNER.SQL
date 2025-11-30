@@ -10,6 +10,9 @@ CREATE PROCEDURE Owner_Insert(
     IN p_accNo VARCHAR(50)
 )
 BEGIN
+    DECLARE v_uuid BINARY(16);
+    SET v_uuid = UUID_TO_BIN(p_userId); -- <--- Đã thêm dòng này
+    
     -- 1. Check Required Fields
     IF p_bankId IS NULL OR p_bankName IS NULL OR p_accName IS NULL OR p_accNo IS NULL THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: All bank details are required.';

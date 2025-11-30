@@ -1,3 +1,4 @@
+DROP TABLE order_amenities;
 DROP TABLE amenities;
 DROP TABLE venue_images;
 DROP TABLE applies;

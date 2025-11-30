@@ -2,12 +2,29 @@
 DELIMITER $$
 
 -- 1. Invoice_Create (TỐI ƯU: Bỏ tham số status)
-CREATE PROCEDURE Invoice_Create(
+CREATE PROCEDURE Invoice_Insert(
     IN p_id VARCHAR(36),
     IN p_orderId VARCHAR(36),
     IN p_amount DECIMAL(12,2)
 )
 BEGIN
+    DECLARE v_orderId BINARY(16);
+    SET v_orderId = UUID_TO_BIN(p_orderId);
+
+    -- 1. Validate Amount
+    IF p_amount <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Invoice amount must be greater than 0.';
+    END IF;
+
+    -- 2. Validate Order Existence
+    IF NOT EXISTS (SELECT 1 FROM orders WHERE order_id = v_orderId) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Order does not exist.';
+    END IF;
+
+    -- 3. Validate Duplicate (1 Order - 1 Invoice)
+    IF EXISTS (SELECT 1 FROM invoices WHERE order_id = v_orderId) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: An Invoice already exists for this Order.';
+    END IF;
     -- Chỉ insert 3 cột cốt lõi. 
     -- Cột 'status' sẽ tự động nhận giá trị 'PENDING' từ Default của bảng.
     -- Các cột bank, transaction, paidOn, description sẽ tự nhận NULL.
@@ -33,15 +50,29 @@ CREATE PROCEDURE Invoice_CompletePayment(
     IN p_desc TEXT  -- <--- Bổ sung tham số này
 )
 BEGIN
+    DECLARE v_id BINARY(16);
+    SET v_id = UUID_TO_BIN(p_id);
+
+    -- 1. Check Existence
+    IF NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_id = v_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Invoice does not exist.';
+    END IF;
+
+    -- 2. Validate Transaction Info (Bắt buộc phải có)
+    IF p_transId IS NULL OR p_transId = '' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Transaction ID is required for completed payments.';
+    END IF;
+
+    -- Execute Update
     UPDATE invoices 
     SET 
         status = 'SUCCEEDED',
         senderBankAccount = p_senderBank,
         receiverBankAccount = p_recvBank,
         transaction_id = p_transId,
-        description = p_desc, -- <--- Cập nhật nội dung tại đây
+        description = p_desc,
         paidOn = NOW()
-    WHERE invoice_id = UUID_TO_BIN(p_id);
+    WHERE invoice_id = v_id;
 END$$
 
 -- 3. Invoice_UpdateStatus (Dùng cho FAILED/REFUNDED)
@@ -52,16 +83,32 @@ CREATE PROCEDURE Invoice_UpdateStatus(
     IN p_desc TEXT -- <--- Thêm lý do lỗi (VD: "Số dư không đủ")
 )
 BEGIN
+    DECLARE v_id BINARY(16);
+    SET v_id = UUID_TO_BIN(p_id);
+
+    -- 1. Check Existence
+    IF NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_id = v_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Invoice does not exist.';
+    END IF;
+
+    -- 2. Validate Status Enum
+    IF p_status NOT IN ('PENDING', 'SUCCEEDED', 'FAILED', 'REFUNDED') THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Invalid status value.';
+    END IF;
+
+    -- Execute Update
     UPDATE invoices 
     SET 
         status = p_status,
         description = p_desc
-    WHERE invoice_id = UUID_TO_BIN(p_id);
+    WHERE invoice_id = v_id;
 END$$
 
 -- 4. Invoice_Delete (Giữ nguyên)
 CREATE PROCEDURE Invoice_Delete(IN p_id VARCHAR(36))
 BEGIN
+    SIGNAL SQLSTATE '45000' 
+    SET MESSAGE_TEXT = 'Error: STRICT POLICY - Invoices cannot be deleted under any circumstances to maintain financial audit trails. Please update status to FAILED or REFUNDED instead.';
     DELETE FROM invoices WHERE invoice_id = UUID_TO_BIN(p_id);
 END$$
 
