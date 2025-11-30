@@ -47,13 +47,12 @@ CREATE TABLE locations (
     FOREIGN KEY (owner_id) REFERENCES owners(user_id) ON DELETE RESTRICT
 );
 
-CREATE TABLE venue_types (
+CREATE TABLE venue_types ( 
     venueType_id BINARY(16) PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(50) NOT NULL UNIQUE, -- Minimalist, Luxury, Outdoor
     description TEXT,
-    minCapacity INT NOT NULL CHECK (minCapacity > 0),
+    minCapacity INT NOT NULL CHECK (minCapacity > 0), -- 3 type small 0-40, medium 40-80, large 80-120
     maxCapacity INT NOT NULL CHECK (maxCapacity > 0),
-    area DECIMAL(10, 1) NOT NULL CHECK (area > 0),
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CHECK (maxCapacity >= minCapacity)
@@ -64,13 +63,14 @@ CREATE TABLE venues (
     name VARCHAR(100) NOT NULL,
     venueType_id BINARY(16),
     floor VARCHAR(10) NOT NULL,
+    area DECIMAL(10, 1) NOT NULL CHECK (area > 0),
     pricePerHour DECIMAL(10, 2) NOT NULL CHECK (pricePerHour > 0),
     isActive BOOLEAN DEFAULT 1,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (location_id, name),
     FOREIGN KEY (location_id) REFERENCES locations(location_id) ON DELETE CASCADE,
-    FOREIGN KEY (venueType_id) REFERENCES venue_types(venueType_id) ON DELETE SET NULL
+    FOREIGN KEY (venueType_id) REFERENCES venue_types(venueType_id) ON DELETE RESTRICT
 );
 
 CREATE TABLE venue_images (
@@ -87,6 +87,7 @@ CREATE TABLE amenities (
     category VARCHAR(50) NOT NULL,
     description TEXT,
     price DECIMAL(12, 2) NOT NULL DEFAULT 0 CHECK (price >= 0), -- THÊM CỘT GIÁ (Giá thuê niêm yết)
+    compatibleSize SET('Small', 'Medium', 'Large', 'Exclusive') DEFAULT NULL, -- NULL là cho mọi size
     isActive BOOLEAN DEFAULT 1, -- 1 là đang trong kho sẵn sàng phục vụ, 0 thì là đang dùng hoặc hỏng
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
