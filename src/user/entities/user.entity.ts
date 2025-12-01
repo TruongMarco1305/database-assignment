@@ -8,6 +8,7 @@ export class User {
   public avatarURL: string | null;
   public DoB: Date;
   public isActive: number;
+  public isAdmin: number;
   public createdAt: Date;
   public updatedAt: Date;
 }
