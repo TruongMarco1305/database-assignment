@@ -17,8 +17,7 @@ export class ClientService extends TableService {
   public async createNewClient(userId: string) {
     const slug = `${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
     await this.databaseService.execute(
-      `INSERT INTO ${this.tableName} (user_id, slug)
-       VALUES (?, ?)`,
+      `Call Client_Insert(?, ?);`,
       [convertUUIDtoBinaryHex(userId), slug],
     );
   }
