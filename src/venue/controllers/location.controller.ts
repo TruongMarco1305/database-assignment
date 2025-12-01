@@ -1,5 +1,5 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { OwnerGuard } from 'src/auth/guards/owner.guard';
+import { Body, Controller, Post } from '@nestjs/common';
+// import { OwnerGuard } from 'src/auth/guards/owner.guard';
 import { CreateLocationDto } from '../dto/create-venue.dto';
 import { User } from 'src/auth/decorators';
 import { LocationService } from '../services/location.service';
@@ -9,7 +9,7 @@ export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
   @Post()
-  @UseGuards(OwnerGuard)
+  // @UseGuards(OwnerGuard)
   async create(
     @Body() createLocationDto: CreateLocationDto,
     @User() user: Express.User,
