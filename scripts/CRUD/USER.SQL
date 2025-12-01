@@ -76,7 +76,8 @@ CREATE PROCEDURE User_Update(
     IN p_phoneNo VARCHAR(15),
     IN p_avatarURL TEXT,
     IN p_DoB DATE,
-    IN p_isActive BOOLEAN
+    IN p_isActive BOOLEAN,
+    IN p_isAdmin BOOLEAN
 )
 BEGIN
 DECLARE v_id BINARY(16);
@@ -114,7 +115,8 @@ DECLARE v_id BINARY(16);
         phoneNo   = COALESCE(p_phoneNo, phoneNo),
         avatarURL = COALESCE(p_avatarURL, avatarURL),
         DoB       = COALESCE(p_DoB, DoB),
-        isActive  = COALESCE(p_isActive, isActive)
+        isActive  = COALESCE(p_isActive, isActive),
+        isAdmin   = COALESCE(p_isAdmin, isAdmin)
     WHERE id = v_id;
 END$$
 
