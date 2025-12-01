@@ -59,27 +59,27 @@ BEGIN
     WHERE user_id = v_uuid;
 END$$
 
--- Delete Owner
-CREATE PROCEDURE Owner_Delete(IN p_userId VARCHAR(36))
-BEGIN
-    DECLARE v_uuid BINARY(16);
-    SET v_uuid = UUID_TO_BIN(p_userId);
+-- -- Delete Owner
+-- CREATE PROCEDURE Owner_Delete(IN p_userId VARCHAR(36))
+-- BEGIN
+--     DECLARE v_uuid BINARY(16);
+--     SET v_uuid = UUID_TO_BIN(p_userId);
 
-    -- 1. Check Existence
-    IF NOT EXISTS (SELECT 1 FROM owners WHERE user_id = v_uuid) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Owner does not exist.';
-    END IF;
+--     -- 1. Check Existence
+--     IF NOT EXISTS (SELECT 1 FROM owners WHERE user_id = v_uuid) THEN
+--         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Owner does not exist.';
+--     END IF;
 
-    -- 2. Constraint Check: LOCATIONS
-    -- Reason: Cannot delete an owner who manages active locations. 
-    -- Deleting the owner would cascade delete all locations (due to FK settings), potentially destroying critical business data.
-    IF EXISTS (SELECT 1 FROM locations WHERE owner_id = v_uuid) THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Error: Cannot delete Owner. This Owner has registered Locations. Please delete or reassign locations first.';
-    END IF;
+--     -- 2. Constraint Check: LOCATIONS
+--     -- Reason: Cannot delete an owner who manages active locations. 
+--     -- Deleting the owner would cascade delete all locations (due to FK settings), potentially destroying critical business data.
+--     IF EXISTS (SELECT 1 FROM locations WHERE owner_id = v_uuid) THEN
+--         SIGNAL SQLSTATE '45000' 
+--         SET MESSAGE_TEXT = 'Error: Cannot delete Owner. This Owner has registered Locations. Please delete or reassign locations first.';
+--     END IF;
 
-    -- Execute Delete
-    DELETE FROM owners WHERE user_id = v_uuid;
-END$$
+--     -- Execute Delete
+--     DELETE FROM owners WHERE user_id = v_uuid;
+-- END$$
 
 DELIMITER ;

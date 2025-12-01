@@ -1,6 +1,6 @@
 DELIMITER $$
-CREATE TRIGGER 
-BEFORE INSERT ON Check_ExistOrderAme
+CREATE TRIGGER Check_ExistOrderAme
+BEFORE INSERT ON order_amenities
 FOR EACH ROW
 BEGIN
     DECLARE v_currentStart DATETIME;
