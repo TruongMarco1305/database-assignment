@@ -16,9 +16,9 @@ BEGIN
     END IF;
 
     -- 2. Validate Duplicate Name
-    IF EXISTS (SELECT 1 FROM venue_types WHERE name = p_name) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue Type name already exists.';
-    END IF;
+    -- IF EXISTS (SELECT 1 FROM venue_types WHERE name = p_name) THEN
+    --     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue Type name already exists.';
+    -- END IF;
 
     -- 3. Validate Capacity Logic
     IF p_minCap <= 0 OR p_maxCap <= 0 THEN
@@ -56,9 +56,9 @@ BEGIN
     END IF;
 
     -- 2. Validate Duplicate Name (Nếu đổi tên khác, tên đó phải chưa tồn tại)
-    IF p_name IS NOT NULL AND EXISTS (SELECT 1 FROM venue_types WHERE name = p_name AND venueType_id != v_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue Type name already exists.';
-    END IF;
+    -- IF p_name IS NOT NULL AND EXISTS (SELECT 1 FROM venue_types WHERE name = p_name AND venueType_id != v_id) THEN
+    --     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue Type name already exists.';
+    -- END IF;
 
     -- 3. Validate Capacity Logic (Phức tạp hơn vì là Partial Update)
     -- Phải lấy giá trị cũ ra để so sánh với giá trị mới (nếu người dùng chỉ update 1 trong 2)

@@ -1,24 +1,81 @@
--- DISCOUNTS
-INSERT INTO discounts (discount_id, name, percentage, maxDiscountPrice, minPrice, venueTypeId, membershipTier, startedAt, expiredAt)
-VALUES
-  -- General holiday discount for many tiers
-  (UUID_TO_BIN('d4000001-0000-0000-0000-000000000001'),
-   'Holiday Special',
-   20,
-   300.00,
-   100.00,
-   NULL,
-   'SILVER,GOLD,PLATINUM',
-   '2025-11-01 00:00:00',
-   '2025-12-31 23:59:59'),
+-- =============================================================================
+-- 1. WELCOME10 (Cơ bản: All Venues, All Tiers)
+-- ID: dddd0000-...
+-- =============================================================================
+CALL Discount_Insert(
+    'dddd0000-0000-0000-0000-000000000001',  -- Đã sửa ID
+    'WELCOME10',                             
+    10,                                      
+    500000.00,                               
+    0,                                       
+    NULL,                                    
+    NULL,                                    
+    NOW(),                                   
+    DATE_ADD(NOW(), INTERVAL 1 MONTH)        
+);
 
-  -- Conference-specific promo (applies to venueType Conference Hall)
-  (UUID_TO_BIN('d4000002-0000-0000-0000-000000000002'),
-   'Conference Promo',
-   15,
-   200.00,
-   150.00,
-   UUID_TO_BIN('12121212-1212-1212-1212-121212121212'), -- Conference Hall type
-   'GOLD,PLATINUM',
-   '2025-10-01 00:00:00',
-   '2025-11-30 23:59:59');
+-- =============================================================================
+-- 2. LUXURY_VIP (Có điều kiện: Venue cụ thể + Tier cụ thể)
+-- Áp dụng cho: Luxury Large (ID: bbbb2222...0003)
+-- ID: dddd0000-...
+-- =============================================================================
+CALL Discount_Insert(
+    'dddd0000-0000-0000-0000-000000000002',
+    'LUXURY VIP 15%',
+    15,
+    2000000.00,                              
+    5000000.00,                              
+    'bbbb2222-bbbb-bbbb-bbbb-bbbbbbbb0003',  
+    'GOLD,PLATINUM',                         
+    '2023-12-01 00:00:00',
+    '2023-12-31 23:59:59'
+);
+
+-- =============================================================================
+-- 3. SUMMER_SALE (Có điều kiện: Min Price, Tier rộng)
+-- ID: dddd0000-...
+-- =============================================================================
+CALL Discount_Insert(
+    'dddd0000-0000-0000-0000-000000000003',
+    'SUMMER SALE 20%',
+    20,
+    1000000.00,                              
+    1000000.00,                              
+    NULL,                                    
+    'SILVER,GOLD,PLATINUM',                  
+    NOW(),
+    DATE_ADD(NOW(), INTERVAL 7 DAY)          
+);
+
+-- =============================================================================
+-- 4. SMALL_DEAL (Có điều kiện: Venue cụ thể)
+-- Áp dụng cho: Minimalist Small (ID: aaaa1111...0001)
+-- ID: dddd0000-...
+-- =============================================================================
+CALL Discount_Insert(
+    'dddd0000-0000-0000-0000-000000000004',
+    'SMALL ROOM PROMO',
+    5,
+    200000.00,                               
+    0,                                       
+    'aaaa1111-aaaa-aaaa-aaaa-aaaaaaaa0001',  
+    NULL,                                    
+    NOW(),
+    DATE_ADD(NOW(), INTERVAL 3 MONTH)
+);
+
+-- =============================================================================
+-- 5. PLATINUM_ONLY (Có điều kiện: Min Price lớn + Tier cao nhất)
+-- ID: dddd0000-...
+-- =============================================================================
+CALL Discount_Insert(
+    'dddd0000-0000-0000-0000-000000000005',
+    'PLATINUM EXCLUSIVE',
+    25,
+    5000000.00,                              
+    10000000.00,                             
+    NULL,                                    
+    'PLATINUM',                              
+    '2023-01-01 00:00:00',
+    '2024-12-31 23:59:59'                    
+);

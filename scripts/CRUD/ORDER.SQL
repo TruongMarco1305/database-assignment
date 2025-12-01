@@ -1,55 +1,55 @@
 -- order
 DELIMITER $$
 
--- Insert Order
-CREATE PROCEDURE Order_Insert(
-    IN p_id VARCHAR(36),
-    IN p_clientId VARCHAR(36),
-    IN p_locId VARCHAR(36),
-    IN p_venueName VARCHAR(100),
-    -- BỎ p_totalPrice và p_points
-    IN p_start DATETIME,
-    IN p_end DATETIME
-)
-BEGIN
-    -- Validate giờ giấc cơ bản trước khi Insert
-    IF p_end <= p_start THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: End time must be after Start time.';
-    END IF;
-
-    -- Thêm vào Order_Insert
-    IF p_start < DATE_ADD(NOW(), INTERVAL 4 HOUR) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Bookings must be made at least 4 hours in advance.';
-    END IF;
-
-    -- Validation: Kiểm tra Client và Venue tồn tại (Foreign Key Check)
-    IF NOT EXISTS (SELECT 1 FROM clients WHERE user_id = UUID_TO_BIN(p_clientId)) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Client does not exist.';
-    END IF;
-    
-    IF NOT EXISTS (SELECT 1 FROM venues WHERE location_id = UUID_TO_BIN(p_locId) AND name = p_venueName) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue does not exist.';
-    END IF;
-
-    INSERT INTO orders (
-        order_id, client_id, venue_loc_id, venueName, 
-        totalPrice, -- Cột này NOT NULL nên phải truyền
-        points,     -- Cột này NOT NULL nên phải truyền
-        startHour, endHour, expiredAt
+    -- Insert Order
+    CREATE PROCEDURE Order_Insert(
+        IN p_id VARCHAR(36),
+        IN p_clientId VARCHAR(36),
+        IN p_locId VARCHAR(36),
+        IN p_venueName VARCHAR(100),
+        -- BỎ p_totalPrice và p_points
+        IN p_start DATETIME,
+        IN p_end DATETIME
     )
-    VALUES (
-        UUID_TO_BIN(p_id), 
-        UUID_TO_BIN(p_clientId), 
-        UUID_TO_BIN(p_locId), 
-        p_venueName, 
-        0, -- Truyền số 0 giả (Trigger sẽ sửa lại thành tiền thật)
-        0, -- Truyền số 0 giả (Trigger sẽ sửa lại thành điểm thật)
-        p_start, 
-        p_end, 
-        DATE_ADD(NOW(), INTERVAL 15 MINUTE)
-    );
-END$$
-DELIMITER ;
+    BEGIN
+        -- Validate giờ giấc cơ bản trước khi Insert
+        IF p_end <= p_start THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: End time must be after Start time.';
+        END IF;
+
+        -- Thêm vào Order_Insert
+        IF p_start < DATE_ADD(NOW(), INTERVAL 4 HOUR) THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Bookings must be made at least 4 hours in advance.';
+        END IF;
+
+        -- Validation: Kiểm tra Client và Venue tồn tại (Foreign Key Check)
+        IF NOT EXISTS (SELECT 1 FROM clients WHERE user_id = UUID_TO_BIN(p_clientId)) THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Client does not exist.';
+        END IF;
+        
+        IF NOT EXISTS (SELECT 1 FROM venues WHERE location_id = UUID_TO_BIN(p_locId) AND name = p_venueName) THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue does not exist.';
+        END IF;
+
+        INSERT INTO orders (
+            order_id, client_id, venue_loc_id, venueName, 
+            totalPrice, -- Cột này NOT NULL nên phải truyền
+            points,     -- Cột này NOT NULL nên phải truyền
+            startHour, endHour, expiredAt
+        )
+        VALUES (
+            UUID_TO_BIN(p_id), 
+            UUID_TO_BIN(p_clientId), 
+            UUID_TO_BIN(p_locId), 
+            p_venueName, 
+            0, -- Truyền số 0 giả (Trigger sẽ sửa lại thành tiền thật)
+            0, -- Truyền số 0 giả (Trigger sẽ sửa lại thành điểm thật)
+            p_start, 
+            p_end, 
+            DATE_ADD(NOW(), INTERVAL 15 MINUTE)
+        );
+    END$$
+    DELIMITER ;
 
 -- Update Order
 DELIMITER $$

@@ -50,7 +50,7 @@ CREATE TABLE locations (
 
 CREATE TABLE venue_types ( 
     venueType_id BINARY(16) PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE, -- Minimalist, Luxury, Outdoor
+    name VARCHAR(50) NOT NULL, -- Minimalist, Luxury, Outdoor
     description TEXT,
     minCapacity INT NOT NULL CHECK (minCapacity > 0), -- 3 type small 0-40, medium 40-80, large 80-120
     maxCapacity INT NOT NULL CHECK (maxCapacity > 0),
@@ -85,7 +85,7 @@ CREATE TABLE venue_images (
 CREATE TABLE amenities (
     amenity_id BINARY(16) PRIMARY KEY,
     location_id BINARY(16) NOT NULL, 
-    category VARCHAR(50) NOT NULL,
+    category VARCHAR(50) NOT NULL, -- Projector, Catering, Audio Set
     description TEXT,
     price DECIMAL(12, 2) NOT NULL DEFAULT 0 CHECK (price >= 0), -- THÊM CỘT GIÁ (Giá thuê niêm yết)
     compatibleSize SET('Small', 'Medium', 'Large') DEFAULT NULL, -- NULL là cho mọi size
@@ -101,7 +101,7 @@ CREATE TABLE orders (
     client_id BINARY(16),
     venue_loc_id BINARY(16),
     venueName VARCHAR(100),
-    totalPrice DECIMAL(12, 2) NOT NULL CHECK (totalPrice > 0),
+    totalPrice DECIMAL(12, 2) NOT NULL CHECK (totalPrice >= 0),
     status ENUM('PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED') DEFAULT 'PENDING',
     startHour DATETIME NOT NULL,
     endHour DATETIME NOT NULL,
@@ -139,8 +139,8 @@ CREATE TABLE discounts (
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (venueTypeId) REFERENCES venue_types(venueType_id) ON DELETE CASCADE,
     CHECK (expiredAt > startedAt),
-    CHECK (maxDiscountPrice IS NULL OR maxDiscountPrice > 0),
-    CHECK (minPrice IS NULL OR minPrice > 0)
+    CHECK (maxDiscountPrice IS NULL OR maxDiscountPrice >= 0),
+    CHECK (minPrice IS NULL OR minPrice >= 0)
 );
 
 CREATE TABLE applies (
@@ -154,7 +154,7 @@ CREATE TABLE applies (
 CREATE TABLE invoices (
     invoice_id BINARY(16) PRIMARY KEY,
     order_id BINARY(16),
-    amount DECIMAL(12, 2) NOT NULL CHECK (amount > 0),
+    amount DECIMAL(12, 2) NOT NULL CHECK (amount >= 0),
     status ENUM('PENDING', 'SUCCEEDED', 'FAILED', 'REFUNDED') DEFAULT 'PENDING',
     senderBankAccount VARCHAR(50),
     receiverBankAccount VARCHAR(50),

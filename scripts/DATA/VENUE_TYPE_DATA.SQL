@@ -1,7 +1,85 @@
-INSERT INTO venue_types (venueType_id, name, description, minCapacity, maxCapacity, area)
-VALUES
-  (UUID_TO_BIN('12121212-1212-1212-1212-121212121212'), 'Conference Hall', 'Large conference hall suitable for corporate events and conferences.', 50, 500, 450.0),
-  (UUID_TO_BIN('13131313-1313-1313-1313-131313131313'), 'Banquet Hall',    'Elegant banquet hall for weddings, parties and large gatherings.', 80, 600, 520.5),
-  (UUID_TO_BIN('14141414-1414-1414-1414-141414141414'), 'Meeting Room',    'Small to medium meeting rooms for workshops and business meetings.', 4, 40, 45.0),
-  (UUID_TO_BIN('15151515-1515-1515-1515-151515151515'), 'Studio',          'Flexible studio spaces for classes, photography, or rehearsals.', 5, 60, 80.0),
-  (UUID_TO_BIN('16161616-1616-1616-1616-161616161616'), 'Outdoor Venue',   'Open-air spaces suitable for parties, markets or rooftop events.', 20, 400, 600.0);
+-- ===========================================================
+-- NHÓM 1: MINIMALIST
+-- ===========================================================
+
+-- 1. Small (1-40)
+CALL VenueType_Insert(
+    'aaaa1111-aaaa-aaaa-aaaa-aaaaaaaa0001', 
+    'Minimalist', 
+    'Không gian tối giản, gọn gàng dành cho các nhóm nhỏ (Size S).', 
+    1, 40
+);
+
+-- 2. Medium (40-80)
+CALL VenueType_Insert(
+    'aaaa1111-aaaa-aaaa-aaaa-aaaaaaaa0002', 
+    'Minimalist', 
+    'Phòng họp phong cách tối giản, phù hợp training (Size M).', 
+    40, 80
+);
+
+-- 3. Large (80-120)
+CALL VenueType_Insert(
+    'aaaa1111-aaaa-aaaa-aaaa-aaaaaaaa0003', 
+    'Minimalist', 
+    'Sảnh lớn thiết kế tối giản cho sự kiện đông người (Size L).', 
+    80, 120
+);
+
+
+-- ===========================================================
+-- NHÓM 2: LUXURY
+-- ===========================================================
+
+-- 4. Small (1-40)
+CALL VenueType_Insert(
+    'bbbb2222-bbbb-bbbb-bbbb-bbbbbbbb0001', 
+    'Luxury', 
+    'Phòng VIP sang trọng cho cuộc họp kín (Size S).', 
+    1, 40
+);
+
+-- 5. Medium (40-80)
+CALL VenueType_Insert(
+    'bbbb2222-bbbb-bbbb-bbbb-bbbbbbbb0002', 
+    'Luxury', 
+    'Không gian tiệc sang trọng, trang trí cầu kỳ (Size M).', 
+    40, 80
+);
+
+-- 6. Large (80-120)
+CALL VenueType_Insert(
+    'bbbb2222-bbbb-bbbb-bbbb-bbbbbbbb0003', 
+    'Luxury', 
+    'Đại sảnh Luxury đẳng cấp 5 sao (Size L).', 
+    80, 120
+);
+
+
+-- ===========================================================
+-- NHÓM 3: OUTDOOR
+-- ===========================================================
+
+-- 7. Small (1-40)
+CALL VenueType_Insert(
+    'cccc3333-cccc-cccc-cccc-cccccccc0001', 
+    'Outdoor', 
+    'Góc sân vườn nhỏ xanh mát (Size S).', 
+    1, 40
+);
+
+-- 8. Medium (40-80)
+CALL VenueType_Insert(
+    'cccc3333-cccc-cccc-cccc-cccccccc0002', 
+    'Outdoor', 
+    'Khu vực bãi cỏ hoặc sân thượng thoáng đãng (Size M).', 
+    40, 80
+);
+
+-- 9. Large (80-120)
+CALL VenueType_Insert(
+    'cccc3333-cccc-cccc-cccc-cccccccc0003', 
+    'Outdoor', 
+    'Không gian sự kiện ngoài trời rộng lớn (Size L).', 
+    80, 120
+);

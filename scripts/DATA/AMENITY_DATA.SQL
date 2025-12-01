@@ -1,40 +1,104 @@
-INSERT INTO amenities (amenity_id, location_id, venueName, category, description) VALUES
-  -- Main Hall (Sunrise Conference Hall)
-  (UUID_TO_BIN('d1111111-1111-1111-1111-111111111001'), UUID_TO_BIN('10101010-1010-1010-1010-101010101001'), 'Main Hall',       'Audio/Visual',  'Full AV system with wireless microphones, PA, mixer and speakers.'),
-  (UUID_TO_BIN('d2222222-2222-2222-2222-222222222002'), UUID_TO_BIN('10101010-1010-1010-1010-101010101001'), 'Main Hall',       'Stage',         'Large stage with backdrop and stage lighting.'),
+-- =============================================================================
+-- LOCATION 1: Sunrise Conference Hall (Chuyên sự kiện lớn - Large/Exclusive)
+-- ID: 10101010-1010-1010-1010-101010101001
+-- =============================================================================
+-- 1. Projector (Large)
+CALL Amenity_Insert('aaaa1111-aaaa-aaaa-aaaa-000000000001', '10101010-1010-1010-1010-101010101001', 'Projector', 'High-Lumen Laser Projector & 200" Screen', 800000, 'Large');
+-- 2. Catering (Large)
+CALL Amenity_Insert('aaaa1111-aaaa-aaaa-aaaa-000000000002', '10101010-1010-1010-1010-101010101001', 'Catering', 'Full Buffet Service (Asian/Western)', 400000, 'Large');
+-- 3. Audio Set (Universal)
+CALL Amenity_Insert('aaaa1111-aaaa-aaaa-aaaa-000000000003', '10101010-1010-1010-1010-101010101001', 'Audio Set', 'Standard PA System (2 Wireless Mics + Speaker)', 300000, NULL);
+-- 4. Projector (Large - thay cho Exclusive)
+CALL Amenity_Insert('aaaa1111-aaaa-aaaa-aaaa-000000000004', '10101010-1010-1010-1010-101010101001', 'Projector', 'P3 LED Video Wall (Custom Size)', 2000000, 'Large');
+-- 5. Catering (Large - thay cho Exclusive)
+CALL Amenity_Insert('aaaa1111-aaaa-aaaa-aaaa-000000000005', '10101010-1010-1010-1010-101010101001', 'Catering', 'VIP Gala Dinner Set Menu', 600000, 'Large');
 
-  -- Annex Room (Sunrise Annex)
-  (UUID_TO_BIN('d3333333-3333-3333-3333-333333333003'), UUID_TO_BIN('10101010-1010-1010-1010-101010101002'), 'Annex Room',      'Seating',       'Modular seating arrangement for 20–60 people.'),
-  (UUID_TO_BIN('d4444444-4444-4444-4444-444444444004'), UUID_TO_BIN('10101010-1010-1010-1010-101010101002'), 'Annex Room',      'Whiteboard',    'Mobile whiteboards, markers and flip charts.'),
+-- =============================================================================
+-- LOCATION 2: Sunrise Annex (Phòng họp nhỏ/vừa - Small/Medium)
+-- ID: 10101010-1010-1010-1010-101010101002
+-- =============================================================================
+CALL Amenity_Insert('aaaa2222-aaaa-aaaa-aaaa-000000000001', '10101010-1010-1010-1010-101010101002', 'Projector', 'Portable Mini Projector (3000 Lumens)', 150000, 'Small');
+CALL Amenity_Insert('aaaa2222-aaaa-aaaa-aaaa-000000000002', '10101010-1010-1010-1010-101010101002', 'Catering', 'Basic Tea Break (Coffee/Tea + Cookies)', 80000, 'Small');
+CALL Amenity_Insert('aaaa2222-aaaa-aaaa-aaaa-000000000003', '10101010-1010-1010-1010-101010101002', 'Audio Set', 'Standard PA System (2 Wireless Mics + Speaker)', 300000, NULL);
+CALL Amenity_Insert('aaaa2222-aaaa-aaaa-aaaa-000000000004', '10101010-1010-1010-1010-101010101002', 'Projector', 'Standard HD Projector & 100" Screen', 300000, 'Medium');
+CALL Amenity_Insert('aaaa2222-aaaa-aaaa-aaaa-000000000005', '10101010-1010-1010-1010-101010101002', 'Catering', 'Lunch Box & Drink Set', 150000, 'Medium');
 
-  -- Grand Ballroom (Grace Events Center)
-  (UUID_TO_BIN('d5555555-5555-5555-5555-555555555005'), UUID_TO_BIN('20202020-2020-2020-2020-202020202001'), 'Grand Ballroom',  'Catering',      'In-house catering options with customizable menus.'),
-  (UUID_TO_BIN('d6666666-6666-6666-6666-666666666006'), UUID_TO_BIN('20202020-2020-2020-2020-202020202001'), 'Grand Ballroom',  'Lighting',      'Professional lighting rig and dimmable house lights.'),
+-- =============================================================================
+-- LOCATION 3: Grace Events Center (Tiệc cưới - Large)
+-- ID: 20202020-2020-2020-2020-202020202001
+-- =============================================================================
+CALL Amenity_Insert('bbbb1111-bbbb-bbbb-bbbb-000000000001', '20202020-2020-2020-2020-202020202001', 'Projector', 'High-Lumen Laser Projector & 200" Screen', 800000, 'Large');
+CALL Amenity_Insert('bbbb1111-bbbb-bbbb-bbbb-000000000002', '20202020-2020-2020-2020-202020202001', 'Catering', 'Full Buffet Service (Asian/Western)', 400000, 'Large');
+CALL Amenity_Insert('bbbb1111-bbbb-bbbb-bbbb-000000000003', '20202020-2020-2020-2020-202020202001', 'Audio Set', 'Standard PA System (2 Wireless Mics + Speaker)', 300000, NULL);
+CALL Amenity_Insert('bbbb1111-bbbb-bbbb-bbbb-000000000004', '20202020-2020-2020-2020-202020202001', 'Projector', 'P3 LED Video Wall (Custom Size)', 2000000, 'Large');
+CALL Amenity_Insert('bbbb1111-bbbb-bbbb-bbbb-000000000005', '20202020-2020-2020-2020-202020202001', 'Catering', 'Premium Wedding Banquet Menu', 700000, 'Large');
 
-  -- Studio A (Grace Studio Rooms)
-  (UUID_TO_BIN('d7777777-7777-7777-7777-777777777007'), UUID_TO_BIN('20202020-2020-2020-2020-202020202002'), 'Studio A',        'Soundproof',    'Soundproofed studio suitable for rehearsals and recordings.'),
-  (UUID_TO_BIN('d8888888-8888-8888-8888-888888888008'), UUID_TO_BIN('20202020-2020-2020-2020-202020202002'), 'Studio A',        'Mirrors',       'Full-wall mirrors and barre for dance sessions.'),
+-- =============================================================================
+-- LOCATION 4: Grace Studio Rooms (Studio - Small/Medium)
+-- ID: 20202020-2020-2020-2020-202020202002
+-- =============================================================================
+CALL Amenity_Insert('bbbb2222-bbbb-bbbb-bbbb-000000000001', '20202020-2020-2020-2020-202020202002', 'Projector', 'Portable Mini Projector (3000 Lumens)', 150000, 'Small');
+CALL Amenity_Insert('bbbb2222-bbbb-bbbb-bbbb-000000000002', '20202020-2020-2020-2020-202020202002', 'Catering', 'Basic Tea Break (Coffee/Tea + Cookies)', 80000, 'Small');
+CALL Amenity_Insert('bbbb2222-bbbb-bbbb-bbbb-000000000003', '20202020-2020-2020-2020-202020202002', 'Audio Set', 'Standard PA System (2 Wireless Mics + Speaker)', 300000, NULL);
+CALL Amenity_Insert('bbbb2222-bbbb-bbbb-bbbb-000000000004', '20202020-2020-2020-2020-202020202002', 'Projector', 'Standard HD Projector & 100" Screen', 300000, 'Medium');
+CALL Amenity_Insert('bbbb2222-bbbb-bbbb-bbbb-000000000005', '20202020-2020-2020-2020-202020202002', 'Catering', 'Finger Food Platter', 200000, 'Medium');
 
-  -- Banquet Main (Heidi Banquet Hall)
-  (UUID_TO_BIN('d9999999-9999-9999-9999-999999999009'), UUID_TO_BIN('30303030-3030-3030-3030-303030303001'), 'Banquet Main',    'Decor',         'Decoration service and staging available upon request.'),
-  (UUID_TO_BIN('daaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa00aa'), UUID_TO_BIN('30303030-3030-3030-3030-303030303001'), 'Banquet Main',    'Parking',       'On-site parking area with capacity for ~80 cars.'),
+-- =============================================================================
+-- LOCATION 5: Heidi Banquet Hall (Tiệc sang trọng - Large)
+-- ID: 30303030-3030-3030-3030-303030303001
+-- =============================================================================
+CALL Amenity_Insert('cccc1111-cccc-cccc-cccc-000000000001', '30303030-3030-3030-3030-303030303001', 'Projector', 'High-Lumen Laser Projector & 200" Screen', 800000, 'Large');
+CALL Amenity_Insert('cccc1111-cccc-cccc-cccc-000000000002', '30303030-3030-3030-3030-303030303001', 'Catering', 'Full Buffet Service (Asian/Western)', 400000, 'Large');
+CALL Amenity_Insert('cccc1111-cccc-cccc-cccc-000000000003', '30303030-3030-3030-3030-303030303001', 'Audio Set', 'Standard PA System (2 Wireless Mics + Speaker)', 300000, NULL);
+CALL Amenity_Insert('cccc1111-cccc-cccc-cccc-000000000004', '30303030-3030-3030-3030-303030303001', 'Projector', 'P3 LED Video Wall (Custom Size)', 2000000, 'Large');
+CALL Amenity_Insert('cccc1111-cccc-cccc-cccc-000000000005', '30303030-3030-3030-3030-303030303001', 'Catering', 'Cocktail Reception Package', 500000, 'Large');
 
-  -- Suite 1 (Heidi Meeting Suites)
-  (UUID_TO_BIN('db111111-1111-1111-1111-111111111011'), UUID_TO_BIN('30303030-3030-3030-3030-303030303002'), 'Suite 1',         'Projector',     'HD projector with retractable screen.'),
-  (UUID_TO_BIN('db222222-2222-2222-2222-222222222012'), UUID_TO_BIN('30303030-3030-3030-3030-303030303002'), 'Suite 1',         'Conference Phone','Conference phone system for remote calls.'),
+-- =============================================================================
+-- LOCATION 6: Heidi Meeting Suites (Họp nhỏ - Small)
+-- ID: 30303030-3030-3030-3030-303030303002
+-- =============================================================================
+CALL Amenity_Insert('cccc2222-cccc-cccc-cccc-000000000001', '30303030-3030-3030-3030-303030303002', 'Projector', 'Portable Mini Projector (3000 Lumens)', 150000, 'Small');
+CALL Amenity_Insert('cccc2222-cccc-cccc-cccc-000000000002', '30303030-3030-3030-3030-303030303002', 'Catering', 'Basic Tea Break (Coffee/Tea + Cookies)', 80000, 'Small');
+CALL Amenity_Insert('cccc2222-cccc-cccc-cccc-000000000003', '30303030-3030-3030-3030-303030303002', 'Audio Set', 'Standard PA System (2 Wireless Mics + Speaker)', 300000, NULL);
+CALL Amenity_Insert('cccc2222-cccc-cccc-cccc-000000000004', '30303030-3030-3030-3030-303030303002', 'Projector', 'Interactive Smart Board', 250000, 'Small');
+CALL Amenity_Insert('cccc2222-cccc-cccc-cccc-000000000005', '30303030-3030-3030-3030-303030303002', 'Catering', 'Sandwich & Juice Combo', 120000, 'Small');
 
-  -- Rooftop Deck (Ivan Rooftop Venue)
-  (UUID_TO_BIN('dc333333-3333-3333-3333-333333333013'), UUID_TO_BIN('40404040-4040-4040-4040-404040404001'), 'Rooftop Deck',    'Bar',           'Portable bar setup and bartender service available.'),
-  (UUID_TO_BIN('dc444444-4444-4444-4444-444444444014'), UUID_TO_BIN('40404040-4040-4040-4040-404040404001'), 'Rooftop Deck',    'Outdoor Heaters','Heaters available for evening events (rental).'),
+-- =============================================================================
+-- LOCATION 7: Ivan Rooftop Venue (Ngoài trời - Medium/Large)
+-- ID: 40404040-4040-4040-4040-404040404001
+-- =============================================================================
+CALL Amenity_Insert('dddd1111-dddd-dddd-dddd-000000000001', '40404040-4040-4040-4040-404040404001', 'Projector', 'Standard HD Projector & 100" Screen', 300000, 'Medium');
+CALL Amenity_Insert('dddd1111-dddd-dddd-dddd-000000000002', '40404040-4040-4040-4040-404040404001', 'Catering', 'Lunch Box & Drink Set', 150000, 'Medium');
+CALL Amenity_Insert('dddd1111-dddd-dddd-dddd-000000000003', '40404040-4040-4040-4040-404040404001', 'Audio Set', 'Standard PA System (2 Wireless Mics + Speaker)', 300000, NULL);
+CALL Amenity_Insert('dddd1111-dddd-dddd-dddd-000000000004', '40404040-4040-4040-4040-404040404001', 'Projector', 'High-Lumen Laser Projector & 200" Screen', 800000, 'Large');
+CALL Amenity_Insert('dddd1111-dddd-dddd-dddd-000000000005', '40404040-4040-4040-4040-404040404001', 'Catering', 'BBQ Party Package', 450000, 'Large');
 
-  -- Conference B (Ivan Conference Rooms)
-  (UUID_TO_BIN('dd555555-5555-5555-5555-555555555015'), UUID_TO_BIN('40404040-4040-4040-4040-404040404002'), 'Conference B',    'Video Conferencing','Ready-to-use Zoom/Teams video conferencing setup.'),
-  (UUID_TO_BIN('dd666666-6666-6666-6666-666666666016'), UUID_TO_BIN('40404040-4040-4040-4040-404040404002'), 'Conference B',    'Flipchart',     'Flipcharts, markers and stationery provided.'),
+-- =============================================================================
+-- LOCATION 8: Ivan Conference Rooms (Hội nghị - Medium)
+-- ID: 40404040-4040-4040-4040-404040404002
+-- =============================================================================
+CALL Amenity_Insert('dddd2222-dddd-dddd-dddd-000000000001', '40404040-4040-4040-4040-404040404002', 'Projector', 'Standard HD Projector & 100" Screen', 300000, 'Medium');
+CALL Amenity_Insert('dddd2222-dddd-dddd-dddd-000000000002', '40404040-4040-4040-4040-404040404002', 'Catering', 'Lunch Box & Drink Set', 150000, 'Medium');
+CALL Amenity_Insert('dddd2222-dddd-dddd-dddd-000000000003', '40404040-4040-4040-4040-404040404002', 'Audio Set', 'Standard PA System (2 Wireless Mics + Speaker)', 300000, NULL);
+CALL Amenity_Insert('dddd2222-dddd-dddd-dddd-000000000004', '40404040-4040-4040-4040-404040404002', 'Projector', 'Standard HD Projector & 100" Screen', 300000, 'Medium');
+CALL Amenity_Insert('dddd2222-dddd-dddd-dddd-000000000005', '40404040-4040-4040-4040-404040404002', 'Catering', 'Premium Coffee Break', 180000, 'Medium');
 
-  -- Exhibit Hall (Judy Event Space)
-  (UUID_TO_BIN('de777777-7777-7777-7777-777777777017'), UUID_TO_BIN('50505050-5050-5050-5050-505050505001'), 'Exhibit Hall',    'Exhibit Booths', 'Modular exhibit booths and power hookups available.'),
-  (UUID_TO_BIN('de888888-8888-8888-8888-888888888018'), UUID_TO_BIN('50505050-5050-5050-5050-505050505001'), 'Exhibit Hall',    'Security',      'On-site security personnel available during events.'),
+-- =============================================================================
+-- LOCATION 9: Judy Event Space (Triển lãm - Medium/Large)
+-- ID: 50505050-5050-5050-5050-505050505001
+-- =============================================================================
+CALL Amenity_Insert('eeee1111-eeee-eeee-eeee-000000000001', '50505050-5050-5050-5050-505050505001', 'Projector', 'Standard HD Projector & 100" Screen', 300000, 'Medium');
+CALL Amenity_Insert('eeee1111-eeee-eeee-eeee-000000000002', '50505050-5050-5050-5050-505050505001', 'Catering', 'Finger Food Platter', 250000, 'Medium');
+CALL Amenity_Insert('eeee1111-eeee-eeee-eeee-000000000003', '50505050-5050-5050-5050-505050505001', 'Audio Set', 'Standard PA System (2 Wireless Mics + Speaker)', 300000, NULL);
+CALL Amenity_Insert('eeee1111-eeee-eeee-eeee-000000000004', '50505050-5050-5050-5050-505050505001', 'Projector', 'High-Lumen Laser Projector & 200" Screen', 800000, 'Large');
+CALL Amenity_Insert('eeee1111-eeee-eeee-eeee-000000000005', '50505050-5050-5050-5050-505050505001', 'Catering', 'Canapes & Wine Service', 550000, 'Large');
 
-  -- Workshop Room (Judy Workshop Hub)
-  (UUID_TO_BIN('df999999-9999-9999-9999-999999999019'), UUID_TO_BIN('50505050-5050-5050-5050-505050505002'), 'Workshop Room',   'WiFi',          'High-speed fiber internet with guest access.'),
-  (UUID_TO_BIN('dfaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa01aa'), UUID_TO_BIN('50505050-5050-5050-5050-505050505002'), 'Workshop Room',   'Tables',        'Foldable tables and stackable chairs; cleaning included.');
+-- =============================================================================
+-- LOCATION 10: Judy Workshop Hub (Workshop - Small)
+-- ID: 50505050-5050-5050-5050-505050505002
+-- =============================================================================
+CALL Amenity_Insert('eeee2222-eeee-eeee-eeee-000000000001', '50505050-5050-5050-5050-505050505002', 'Projector', 'Portable Mini Projector (3000 Lumens)', 150000, 'Small');
+CALL Amenity_Insert('eeee2222-eeee-eeee-eeee-000000000002', '50505050-5050-5050-5050-505050505002', 'Catering', 'Basic Tea Break (Coffee/Tea + Cookies)', 80000, 'Small');
+CALL Amenity_Insert('eeee2222-eeee-eeee-eeee-000000000003', '50505050-5050-5050-5050-505050505002', 'Audio Set', 'Standard PA System (2 Wireless Mics + Speaker)', 300000, NULL);
+CALL Amenity_Insert('eeee2222-eeee-eeee-eeee-000000000004', '50505050-5050-5050-5050-505050505002', 'Projector', 'Smart TV 65 Inch', 100000, 'Small');
+CALL Amenity_Insert('eeee2222-eeee-eeee-eeee-000000000005', '50505050-5050-5050-5050-505050505002', 'Catering', 'DIY Drink Station', 100000, 'Small');
