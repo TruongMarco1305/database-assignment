@@ -1,14 +1,40 @@
 -- client
 DELIMITER $$
-CREATE TRIGGER Update_MemberPoints
+CREATE TRIGGER Update_OrderCompleted
 AFTER UPDATE ON orders
 FOR EACH ROW
 BEGIN
-    -- Chỉ cộng điểm khi trạng thái chuyển từ KHÁC sang 'COMPLETED'
+    -- =================================================================
+    -- PHẦN 1: GIẢI PHÓNG TÀI NGUYÊN (AMENITIES & VENUE)
+    -- Chạy khi đơn hàng kết thúc (Dù là Hoàn thành hay Hủy)
+    -- =================================================================
+    -- IF NEW.status IN ('COMPLETED', 'CANCELLED') AND OLD.status NOT IN ('COMPLETED', 'CANCELLED') THEN
+        
+    --     -- 1.1. Trả Amenities về trạng thái sẵn sàng (isActive = 1)
+    --     UPDATE amenities a
+    --     INNER JOIN order_amenities oa ON a.amenity_id = oa.amenity_id
+    --     SET a.isActive = 1
+    --     WHERE oa.order_id = NEW.order_id;
+
+    --     -- 1.2. Trả Venue về trạng thái sẵn sàng (isActive = 1)
+    --     -- (Lưu ý: Chỉ cần thiết nếu quy trình của bạn có bước set isActive=0 khi đặt phòng)
+    --     UPDATE venues
+    --     SET isActive = 1
+    --     WHERE location_id = NEW.venue_loc_id 
+    --       AND name = NEW.venueName;
+          
+    -- END IF;
+
+    -- =================================================================
+    -- PHẦN 2: TÍCH ĐIỂM THÀNH VIÊN
+    -- Chỉ chạy khi đơn hàng HOÀN TẤT (COMPLETED)
+    -- =================================================================
     IF NEW.status = 'COMPLETED' AND OLD.status <> 'COMPLETED' THEN
+        
         UPDATE clients
         SET membership_points = membership_points + NEW.points
         WHERE user_id = NEW.client_id;
+        
     END IF;
 END$$
 
@@ -37,30 +63,6 @@ BEGIN
     
     -- 4. Tự động tính điểm luôn (Ví dụ: 10.000 VND = 1 điểm)
     SET NEW.points = FLOOR(NEW.totalPrice / 10000);
-END$$
-
-DELIMITER ;
-
--- amenity
-DELIMITER $$
-CREATE TRIGGER Update_Amenity_Completed
-AFTER UPDATE ON orders
-FOR EACH ROW
-BEGIN
-    -- =================================================================
-    -- PHẦN 1: QUẢN LÝ THIẾT BỊ (AMENITIES)
-    -- =================================================================
-    
-    -- Nếu đơn hàng kết thúc (Hoàn thành hoặc Hủy) -> Mở khóa thiết bị
-    IF NEW.status IN ('CANCELLED', 'COMPLETED') AND OLD.status NOT IN ('CANCELLED', 'COMPLETED') THEN
-        
-        -- Cập nhật tất cả thiết bị đi kèm đơn hàng này thành Active = 1
-        UPDATE amenities a
-        INNER JOIN order_amenities oa ON a.amenity_id = oa.amenity_id
-        SET a.isActive = 1
-        WHERE oa.order_id = NEW.order_id;
-        
-    END IF;
 END$$
 
 DELIMITER ;

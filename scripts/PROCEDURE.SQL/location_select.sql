@@ -70,17 +70,45 @@ WHERE
             END
         )
     )
-    -- 5. Lọc theo Tiện nghi (Amenity)
-    -- Logic: Kiểm tra xem Location này có sở hữu món đồ này không (trong kho hoặc trong phòng bất kỳ)
-    AND (
-        p_amenityCategory IS NULL 
-        OR EXISTS (
-            SELECT 1 FROM amenities a
-            WHERE a.location_id = l.location_id -- Chỉ cần thuộc Location này là được
-                AND a.category = p_amenityCategory
-                AND a.isActive = 1
+    -- 4. Filter Amenity (NÂNG CẤP: Check Tương thích Size + Check Trùng giờ)
+        AND (
+            p_amenityCategory IS NULL 
+            OR EXISTS (
+                SELECT 1 FROM amenities a
+                WHERE a.location_id = l.location_id 
+                  AND a.category = p_amenityCategory
+                  AND a.isActive = 1
+                  
+                  -- A. CHECK TƯƠNG THÍCH SIZE (Compatibility)
+                  -- Quy đổi Capacity của phòng ra Size để so sánh với thiết bị
+                  AND (
+                      a.compatibleSize IS NULL -- Thiết bị dùng chung (Universal)
+                      OR FIND_IN_SET(
+                          CASE 
+                              WHEN vt.maxCapacity <= 40 THEN 'Small'
+                              WHEN vt.maxCapacity <= 80 THEN 'Medium'
+                              WHEN vt.maxCapacity <= 120 THEN 'Large'
+                              ELSE 'Exclusive'
+                          END, 
+                          a.compatibleSize
+                      ) > 0
+                  )
+                  
+                  -- B. CHECK TRÙNG GIỜ (Availability)
+                  -- Đảm bảo thiết bị này chưa bị đơn hàng nào khác xí chỗ trong khung giờ tìm kiếm
+                  AND (
+                      p_startTime IS NULL OR p_endTime IS NULL
+                      OR NOT EXISTS (
+                          SELECT 1 
+                          FROM order_amenities oa
+                          JOIN orders o2 ON oa.order_id = o2.order_id
+                          WHERE oa.amenity_id = a.amenity_id
+                            AND o2.status IN ('PENDING', 'CONFIRMED')
+                            AND (o2.startHour < p_endTime AND o2.endHour > p_startTime)
+                      )
+                  )
+            )
         )
-    )
     AND (
         p_minAvgRating IS NULL
         OR l.avgRating >= p_minAvgRating
