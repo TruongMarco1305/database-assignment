@@ -35,8 +35,9 @@ export class OwnerService extends TableService {
       `SELECT * FROM owners WHERE user_id=?`,
       [convertUUIDtoBinaryHex(userId)],
     );
-    if (!result) {
+    if (!result || result.length === 0) {
       throw new NotFoundException('Owner not found');
     }
+    return result[0];
   }
 }
