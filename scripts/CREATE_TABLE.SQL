@@ -184,3 +184,40 @@ CREATE TABLE favors (
     FOREIGN KEY (client_id) REFERENCES clients(user_id) ON DELETE RESTRICT,
     FOREIGN KEY (location_id) REFERENCES locations(location_id) ON DELETE CASCADE
 );
+
+-- Bảng Chat Channels (Kênh chat đôi 1-1)
+CREATE TABLE chat_channels (
+    user_1_id BINARY(16) NOT NULL,
+    user_2_id BINARY(16) NOT NULL,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    PRIMARY KEY (user_1_id, user_2_id),
+    
+    -- Tham chiếu về bảng Users (giả sử PK là id)
+    FOREIGN KEY (user_1_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_2_id) REFERENCES users(id) ON DELETE CASCADE,
+    
+    -- Ràng buộc để tránh trùng lặp (VD: A-B và B-A là một)
+    CHECK (user_1_id < user_2_id)
+);
+
+-- Bảng Messages (Tin nhắn)
+CREATE TABLE messages (
+    message_id BINARY(16) PRIMARY KEY,
+    
+    -- KHÓA NGOẠI PHẢI LÀ BINARY(16) ĐỂ KHỚP VỚI BẢNG CHA
+    channel_user_1_id BINARY(16) NOT NULL, 
+    channel_user_2_id BINARY(16) NOT NULL,
+    
+    sender_id BINARY(16) NOT NULL,
+    content TEXT NOT NULL,
+    sentAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    -- Khóa ngoại phức hợp
+    FOREIGN KEY (channel_user_1_id, channel_user_2_id) 
+        REFERENCES chat_channels(user_1_id, user_2_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+);
