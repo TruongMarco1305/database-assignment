@@ -75,10 +75,10 @@ CREATE TABLE venues (
 );
 
 CREATE TABLE venue_images (
-    image_id BINARY(16) PRIMARY KEY,
     location_id BINARY(16) NOT NULL,
     venueName VARCHAR(100) NOT NULL,
     locationImgURL VARCHAR(255) NOT NULL,
+    PRIMARY KEY (location_id, venueName, locationImgURL),
     FOREIGN KEY (location_id, venueName) REFERENCES venues(location_id, name) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
