@@ -7,8 +7,12 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { OwnerGuard } from 'src/auth/guards';
-import { CreateLocationDto, UpdateLocationDto } from '../dto/create-venue.dto';
+import { AuthGuard, OwnerGuard } from 'src/auth/guards';
+import {
+  CreateLocationDto,
+  SearchLocationsDto,
+  UpdateLocationDto,
+} from '../dto/create-venue.dto';
 import { User } from 'src/auth/decorators';
 import { LocationService } from '../services/location.service';
 
@@ -38,5 +42,19 @@ export class LocationController {
   async delete(@Param('id') id: string) {
     await this.locationService.deleteLocation(id);
     return { message: 'Location deleted successfully' };
+  }
+
+  // ===== SEARCH LOCATIONS ENDPOINT =====
+  @Post('/search')
+  @UseGuards(AuthGuard)
+  async searchLocations(
+    @Body() dto: SearchLocationsDto,
+    @User() user: Express.User,
+  ) {
+    const results = await this.locationService.searchLocations(
+      user.userId,
+      dto,
+    );
+    return results;
   }
 }

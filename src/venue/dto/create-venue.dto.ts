@@ -7,6 +7,7 @@ import {
   Min,
   Max,
   IsInt,
+  IsDateString,
 } from 'class-validator';
 
 export class CreateLocationDto {
@@ -278,4 +279,50 @@ export class UpdateAmenityDto {
 
   @IsOptional()
   isActive?: boolean;
+}
+
+export class SearchLocationsDto {
+  @IsNotEmpty()
+  @IsString()
+  city: string;
+
+  @IsOptional()
+  @IsDateString()
+  startTime?: string;
+
+  @IsOptional()
+  @IsDateString()
+  endTime?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  minPrice?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  maxPrice?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(5)
+  minAvgRating?: number;
+
+  @IsOptional()
+  @IsString()
+  theme?: string;
+
+  @IsOptional()
+  @IsString()
+  size?: string; // 'Small', 'Medium', 'Large'
+
+  @IsOptional()
+  @IsString()
+  amenityCategory?: string;
+
+  @IsOptional()
+  @IsString()
+  sort?: string; // 'PRICE_ASC', 'PRICE_DESC', 'RATING', 'AREA_ASC', 'AREA_DESC'
 }

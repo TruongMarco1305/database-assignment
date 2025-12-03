@@ -1,6 +1,10 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { CreateLocationDto, UpdateLocationDto } from '../dto/create-venue.dto';
+import {
+  CreateLocationDto,
+  SearchLocationsDto,
+  UpdateLocationDto,
+} from '../dto/create-venue.dto';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -67,6 +71,36 @@ export class LocationService {
       await this.databaseService.execute(`CALL Location_Delete(?)`, [id]);
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to delete location');
+    }
+  }
+
+  // ===== SEARCH LOCATIONS OPERATION =====
+  public async searchLocations(
+    clientId: string | null,
+    dto: SearchLocationsDto,
+  ): Promise<any[]> {
+    try {
+      const result = await this.databaseService.execute<any>(
+        `CALL getListLocations(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          dto.city,
+          dto.startTime ? new Date(dto.startTime) : null,
+          dto.endTime ? new Date(dto.endTime) : null,
+          dto.minPrice || null,
+          dto.maxPrice || null,
+          dto.minAvgRating || null,
+          dto.theme || null,
+          dto.size || null,
+          dto.amenityCategory || null,
+          dto.sort || null,
+          clientId,
+        ],
+      );
+      return result;
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to search locations',
+      );
     }
   }
 }
