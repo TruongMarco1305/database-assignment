@@ -16,22 +16,39 @@ export class AuthService {
   public async signup(signupDto: SignupDto) {
     const userId = await this.userService.createUser(signupDto);
     await this.clientService.createNewClient(userId);
-    const token = await this.tokenService.generateToken(userId);
-    return { token };
+    const token = await this.tokenService.generateToken({
+      userId,
+      role: 'client',
+    });
+    return { token, role: 'client' };
   }
 
   public async login(loginDto: LoginDto) {
     const userId = await this.userService.validateLoginCredentials(loginDto);
-    const token = await this.tokenService.generateToken(userId);
-    return { token };
+    await this.userService.validateLoginCredentials(loginDto);
+    const token = await this.tokenService.generateToken({
+      userId,
+      role: 'client',
+    });
+    return { token, role: 'client' };
   }
 
   public async ownerSignup(userId: string, ownerSignupDto: OwnerSignupDto) {
     await this.ownerService.createNewOwner(userId, ownerSignupDto);
+    const token = await this.tokenService.generateToken({
+      userId,
+      role: 'owner',
+    });
+    return { token, role: 'owner' };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  public async switchToOwner(userId: string) {
+    await this.ownerService.findOwnerByClientId(userId);
+    const token = await this.tokenService.generateToken({
+      userId,
+      role: 'owner',
+    });
+    return { token, role: 'owner' };
   }
 
   remove(id: number) {

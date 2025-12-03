@@ -31,11 +31,12 @@ export class OwnerGuard implements CanActivate {
       if (dayjs().isAfter(dayjs(payload.expiredAt).toDate())) {
         throw new UnauthorizedException('User not valid');
       }
-      await this.ownerService.findOwnerByClientId(payload.user);
+      await this.ownerService.findOwnerByClientId(payload.userId);
       // 3. Attach payload to the request object
       // This allows you to access 'req.user' in your controller
       request.user = {
-        userId: payload.user,
+        userId: payload.userId,
+        role: payload.role,
       };
     } catch (err) {
       throw err;

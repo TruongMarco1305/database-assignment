@@ -32,14 +32,15 @@ export class AuthGuard implements CanActivate {
       if (dayjs().isAfter(dayjs(payload.expiredAt).toDate())) {
         throw new UnauthorizedException('User not valid');
       }
-      const user = await this.userService.findUserById(payload.user);
+      const user = await this.userService.findUserById(payload.userId);
       if (user.isActive === 0) {
         throw new BadRequestException('Account is not activated');
       }
       // 3. Attach payload to the request object
       // This allows you to access 'req.user' in your controller
       request.user = {
-        userId: payload.user,
+        userId: payload.userId,
+        role: payload.role,
       };
     } catch (err) {
       throw err;
