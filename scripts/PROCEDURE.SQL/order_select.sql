@@ -45,28 +45,38 @@ BEGIN
     ORDER BY o.createdAt DESC
     LIMIT p_limit OFFSET v_offset;
 END //
+DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE getOrdersForOwner(
-    IN p_ownerId BINARY(16)
+    IN p_ownerId BINARY(16),
+    IN p_locationName VARCHAR(100),
+    IN p_orderStatus VARCHAR(20),
+    IN p_startTime DATETIME,
+    IN p_endTime DATETIME
 )
 BEGIN
   SELECT
     BIN_TO_UUID(o.order_id) AS order_id,
     o.status AS order_status,
-    o.startTime,
-    o.endTime,
-    o.totalPrice,
-    c.firstName AS client_first_name,
-    c.lastName AS client_last_name,
-    c.phoneNo AS client_phone,
+    o.startHour AS start_time,
+    o.endHour AS end_time,
+    o.totalPrice AS total_price,
+    l.name AS location_name,
+    u.firstName AS client_first_name,
+    u.lastName AS client_last_name,
+    u.phoneNo AS client_phone,
     i.senderBankAccount AS client_bank_account,
     i.paidOn AS payment_date
   FROM orders o
-  JOIN clients c ON o.client_id = c.user_id
-  JOIN venues v ON o.venue_id = v.venue_id
+  JOIN users u ON o.client_id = u.user_id
+  JOIN locations l ON o.venue_loc_id = l.location_id
   JOIN invoices i ON o.order_id = i.order_id
-  WHERE v.owner_id = p_ownerId
-  ORDER BY o.startTime DESC;
+  WHERE l.owner_id = p_ownerId
+    AND (p_locationName IS NULL OR l.name = p_locationName)
+    AND (p_orderStatus IS NULL OR o.status = p_orderStatus)
+    AND (p_startTime IS NULL OR o.startHour >= p_startTime)
+    AND (p_endTime IS NULL OR o.endHour <= p_endTime)
+  ORDER BY o.startHour DESC;
 END$$
 DELIMITER ;
