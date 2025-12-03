@@ -155,7 +155,7 @@ CREATE TABLE invoices (
     invoice_id BINARY(16) PRIMARY KEY,
     order_id BINARY(16),
     amount DECIMAL(12, 2) NOT NULL CHECK (amount >= 0),
-    status ENUM('PENDING', 'SUCCEEDED', 'FAILED', 'REFUNDED') DEFAULT 'PENDING',
+    status ENUM('PENDING', 'SUCCEEDED', 'FAILED') DEFAULT 'PENDING',
     senderBankAccount VARCHAR(50),
     receiverBankAccount VARCHAR(50),
     transaction_id VARCHAR(50),

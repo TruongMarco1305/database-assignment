@@ -2,7 +2,6 @@ export enum InvoiceStatus {
   PENDING = 'PENDING',
   SUCCEEDED = 'SUCCEEDED',
   FAILED = 'FAILED',
-  REFUNDED = 'REFUNDED',
 }
 
 export class Invoices {

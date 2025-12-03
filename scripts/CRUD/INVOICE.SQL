@@ -75,7 +75,7 @@ BEGIN
     WHERE invoice_id = v_id;
 END$$
 
--- 3. Invoice_UpdateStatus (Dùng cho FAILED/REFUNDED)
+-- 3. Invoice_UpdateStatus (Dùng cho FAILED)
 -- Cũng nên cho phép cập nhật lý do lỗi vào description
 CREATE PROCEDURE Invoice_UpdateStatus(
     IN p_id VARCHAR(36),
@@ -92,7 +92,7 @@ BEGIN
     END IF;
 
     -- 2. Validate Status Enum
-    IF p_status NOT IN ('PENDING', 'SUCCEEDED', 'FAILED', 'REFUNDED') THEN
+    IF p_status NOT IN ('PENDING', 'SUCCEEDED', 'FAILED') THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Invalid status value.';
     END IF;
 
@@ -108,7 +108,7 @@ END$$
 -- CREATE PROCEDURE Invoice_Delete(IN p_id VARCHAR(36))
 -- BEGIN
 --     SIGNAL SQLSTATE '45000' 
---     SET MESSAGE_TEXT = 'Error: STRICT POLICY - Invoices cannot be deleted under any circumstances to maintain financial audit trails. Please update status to FAILED or REFUNDED instead.';
+--     SET MESSAGE_TEXT = 'Error: STRICT POLICY - Invoices cannot be deleted under any circumstances to maintain financial audit trails. Please update status to FAILED instead.';
 --     DELETE FROM invoices WHERE invoice_id = UUID_TO_BIN(p_id);
 -- END$$
 
