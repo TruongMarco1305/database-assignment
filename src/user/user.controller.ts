@@ -17,6 +17,6 @@ export class UserController {
   @Get('/me')
   @UseGuards(AuthGuard)
   getProfile(@User() user: Express.User) {
-    return this.userService.getUserById(user.userId);
+    return this.userService.findUserById(user.userId);
   }
 }
