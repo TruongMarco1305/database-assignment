@@ -1,34 +1,87 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { PaymentService } from '../services/payment.service';
-import { CreatePaymentDto } from '../dto/create-payment.dto';
-import { UpdatePaymentDto } from '../dto/update-payment.dto';
+import {
+  CreateInvoiceDto,
+  CompleteInvoicePaymentDto,
+  UpdateInvoiceStatusDto,
+  CreateDiscountDto,
+  UpdateDiscountDto,
+  CreateApplyDto,
+  UpdateApplyDto,
+  DeleteApplyDto,
+} from '../dto/payment.dto';
+import { AuthGuard } from 'src/auth/guards';
 
 @Controller('payment')
+@UseGuards(AuthGuard)
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
-  @Post()
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentService.create(createPaymentDto);
+  // ===== INVOICE ENDPOINTS =====
+  @Post('/invoices')
+  async createInvoice(@Body() dto: CreateInvoiceDto) {
+    const invoiceId = await this.paymentService.createInvoice(dto);
+    return { _id: invoiceId };
   }
 
-  @Get()
-  findAll() {
-    return this.paymentService.findAll();
+  @Patch('/invoices/complete')
+  async completeInvoicePayment(@Body() dto: CompleteInvoicePaymentDto) {
+    await this.paymentService.completeInvoicePayment(dto);
+    return { message: 'Invoice payment completed successfully' };
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paymentService.findOne(+id);
+  @Patch('/invoices/status')
+  async updateInvoiceStatus(@Body() dto: UpdateInvoiceStatusDto) {
+    await this.paymentService.updateInvoiceStatus(dto);
+    return { message: 'Invoice status updated successfully' };
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePaymentDto: UpdatePaymentDto) {
-    return this.paymentService.update(+id, updatePaymentDto);
+  // ===== DISCOUNT ENDPOINTS =====
+  @Post('/discounts')
+  async createDiscount(@Body() dto: CreateDiscountDto) {
+    const discountId = await this.paymentService.createDiscount(dto);
+    return { _id: discountId };
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.paymentService.remove(+id);
+  @Patch('/discounts/:id')
+  async updateDiscount(
+    @Param('id') id: string,
+    @Body() dto: UpdateDiscountDto,
+  ) {
+    await this.paymentService.updateDiscount(id, dto);
+    return { message: 'Discount updated successfully' };
+  }
+
+  @Delete('/discounts/:id')
+  async deleteDiscount(@Param('id') id: string) {
+    await this.paymentService.deleteDiscount(id);
+    return { message: 'Discount deleted successfully' };
+  }
+
+  // ===== APPLY DISCOUNT ENDPOINTS =====
+  @Post('/applies')
+  async applyDiscount(@Body() dto: CreateApplyDto) {
+    await this.paymentService.applyDiscount(dto);
+    return { message: 'Discount applied successfully' };
+  }
+
+  @Patch('/applies')
+  async updateApply(@Body() dto: UpdateApplyDto) {
+    await this.paymentService.updateApply(dto);
+    return { message: 'Discount updated successfully' };
+  }
+
+  @Delete('/applies')
+  async removeDiscount(@Body() dto: DeleteApplyDto) {
+    await this.paymentService.removeDiscount(dto);
+    return { message: 'Discount removed successfully' };
   }
 }

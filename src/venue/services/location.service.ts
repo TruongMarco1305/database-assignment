@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { CreateLocationDto } from '../dto/create-venue.dto';
+import { CreateLocationDto, UpdateLocationDto } from '../dto/create-venue.dto';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -13,24 +13,60 @@ export class LocationService {
   ): Promise<string> {
     const locationId = uuidv4();
 
-    await this.databaseService.execute(
-      `
-      CALL Location_Insert(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      `,
-      [
-        locationId,
-        ownerId,
-        dto.name,
-        dto.description || null,
-        dto.addrNo,
-        dto.ward,
-        dto.city,
-        dto.policy || null,
-        dto.phoneNo || null,
-        dto.mapURL,
-        dto.thumbnailURL,
-      ],
-    );
-    return locationId;
+    try {
+      await this.databaseService.execute(
+        `CALL Location_Insert(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          locationId,
+          ownerId,
+          dto.name,
+          dto.description || null,
+          dto.addrNo,
+          dto.ward,
+          dto.city,
+          dto.phoneNo || null,
+          dto.policy || null,
+          dto.mapURL,
+          dto.thumbnailURL,
+        ],
+      );
+      return locationId;
+    } catch (error) {
+      throw new ConflictException(error.message || 'Failed to create location');
+    }
+  }
+
+  public async updateLocation(
+    id: string,
+    dto: UpdateLocationDto,
+  ): Promise<void> {
+    try {
+      await this.databaseService.execute(
+        `CALL Location_Update(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          id,
+          dto.name || null,
+          dto.description || null,
+          dto.addrNo || null,
+          dto.ward || null,
+          dto.city || null,
+          dto.phoneNo || null,
+          dto.policy || null,
+          dto.mapURL || null,
+          dto.thumbnailURL || null,
+          dto.isActive !== undefined ? dto.isActive : null,
+        ],
+      );
+    } catch (error) {
+      throw new ConflictException(error.message || 'Failed to update location');
+    }
+  }
+
+  public async deleteLocation(id: string): Promise<void> {
+    try {
+      await this.databaseService.execute(`CALL Location_Delete(?)`, [id]);
+    } catch (error) {
+      throw new ConflictException(error.message || 'Failed to delete location');
+    }
   }
 }

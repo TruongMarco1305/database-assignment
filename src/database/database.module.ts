@@ -1,9 +1,8 @@
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { DatabaseService } from './database.service';
 import { commonConfig, CommonConfigType } from 'src/config';
 import * as mysql from 'mysql2/promise';
 
-@Global()
 @Module({
   providers: [
     {
