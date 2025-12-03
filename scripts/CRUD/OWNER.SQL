@@ -59,6 +59,27 @@ BEGIN
     WHERE user_id = v_uuid;
 END$$
 
+    CREATE PROCEDURE FindOwnerByUserId(
+        IN p_id BINARY(16)
+    )
+    BEGIN
+        SELECT 
+            BIN_TO_UUID(users.id) as id,
+            users.email as email, 
+            users.firstName as firstName, 
+            users.lastName as lastName, 
+            users.DoB as DoB, 
+            users.isActive as isActive, 
+            users.phoneNo as phoneNo, 
+            users.avatarUrl as avatarUrl,
+            owners.bankId as bankId,
+            owners.bankName as bankName,
+            owners.accountName as accountName,
+            owners.accountNo as accountNo
+        FROM users JOIN owners
+        ON users.id = owners.user_id
+        WHERE users.id = p_id;
+    END $$
 -- -- Delete Owner
 -- CREATE PROCEDURE Owner_Delete(IN p_userId VARCHAR(36))
 -- BEGIN

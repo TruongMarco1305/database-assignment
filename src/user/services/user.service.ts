@@ -81,6 +81,17 @@ export class UserService extends TableService {
     return result[0];
   }
 
+  public async findOwnerByUserId(userId: string): Promise<User> {
+    const result = await this.databaseService.execute<User>(
+      `CALL FindOwnerByUserId(?)`,
+      [convertUUIDtoBinaryHex(userId)],
+    );
+    if (result.length === 0) {
+      throw new BadRequestException('Owner not found');
+    }
+    return result[0];
+  }
+
   public async updateUser(
     userId: string,
     updateUserDto: UpdateUserDto,

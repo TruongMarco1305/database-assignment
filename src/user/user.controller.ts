@@ -17,6 +17,11 @@ export class UserController {
   @Get('/me')
   @UseGuards(AuthGuard)
   getProfile(@User() user: Express.User) {
-    return this.userService.findUserById(user.userId);
+    console.log(user);
+    if (user.role === 'client') {
+      return this.userService.findUserById(user.userId);
+    } else {
+      return this.userService.findOwnerByUserId(user.userId);
+    }
   }
 }
