@@ -9,10 +9,10 @@ import {
 } from '@nestjs/common';
 import { AmenityService } from '../services/amenity.service';
 import { CreateAmenityDto, UpdateAmenityDto } from '../dto/create-venue.dto';
-import { AuthGuard } from 'src/auth/guards';
+import { OwnerGuard } from 'src/auth/guards';
 
 @Controller('amenity')
-@UseGuards(AuthGuard)
+@UseGuards(OwnerGuard)
 export class AmenityController {
   constructor(private readonly amenityService: AmenityService) {}
 

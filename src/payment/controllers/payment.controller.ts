@@ -18,10 +18,9 @@ import {
   UpdateApplyDto,
   DeleteApplyDto,
 } from '../dto/payment.dto';
-import { AuthGuard } from 'src/auth/guards';
+import { AdminGuard, AuthGuard } from 'src/auth/guards';
 
 @Controller('payment')
-@UseGuards(AuthGuard)
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
@@ -46,12 +45,14 @@ export class PaymentController {
 
   // ===== DISCOUNT ENDPOINTS =====
   @Post('/discounts')
+  @UseGuards(AdminGuard)
   async createDiscount(@Body() dto: CreateDiscountDto) {
     const discountId = await this.paymentService.createDiscount(dto);
     return { _id: discountId };
   }
 
   @Patch('/discounts/:id')
+  @UseGuards(AdminGuard)
   async updateDiscount(
     @Param('id') id: string,
     @Body() dto: UpdateDiscountDto,
@@ -61,6 +62,7 @@ export class PaymentController {
   }
 
   @Delete('/discounts/:id')
+  @UseGuards(AdminGuard)
   async deleteDiscount(@Param('id') id: string) {
     await this.paymentService.deleteDiscount(id);
     return { message: 'Discount deleted successfully' };
@@ -68,18 +70,21 @@ export class PaymentController {
 
   // ===== APPLY DISCOUNT ENDPOINTS =====
   @Post('/applies')
+  @UseGuards(AuthGuard)
   async applyDiscount(@Body() dto: CreateApplyDto) {
     await this.paymentService.applyDiscount(dto);
     return { message: 'Discount applied successfully' };
   }
 
   @Patch('/applies')
+  @UseGuards(AuthGuard)
   async updateApply(@Body() dto: UpdateApplyDto) {
     await this.paymentService.updateApply(dto);
     return { message: 'Discount updated successfully' };
   }
 
   @Delete('/applies')
+  @UseGuards(AuthGuard)
   async removeDiscount(@Body() dto: DeleteApplyDto) {
     await this.paymentService.removeDiscount(dto);
     return { message: 'Discount removed successfully' };
