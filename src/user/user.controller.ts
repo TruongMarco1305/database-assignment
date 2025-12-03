@@ -1,4 +1,4 @@
-import { Body, Controller, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { UserService } from './services/user.service';
 import { UpdateUserDto } from './user.dto';
 import { AuthGuard } from 'src/auth/guards';
@@ -12,5 +12,11 @@ export class UserController {
   @UseGuards(AuthGuard)
   update(@User() user: Express.User, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.updateUser(user.userId, updateUserDto);
+  }
+
+  @Get('/me')
+  @UseGuards(AuthGuard)
+  getProfile(@User() user: Express.User) {
+    return this.userService.getUserById(user.userId);
   }
 }
