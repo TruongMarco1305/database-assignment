@@ -11,12 +11,12 @@ export class TokenService {
     @Inject(commonConfig.KEY) private appCommonConfig: CommonConfigType,
   ) {}
 
-  public async generateToken(userId: string): Promise<string> {
-    const payload = {
-      user: userId,
+  public async generateToken(payload: any): Promise<string> {
+    const data = {
+      ...payload,
       expiredAt: dayjs().add(1, 'year').toDate().toString(),
     };
-    return this.jwtService.signAsync(payload);
+    return this.jwtService.signAsync(data);
   }
 
   public async verifyToken(token: string): Promise<Token> {

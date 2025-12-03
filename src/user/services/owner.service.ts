@@ -17,17 +17,13 @@ export class OwnerService extends TableService {
 
   public async createNewOwner(userId: string, ownerSignupDto: OwnerSignupDto) {
     const { bankId, bankName, accountName, accountNumber } = ownerSignupDto;
-    await this.databaseService.execute(
-      `INSERT INTO ${this.tableName} (user_id, bankId, bankName, accountName, accountNo)
-       VALUES (?, ?, ?, ?, ?)`,
-      [
-        convertUUIDtoBinaryHex(userId),
-        bankId,
-        bankName,
-        accountName,
-        accountNumber,
-      ],
-    );
+    await this.databaseService.execute(`CALL Owner_Insert(?, ?, ?, ?, ?)`, [
+      userId,
+      bankId,
+      bankName,
+      accountName,
+      accountNumber,
+    ]);
   }
 
   public async findOwnerByClientId(userId: string) {

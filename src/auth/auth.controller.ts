@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Patch } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
 import { LoginDto, OwnerSignupDto, SignupDto } from './auth.dto';
 import { AuthGuard } from './guards/user.guard';
@@ -25,5 +25,11 @@ export class AuthController {
   @Post('/login')
   public async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Patch('/switch/owner')
+  @UseGuards(AuthGuard)
+  public async switchToOwner(@User() user: Express.User) {
+    return this.authService.switchToOwner(user.userId);
   }
 }

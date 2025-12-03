@@ -32,14 +32,15 @@ export class AdminGuard implements CanActivate {
       if (dayjs().isAfter(dayjs(payload.expiredAt).toDate())) {
         throw new UnauthorizedException('User not valid');
       }
-      const user = await this.userService.findUserById(payload.user);
+      const user = await this.userService.findUserById(payload.userId);
       if (user.isActive === 0 || user.isAdmin === 0) {
         throw new BadRequestException('Account is not administrator');
       }
       // 3. Attach payload to the request object
       // This allows you to access 'req.user' in your controller
       request.user = {
-        userId: payload.user,
+        userId: payload.userId,
+        role: 'admin',
       };
     } catch (err) {
       throw err;
