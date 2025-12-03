@@ -81,6 +81,10 @@ export class UserService extends TableService {
     return result[0];
   }
 
+  public async getUserById(userId: string): Promise<User> {
+    return this.findUserById(userId);
+  }
+
   public async updateUser(
     userId: string,
     updateUserDto: UpdateUserDto,
