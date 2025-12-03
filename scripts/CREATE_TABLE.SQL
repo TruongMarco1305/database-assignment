@@ -5,7 +5,7 @@ CREATE TABLE users (
     firstName VARCHAR(50) CHECK (firstName REGEXP '^[A-Za-z]+$'),
     lastName VARCHAR(50) CHECK (lastName REGEXP '^[A-Za-z]+$'),
     phoneNo VARCHAR(10) CHECK (phoneNo REGEXP '^[0-9]+$'),
-    avatarURL TEXT,
+    avatarURL VARCHAR(255),
     DoB DATE NOT NULL,
     isActive BOOLEAN DEFAULT 1,
     isAdmin BOOLEAN DEFAULT 0,

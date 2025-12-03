@@ -6,7 +6,7 @@ export const CREATE_USER_TABLE_QUERY = `
         firstName VARCHAR(50) CHECK (firstName REGEXP '^[A-Za-z]+$'),
         lastName VARCHAR(50) CHECK (lastName REGEXP '^[A-Za-z]+$'),
         phoneNo VARCHAR(15) CHECK (phoneNo REGEXP '^[0-9]+$'),
-        avatarURL TEXT,
+        avatarURL VARCHAR(255),
         DoB DATE NOT NULL,
         isActive BOOLEAN DEFAULT 1,
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -39,7 +39,7 @@ export const CREATE_USER_PROCEDURE = `
         IN p_firstName VARCHAR(50),
         IN p_lastName VARCHAR(50),
         IN p_phoneNo VARCHAR(15),
-        IN p_avatarUrl TEXT,
+        IN p_avatarURL VARCHAR(255),
         IN p_DoB DATE
     )
     BEGIN

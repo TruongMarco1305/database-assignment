@@ -6,7 +6,7 @@ CREATE PROCEDURE VenueImage_Insert(
     IN p_id VARCHAR(36),       -- ID của ảnh (tạo mới từ code)
     IN p_locId VARCHAR(36),    -- ID của địa điểm
     IN p_venueName VARCHAR(100), -- Tên phòng
-    IN p_url VARCHAR(255)      -- Link ảnh
+    IN p_URL VARCHAR(255)      -- Link ảnh
 )
 BEGIN
     DECLARE v_locId BINARY(16);
@@ -35,7 +35,7 @@ END$$
 -- Nếu muốn đổi ảnh sang phòng khác, nên Xóa đi tạo lại thay vì Update khóa ngoại.
 CREATE PROCEDURE VenueImage_Update(
     IN p_id VARCHAR(36),
-    IN p_url VARCHAR(255)
+    IN p_URL VARCHAR(255)
 )
 BEGIN
     DECLARE v_id BINARY(16);

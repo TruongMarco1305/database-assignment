@@ -9,7 +9,7 @@ CREATE PROCEDURE User_Insert(
     IN p_firstName VARCHAR(50),
     IN p_lastName VARCHAR(50),
     IN p_phoneNo VARCHAR(15),
-    IN p_avatarURL TEXT,
+    IN p_avatarURL VARCHAR(255),
     IN p_DoB DATE
 )
 BEGIN
@@ -74,7 +74,7 @@ CREATE PROCEDURE User_Update(
     IN p_firstName VARCHAR(50),
     IN p_lastName VARCHAR(50),
     IN p_phoneNo VARCHAR(15),
-    IN p_avatarURL TEXT,
+    IN p_avatarURL VARCHAR(255),
     IN p_DoB DATE,
     IN p_isActive BOOLEAN,
     IN p_isAdmin BOOLEAN
