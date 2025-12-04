@@ -133,7 +133,7 @@ CREATE TABLE discounts (
     maxDiscountPrice DECIMAL(12, 2),
     minPrice DECIMAL(12, 2),
     venueTypeId BINARY(16),
-    membershipTier SET('BRONZE', 'SILVER', 'GOLD', 'PLATINUM'), -- CHECK SET MEMBERSHIP
+    membershipTier ENUM('BRONZE', 'SILVER', 'GOLD', 'PLATINUM'), -- CHECK SET MEMBERSHIP
     startedAt DATETIME NOT NULL,
     expiredAt DATETIME NOT NULL,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
