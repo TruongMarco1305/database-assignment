@@ -4,6 +4,7 @@ import { TableService } from 'src/database/table.service';
 import { CREATE_OWNER_TABLE_QUERY } from 'src/database/queries';
 import { OwnerSignupDto } from 'src/auth/auth.dto';
 import { convertUUIDtoBinaryHex } from 'src/utils';
+import { UpdateOwnerDto } from '../user.dto';
 
 @Injectable()
 export class OwnerService extends TableService {
@@ -35,5 +36,16 @@ export class OwnerService extends TableService {
       throw new NotFoundException('Owner not found');
     }
     return result[0];
+  }
+
+  public async updateOwner(userId: string, updateOwnerDto: UpdateOwnerDto) {
+    const { bankId, bankName, accountName, accountNo } = updateOwnerDto;
+    await this.databaseService.execute(`CALL Owner_Update(?, ?, ?, ?, ?)`, [
+      userId,
+      bankId,
+      bankName,
+      accountName,
+      accountNo,
+    ]);
   }
 }

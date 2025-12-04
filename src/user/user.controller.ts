@@ -1,12 +1,16 @@
 import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { UserService } from './services/user.service';
-import { UpdateUserDto } from './user.dto';
-import { AuthGuard } from 'src/auth/guards';
+import { UpdateOwnerDto, UpdateUserDto } from './user.dto';
+import { AuthGuard, OwnerGuard } from 'src/auth/guards';
 import { User } from 'src/auth/decorators';
+import { OwnerService } from './services';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly ownerService: OwnerService,
+  ) {}
 
   @Patch('/me')
   @UseGuards(AuthGuard)
@@ -23,5 +27,11 @@ export class UserController {
     } else {
       return this.userService.findOwnerByUserId(user.userId);
     }
+  }
+
+  @Patch('/owner/me')
+  @UseGuards(OwnerGuard)
+  updateOwner(@User() user: Express.User, @Body() dto: UpdateOwnerDto) {
+    return this.ownerService.updateOwner(user.userId, dto);
   }
 }
