@@ -171,28 +171,27 @@ CREATE PROCEDURE getLocationDetailById(
     IN p_id VARCHAR(36)
 )
 BEGIN
-    SELECT name, description, addrNo, ward, city, avgRating, policy, phoneNo, mapURL, thumbnailURL FROM locations
+    SELECT p_id as id, description, addrNo, ward, city, avgRating, policy, phoneNo, mapURL, thumbnailURL FROM locations
     WHERE UUID_TO_BIN(p_id) = location_id AND UUID_TO_BIN(p_userId) = owner_id;
 END$$
 
 CREATE PROCEDURE listVenueOfLocation(
-	IN p_userId VARCHAR(36),
     IN p_locId VARCHAR(36)
 )
 BEGIN
     SELECT 
-        v.*,
-        l.name AS location_name,
-        l.addrNo AS location_addrNo,
-        l.ward AS location_ward,
-        l.city AS location_city,
-        l.avgRating AS location_avgRating,
-        l.thumbnailURL AS location_thumbnailURL,
-        l.mapURL AS location_mapURL,
-        l.phoneNo AS location_phone
+        v.name as venueName,
+        v.floor as venueFloor,
+        v.area as venueArea,
+        v.pricePerHour as venuePricePerHour,
+        v.isActive as venueIsActive,
+        vt.name as venueTypeName,
+        vt.maxCapacity as venueCapacity,
+        vi.locationImgURL as venueImageURL
     FROM venues v
-    JOIN locations l ON v.location_id = l.location_id
-    WHERE v.location_id = UUID_TO_BIN(p_locId) AND l.owner_id = UUID_TO_BIN(p_userId)
-    ORDER BY v.name ASC;
+    JOIN venue_types vt ON v.venueType_id = vt.venueType_id
+    JOIN venue_images vi ON v.location_id = vi.location_id AND v.name = vi.venueName
+    WHERE v.location_id = UUID_TO_BIN(p_locId)
+    ORDER BY v.createdAt DESC;
 END$$
 DELIMITER ;
