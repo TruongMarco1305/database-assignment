@@ -189,6 +189,9 @@ export class CreateVenueDto {
   @IsNumber()
   @Min(0.01)
   pricePerHour: number;
+
+  @IsOptional()
+  images: string[];
 }
 
 export class UpdateVenueDto {
