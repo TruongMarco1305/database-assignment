@@ -9,40 +9,74 @@ import {
   IsInt,
   IsDateString,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateLocationDto {
+  @ApiProperty({
+    example: 'Sky Garden Event Space',
+    description: 'Location name',
+  })
   @IsNotEmpty()
   @IsString()
   name: string;
 
+  @ApiProperty({
+    example: 'Modern event space with panoramic city views',
+    description: 'Location description',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   description?: string;
 
+  @ApiProperty({
+    example: '123 Nguyen Hue',
+    description: 'Street address number',
+  })
   @IsNotEmpty()
   @IsString()
   addrNo: string;
 
+  @ApiProperty({ example: 'Ben Nghe', description: 'Ward/District' })
   @IsNotEmpty()
   @IsString()
   ward: string;
 
+  @ApiProperty({ example: 'Ho Chi Minh City', description: 'City name' })
   @IsNotEmpty()
   @IsString()
   city: string;
 
+  @ApiProperty({
+    example: 'No smoking. Pets not allowed.',
+    description: 'Location policies',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   policy?: string;
 
+  @ApiProperty({
+    example: '+84281234567',
+    description: 'Contact phone number',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   phoneNo?: string;
 
+  @ApiProperty({
+    example: 'https://maps.google.com/?q=10.7769,106.7009',
+    description: 'Google Maps URL',
+  })
   @IsUrl()
   @IsNotEmpty()
   mapURL: string;
 
+  @ApiProperty({
+    example: 'https://example.com/thumbnail.jpg',
+    description: 'Thumbnail image URL',
+  })
   @IsUrl()
   @IsNotEmpty()
   thumbnailURL: string;
