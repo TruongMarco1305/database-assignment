@@ -15,16 +15,16 @@ BEGIN
 
     -- 1. Validate Foreign Keys
     IF NOT EXISTS (SELECT 1 FROM orders WHERE order_id = v_orderId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Order does not exist.';
+        SIGNAL SQLSTATE '45077' SET MESSAGE_TEXT = 'Error: Order does not exist.';
     END IF;
     
     IF NOT EXISTS (SELECT 1 FROM discounts WHERE discount_id = v_discountId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Discount does not exist.';
+        SIGNAL SQLSTATE '45078' SET MESSAGE_TEXT = 'Error: Discount does not exist.';
     END IF;
     
     -- 2. Validate Duplicate (Đã có mã này chưa)
     IF EXISTS (SELECT 1 FROM applies WHERE order_id = v_orderId AND discount_id = v_discountId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: This discount is already applied to this order.';
+        SIGNAL SQLSTATE '45079' SET MESSAGE_TEXT = 'Error: This discount is already applied to this order.';
     END IF;
 
     -- 3. Execute Insert
@@ -51,12 +51,12 @@ BEGIN
 
     -- 1. Validate New Discount Existence
     IF NOT EXISTS (SELECT 1 FROM discounts WHERE discount_id = v_newDiscountId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: New Discount does not exist.';
+        SIGNAL SQLSTATE '45080' SET MESSAGE_TEXT = 'Error: New Discount does not exist.';
     END IF;
 
     -- 2. Validate Existing Application (Có dòng cũ để sửa không?)
     IF NOT EXISTS (SELECT 1 FROM applies WHERE order_id = v_orderId AND discount_id = v_oldDiscountId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: The old discount was not applied to this order.';
+        SIGNAL SQLSTATE '45081' SET MESSAGE_TEXT = 'Error: The old discount was not applied to this order.';
     END IF;
 
     -- 3. Execute Update
@@ -83,7 +83,7 @@ BEGIN
 
     -- 1. Validate Existence
     IF NOT EXISTS (SELECT 1 FROM applies WHERE order_id = v_orderId AND discount_id = v_discountId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Discount not found in this order.';
+        SIGNAL SQLSTATE '45082' SET MESSAGE_TEXT = 'Error: Discount not found in this order.';
     END IF;
 
     -- 2. Execute Delete

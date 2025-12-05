@@ -17,21 +17,21 @@ BEGIN
 
     -- 1. Validate Stars (1-5)
     IF p_stars < 1 OR p_stars > 5 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Rating stars must be an integer between 1 and 5.';
+        SIGNAL SQLSTATE '45044' SET MESSAGE_TEXT = 'Error: Rating stars must be an integer between 1 and 5.';
     END IF;
 
     -- 2. Validate Foreign Keys
     IF NOT EXISTS (SELECT 1 FROM clients WHERE user_id = v_clientId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Client does not exist.';
+        SIGNAL SQLSTATE '45045' SET MESSAGE_TEXT = 'Error: Client does not exist.';
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM locations WHERE location_id = v_locId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Location does not exist.';
+        SIGNAL SQLSTATE '45046' SET MESSAGE_TEXT = 'Error: Location does not exist.';
     END IF;
 
     -- 3. Validate Duplicate (Mỗi khách chỉ đánh giá 1 lần cho 1 địa điểm)
     IF EXISTS (SELECT 1 FROM rates WHERE client_id = v_clientId AND location_id = v_locId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: You have already rated this location. Please update your existing rating instead.';
+        SIGNAL SQLSTATE '45047' SET MESSAGE_TEXT = 'Error: You have already rated this location. Please update your existing rating instead.';
     END IF;
 
     -- Lưu ý: Logic "Phải có đơn hàng hoàn tất mới được đánh giá" 
@@ -57,12 +57,12 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM rates WHERE client_id = v_clientId AND location_id = v_locId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Rating does not exist.';
+        SIGNAL SQLSTATE '45048' SET MESSAGE_TEXT = 'Error: Rating does not exist.';
     END IF;
 
     -- 2. Validate Stars (Nếu có truyền vào)
     IF p_stars IS NOT NULL AND (p_stars < 1 OR p_stars > 5) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Rating stars must be an integer between 1 and 5.';
+        SIGNAL SQLSTATE '45049' SET MESSAGE_TEXT = 'Error: Rating stars must be an integer between 1 and 5.';
     END IF;
 
     -- Execute Update (Partial Update)
@@ -87,7 +87,7 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM rates WHERE client_id = v_clientId AND location_id = v_locId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Rating does not exist.';
+        SIGNAL SQLSTATE '45050' SET MESSAGE_TEXT = 'Error: Rating does not exist.';
     END IF;
 
     DELETE FROM rates 

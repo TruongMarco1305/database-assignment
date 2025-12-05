@@ -59,7 +59,7 @@ BEGIN
 
     -- 2. Kiểm tra kênh có tồn tại không
     IF NOT EXISTS (SELECT 1 FROM chat_channels WHERE user_1_id = v_u1 AND user_2_id = v_u2) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Chat channel not found.';
+        SIGNAL SQLSTATE '45076' SET MESSAGE_TEXT = 'Error: Chat channel not found.';
     END IF;
 
     -- 3. Truy vấn TOÀN BỘ tin nhắn

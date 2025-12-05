@@ -46,11 +46,11 @@ BEGIN
     DECLARE v_total DECIMAL(12,2);
 
     IF p_start IS NULL OR p_end IS NULL THEN 
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid dates'; 
+        SIGNAL SQLSTATE '45001' SET MESSAGE_TEXT='Invalid dates'; 
     END IF;
 
     IF p_start >= p_end THEN 
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='start must be before end'; 
+        SIGNAL SQLSTATE '45002' SET MESSAGE_TEXT='start must be before end'; 
     END IF;
 
     -- 1. Lấy giá phòng
@@ -60,7 +60,7 @@ BEGIN
 
     -- Nếu không tìm thấy phòng (phòng sai tên hoặc id), trả về 0 hoặc báo lỗi
     IF v_pricePerHour IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Venue not found';
+        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT='Venue not found';
     END IF;
 
     -- 2. Tính số giờ (Làm tròn logic như cũ)
@@ -279,13 +279,13 @@ BEGIN
 
     -- 4. Validate Input
     IF p_locationId IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: locationId is required.';
+        SIGNAL SQLSTATE '45004' SET MESSAGE_TEXT = 'Error: locationId is required.';
     END IF;
     
     SET v_loc_uuid = UUID_TO_BIN(p_locationId);
     
     IF v_loc_uuid IS NULL OR NOT EXISTS (SELECT 1 FROM locations WHERE location_id = v_loc_uuid) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Location not found or invalid locationId.';
+        SIGNAL SQLSTATE '45005' SET MESSAGE_TEXT = 'Error: Location not found or invalid locationId.';
     END IF;
 
     -- 5. Mở Cursor

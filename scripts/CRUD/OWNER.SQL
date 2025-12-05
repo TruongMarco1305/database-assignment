@@ -15,17 +15,17 @@ BEGIN
     
     -- 1. Check Required Fields
     IF p_bankId IS NULL OR p_bankName IS NULL OR p_accName IS NULL OR p_accNo IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: All bank details are required.';
+        SIGNAL SQLSTATE '45126' SET MESSAGE_TEXT = 'Error: All bank details are required.';
     END IF;
 
     -- 2. Check if User exists in USERS table (Foreign Key integrity)
     IF NOT EXISTS (SELECT 1 FROM users WHERE id = v_uuid) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: User ID does not exist in Users table.';
+        SIGNAL SQLSTATE '45127' SET MESSAGE_TEXT = 'Error: User ID does not exist in Users table.';
     END IF;
 
     -- 3. Check if this User is already an Owner (One-to-One relationship)
     IF EXISTS (SELECT 1 FROM owners WHERE user_id = v_uuid) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: This User is already registered as an Owner.';
+        SIGNAL SQLSTATE '45128' SET MESSAGE_TEXT = 'Error: This User is already registered as an Owner.';
     END IF;
     
     INSERT INTO owners (user_id, bankId, bankName, accountName, accountNo)
@@ -46,7 +46,7 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM owners WHERE user_id = v_uuid) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Owner does not exist.';
+        SIGNAL SQLSTATE '45129' SET MESSAGE_TEXT = 'Error: Owner does not exist.';
     END IF;
 
     -- Execute Update with Partial Update logic

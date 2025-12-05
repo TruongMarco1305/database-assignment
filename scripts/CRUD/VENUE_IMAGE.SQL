@@ -13,7 +13,7 @@ BEGIN
 
     -- 1. Validate URL
     IF p_url IS NULL OR p_url = '' THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Image URL cannot be empty.';
+        SIGNAL SQLSTATE '45014' SET MESSAGE_TEXT = 'Error: Image URL cannot be empty.';
     END IF;
 
     -- 2. Validate Foreign Key (Venue Existence)
@@ -21,7 +21,7 @@ BEGIN
         SELECT 1 FROM venues 
         WHERE location_id = v_locId AND name = p_venueName
     ) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue does not exist.';
+        SIGNAL SQLSTATE '45015' SET MESSAGE_TEXT = 'Error: Venue does not exist.';
     END IF;
 
     -- 3. Validate Duplicate (Trùng ảnh trong cùng 1 phòng)
@@ -31,7 +31,7 @@ BEGIN
           AND venueName = p_venueName 
           AND locationImgURL = p_url
     ) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: This image already exists for this venue.';
+        SIGNAL SQLSTATE '45016' SET MESSAGE_TEXT = 'Error: This image already exists for this venue.';
     END IF;
 
     -- Execute Insert
@@ -58,7 +58,7 @@ BEGIN
           AND venueName = p_venueName 
           AND locationImgURL = p_url
     ) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Image does not exist.';
+        SIGNAL SQLSTATE '45017' SET MESSAGE_TEXT = 'Error: Image does not exist.';
     END IF;
 
     -- Execute Delete

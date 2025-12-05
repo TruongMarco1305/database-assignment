@@ -25,7 +25,7 @@ BEGIN
               o.startHour < v_currentEnd AND o.endHour > v_currentStart
           )
     ) THEN
-        SIGNAL SQLSTATE '45000' 
+        SIGNAL SQLSTATE '45121' 
         SET MESSAGE_TEXT = 'Error: This amenity is already booked by another order during this time slot.';
     END IF;
 END$$

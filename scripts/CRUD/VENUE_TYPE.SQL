@@ -12,7 +12,7 @@ CREATE PROCEDURE VenueType_Insert(
 BEGIN
     -- 1. Validate Null / Empty
     IF p_name IS NULL OR p_name = '' THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue Type name cannot be empty.';
+        SIGNAL SQLSTATE '45006' SET MESSAGE_TEXT = 'Error: Venue Type name cannot be empty.';
     END IF;
 
     -- 2. Validate Duplicate Name
@@ -22,11 +22,11 @@ BEGIN
 
     -- 3. Validate Capacity Logic
     IF p_minCap <= 0 OR p_maxCap <= 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Capacity must be greater than 0.';
+        SIGNAL SQLSTATE '45007' SET MESSAGE_TEXT = 'Error: Capacity must be greater than 0.';
     END IF;
 
     IF p_minCap > p_maxCap THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Min Capacity cannot be greater than Max Capacity.';
+        SIGNAL SQLSTATE '45008' SET MESSAGE_TEXT = 'Error: Min Capacity cannot be greater than Max Capacity.';
     END IF;
 
     INSERT INTO venue_types (venueType_id, name, description, minCapacity, maxCapacity)
@@ -52,7 +52,7 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM venue_types WHERE venueType_id = v_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue Type does not exist.';
+        SIGNAL SQLSTATE '45009' SET MESSAGE_TEXT = 'Error: Venue Type does not exist.';
     END IF;
 
     -- 2. Validate Duplicate Name (Nếu đổi tên khác, tên đó phải chưa tồn tại)
@@ -69,11 +69,11 @@ BEGIN
     SET v_newMax = COALESCE(p_maxCap, v_currentMax);
 
     IF v_newMin <= 0 OR v_newMax <= 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Capacity must be greater than 0.';
+        SIGNAL SQLSTATE '45010' SET MESSAGE_TEXT = 'Error: Capacity must be greater than 0.';
     END IF;
 
     IF v_newMin > v_newMax THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Min Capacity cannot be greater than Max Capacity.';
+        SIGNAL SQLSTATE '45011' SET MESSAGE_TEXT = 'Error: Min Capacity cannot be greater than Max Capacity.';
     END IF;
 
     -- Execute Update
@@ -94,13 +94,13 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM venue_types WHERE venueType_id = v_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue Type does not exist.';
+        SIGNAL SQLSTATE '45012' SET MESSAGE_TEXT = 'Error: Venue Type does not exist.';
     END IF;
 
     -- 2. Constraint Check: VENUES
     -- Không cho xóa Loại phòng nếu đang có Phòng (Venue) thuộc loại này
     IF EXISTS (SELECT 1 FROM venues WHERE venueType_id = v_id) THEN
-        SIGNAL SQLSTATE '45000' 
+        SIGNAL SQLSTATE '45013' 
         SET MESSAGE_TEXT = 'Error: Cannot delete Venue Type. There are Venues using this type. Please reassign them first.';
     END IF;
 
