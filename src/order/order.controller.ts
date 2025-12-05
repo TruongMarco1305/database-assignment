@@ -9,6 +9,12 @@ import {
   Get,
   Query,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { OrderService } from './order.service';
 import {
   CreateOrderDto,
@@ -19,6 +25,7 @@ import {
 import { AuthGuard, OwnerGuard } from 'src/auth/guards';
 import { User } from 'src/auth/decorators';
 
+@ApiTags('Orders')
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
@@ -26,6 +33,10 @@ export class OrderController {
   // ===== ORDER ENDPOINTS =====
   @Post()
   @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Create a new booking order' })
+  @ApiResponse({ status: 201, description: 'Order created successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async create(@Body() dto: CreateOrderDto, @User() user: Express.User) {
     const orderId = await this.orderService.createOrder(user.userId, dto);
     return { _id: orderId };
@@ -33,6 +44,11 @@ export class OrderController {
 
   @Patch('/:id')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Update order details' })
+  @ApiResponse({ status: 200, description: 'Order updated successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
   async update(@Param('id') id: string, @Body() dto: UpdateOrderDto) {
     await this.orderService.updateOrder(id, dto);
     return { message: 'Order updated successfully' };
@@ -40,6 +56,11 @@ export class OrderController {
 
   @Delete('/:id')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Cancel/delete an order' })
+  @ApiResponse({ status: 200, description: 'Order deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
   async remove(@Param('id') id: string) {
     await this.orderService.deleteOrder(id);
     return { message: 'Order deleted successfully' };
@@ -48,6 +69,13 @@ export class OrderController {
   // ===== ORDER AMENITY ENDPOINTS =====
   @Post('/amenities')
   @UseGuards(OwnerGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Add an amenity to an order' })
+  @ApiResponse({
+    status: 201,
+    description: 'Amenity added to order successfully',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden - Owner role required' })
   async addAmenity(@Body() dto: AddOrderAmenityDto) {
     await this.orderService.addOrderAmenity(dto);
     return { message: 'Amenity added to order successfully' };
@@ -55,6 +83,13 @@ export class OrderController {
 
   @Delete('/amenities')
   @UseGuards(OwnerGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Remove an amenity from an order' })
+  @ApiResponse({
+    status: 200,
+    description: 'Amenity removed from order successfully',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden - Owner role required' })
   async removeAmenity(@Body() dto: RemoveOrderAmenityDto) {
     await this.orderService.removeOrderAmenity(dto);
     return { message: 'Amenity removed from order successfully' };

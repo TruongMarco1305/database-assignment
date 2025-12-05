@@ -8,6 +8,12 @@ import {
   UseGuards,
   Get,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AuthGuard, OwnerGuard } from 'src/auth/guards';
 import {
   CreateLocationDto,
@@ -17,12 +23,18 @@ import {
 import { User } from 'src/auth/decorators';
 import { LocationService } from '../services/location.service';
 
+@ApiTags('Locations')
 @Controller('location')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
   @Post()
   @UseGuards(OwnerGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Create a new location' })
+  @ApiResponse({ status: 201, description: 'Location created successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Owner role required' })
   async create(@Body() dto: CreateLocationDto, @User() user: Express.User) {
     const locationId = await this.locationService.createLocation(
       user.userId,
@@ -53,6 +65,12 @@ export class LocationController {
 
   @Patch('/:id')
   @UseGuards(OwnerGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Update location details' })
+  @ApiResponse({ status: 200, description: 'Location updated successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Owner role required' })
+  @ApiResponse({ status: 404, description: 'Location not found' })
   async update(@Param('id') id: string, @Body() dto: UpdateLocationDto) {
     await this.locationService.updateLocation(id, dto);
     return { message: 'Location updated successfully' };
@@ -60,6 +78,12 @@ export class LocationController {
 
   @Delete('/:id')
   @UseGuards(OwnerGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Delete a location' })
+  @ApiResponse({ status: 200, description: 'Location deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Owner role required' })
+  @ApiResponse({ status: 404, description: 'Location not found' })
   async delete(@Param('id') id: string) {
     await this.locationService.deleteLocation(id);
     return { message: 'Location deleted successfully' };
@@ -68,6 +92,13 @@ export class LocationController {
   // ===== SEARCH LOCATIONS ENDPOINT =====
   @Post('/search')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Search for available locations with filters' })
+  @ApiResponse({
+    status: 200,
+    description: 'Search results returned successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async searchLocations(
     @Body() dto: SearchLocationsDto,
     @User() user: Express.User,
