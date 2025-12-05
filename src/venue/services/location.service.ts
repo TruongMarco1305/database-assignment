@@ -103,4 +103,46 @@ export class LocationService {
       );
     }
   }
+
+  public async getLocationsOfOwner(userId: string) {
+    try {
+      const result = await this.databaseService.execute<any>(
+        `CALL listLocationOfOwner(?)`,
+        [userId],
+      );
+      return result;
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to search locations',
+      );
+    }
+  }
+
+  public async previewLocation(userid: string, id: string): Promise<any> {
+    try {
+      const result = await this.databaseService.execute<any>(
+        `CALL getLocationDetailById(?, ?)`,
+        [userid, id],
+      );
+      return result[0];
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to preview location',
+      );
+    }
+  }
+
+  public async getVenuesAtLocation(userid: string, id: string) {
+    try {
+      const result = await this.databaseService.execute<any>(
+        `CALL listVenueOfLocation(?, ?)`,
+        [userid, id],
+      );
+      return result;
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to get location detail',
+      );
+    }
+  }
 }

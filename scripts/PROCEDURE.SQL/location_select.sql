@@ -157,4 +157,42 @@ WHERE
         l.name ASC;
 END$$
 
+CREATE PROCEDURE listLocationOfOwner(
+    IN p_owner VARCHAR(36)
+)
+BEGIN
+    SELECT * FROM locations
+    WHERE UUID_TO_BIN(p_owner) = owner_id
+    ORDER BY avgRating DESC;
+END$$
+
+CREATE PROCEDURE getLocationDetailById(
+    IN p_userId VARCHAR(36),
+    IN p_id VARCHAR(36)
+)
+BEGIN
+    SELECT name, description, addrNo, ward, city, avgRating, policy, phoneNo, mapURL, thumbnailURL FROM locations
+    WHERE UUID_TO_BIN(p_id) = location_id AND UUID_TO_BIN(p_userId) = owner_id;
+END$$
+
+CREATE PROCEDURE listVenueOfLocation(
+	IN p_userId VARCHAR(36),
+    IN p_locId VARCHAR(36)
+)
+BEGIN
+    SELECT 
+        v.*,
+        l.name AS location_name,
+        l.addrNo AS location_addrNo,
+        l.ward AS location_ward,
+        l.city AS location_city,
+        l.avgRating AS location_avgRating,
+        l.thumbnailURL AS location_thumbnailURL,
+        l.mapURL AS location_mapURL,
+        l.phoneNo AS location_phone
+    FROM venues v
+    JOIN locations l ON v.location_id = l.location_id
+    WHERE v.location_id = UUID_TO_BIN(p_locId) AND l.owner_id = UUID_TO_BIN(p_userId)
+    ORDER BY v.name ASC;
+END$$
 DELIMITER ;
