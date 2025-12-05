@@ -9,8 +9,7 @@ BEGIN
     DECLARE v_start DATETIME;
     DECLARE v_end DATETIME;
     DECLARE v_venueTypeId BINARY(16);
-    DECLARE v_tiers SET('BRONZE', 'SILVER', 'GOLD', 'PLATINUM');
-    
+    DECLARE v_requiredTier VARCHAR(20);    
     -- Khai báo biến để lưu thông tin Order & Client
     DECLARE v_orderTotal DECIMAL(12,2);
     DECLARE v_bookingDate DATETIME;
@@ -51,9 +50,9 @@ BEGIN
         SIGNAL SQLSTATE '45074' SET MESSAGE_TEXT = 'Error: Discount code is not applicable for this venue type.';
     END IF;
 
-    -- Check 4: Hạng thành viên (Nếu discount có quy định)
-    -- Dùng FIND_IN_SET vì membershipTier là kiểu SET, còn v_clientTier là chuỗi đơn
-    IF v_tiers IS NOT NULL AND NOT FIND_IN_SET(v_clientTier, v_tiers) THEN
+    -- Check 4: Hạng thành viên (LOGIC MỚI)
+    -- So sánh trực tiếp: Nếu Discount có quy định Tier thì khách PHẢI CÓ đúng Tier đó
+    IF v_requiredTier IS NOT NULL AND v_clientTier != v_requiredTier THEN
         SIGNAL SQLSTATE '45075' SET MESSAGE_TEXT = 'Error: Your membership tier is not eligible for this discount.';
     END IF;
 
