@@ -122,9 +122,12 @@ CREATE TABLE order_amenities (
     
     PRIMARY KEY (order_id, location_id, amenity_name),    
     FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (location_id, amenity_name) REFERENCES amenities(location_id, amenity_name) ON DELETE CASCADE ON UPDATE CASCADE
-);
+    
+    FOREIGN KEY (amenity_name, location_id) 
+    REFERENCES amenities(amenity_name, location_id) 
 
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
 CREATE TABLE discounts (
     discount_id BINARY(16) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
