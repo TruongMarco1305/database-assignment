@@ -18,6 +18,6 @@ export class MinioStorageController {
       'booking-classroom-assets',
       `booking-database/${user.userId}/${body.key}`,
     );
-    return url;
+    return { url };
   }
 }
