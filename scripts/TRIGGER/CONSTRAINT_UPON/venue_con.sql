@@ -12,7 +12,7 @@ BEGIN
           AND o.venueName = OLD.name
           AND o.status IN ('PENDING', 'CONFIRMED', 'COMPLETED')
     ) THEN
-        SIGNAL SQLSTATE '45000' 
+        SIGNAL SQLSTATE '45123' 
         SET MESSAGE_TEXT = 'Error: Cannot delete Venue. It has associated bookings history (Pending, Confirmed, or Completed). Please deactivate it instead.';
     END IF;
 END$$

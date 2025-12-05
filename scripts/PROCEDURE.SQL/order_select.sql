@@ -49,8 +49,8 @@ DELIMITER ;
 
 DELIMITER $$
 CREATE PROCEDURE getOrdersForOwner(
-    IN p_ownerId BINARY(16),
-    IN p_locationName VARCHAR(100),
+    IN p_ownerId VARCHAR(36),
+    IN p_locationId VARCHAR(36),
     IN p_orderStatus VARCHAR(20),
     IN p_startTime DATETIME,
     IN p_endTime DATETIME
@@ -69,11 +69,11 @@ BEGIN
     i.senderBankAccount AS client_bank_account,
     i.paidOn AS payment_date
   FROM orders o
-  JOIN users u ON o.client_id = u.user_id
+  JOIN users u ON o.client_id = u.id
   JOIN locations l ON o.venue_loc_id = l.location_id
   JOIN invoices i ON o.order_id = i.order_id
   WHERE l.owner_id = p_ownerId
-    AND (p_locationName IS NULL OR l.name = p_locationName)
+    AND (p_locationId IS NULL OR l.location_id = UUID_TO_BIN(p_locationId))
     AND (p_orderStatus IS NULL OR o.status = p_orderStatus)
     AND (p_startTime IS NULL OR o.startHour >= p_startTime)
     AND (p_endTime IS NULL OR o.endHour <= p_endTime)

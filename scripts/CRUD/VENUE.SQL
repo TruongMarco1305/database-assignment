@@ -19,25 +19,25 @@ BEGIN
 
     -- 1. Validate Data Logic
     IF p_area <= 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Area must be greater than 0.';
+        SIGNAL SQLSTATE '45018' SET MESSAGE_TEXT = 'Error: Area must be greater than 0.';
     END IF;
 
     IF p_price <= 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Price per hour must be greater than 0.';
+        SIGNAL SQLSTATE '45019' SET MESSAGE_TEXT = 'Error: Price per hour must be greater than 0.';
     END IF;
 
     -- 2. Validate Foreign Keys
     IF NOT EXISTS (SELECT 1 FROM locations WHERE location_id = v_locId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Location does not exist.';
+        SIGNAL SQLSTATE '45020' SET MESSAGE_TEXT = 'Error: Location does not exist.';
     END IF;
 
     IF v_typeId IS NOT NULL AND NOT EXISTS (SELECT 1 FROM venue_types WHERE venueType_id = v_typeId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue Type does not exist.';
+        SIGNAL SQLSTATE '45021' SET MESSAGE_TEXT = 'Error: Venue Type does not exist.';
     END IF;
 
     -- 3. Validate Duplicate Name (Primary Key)
     IF EXISTS (SELECT 1 FROM venues WHERE location_id = v_locId AND name = p_name) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue name already exists in this location.';
+        SIGNAL SQLSTATE '45022' SET MESSAGE_TEXT = 'Error: Venue name already exists in this location.';
     END IF;
 
     -- Execute Insert
@@ -61,21 +61,21 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM venues WHERE location_id = v_locId AND name = p_name) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue does not exist.';
+        SIGNAL SQLSTATE '45023' SET MESSAGE_TEXT = 'Error: Venue does not exist.';
     END IF;
 
     -- 2. Validate Data (Nếu có truyền giá trị mới)
     IF p_area IS NOT NULL AND p_area <= 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Area must be greater than 0.';
+        SIGNAL SQLSTATE '45024' SET MESSAGE_TEXT = 'Error: Area must be greater than 0.';
     END IF;
 
     IF p_price IS NOT NULL AND p_price <= 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Price per hour must be greater than 0.';
+        SIGNAL SQLSTATE '45025' SET MESSAGE_TEXT = 'Error: Price per hour must be greater than 0.';
     END IF;
     
     -- Check Foreign Key (Nếu có đổi loại phòng)
     IF p_typeId IS NOT NULL AND NOT EXISTS (SELECT 1 FROM venue_types WHERE venueType_id = UUID_TO_BIN(p_typeId)) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue Type does not exist.';
+        SIGNAL SQLSTATE '45026' SET MESSAGE_TEXT = 'Error: Venue Type does not exist.';
     END IF;
 
     -- Execute Update (Partial Update with COALESCE)
@@ -102,7 +102,7 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM venues WHERE location_id = v_locId AND name = p_name) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue does not exist.';
+        SIGNAL SQLSTATE '45027' SET MESSAGE_TEXT = 'Error: Venue does not exist.';
     END IF;
     
     -- Execute Delete

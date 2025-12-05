@@ -13,17 +13,17 @@ BEGIN
 
     -- 1. Validate Amount
     IF p_amount <= 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Invoice amount must be greater than 0.';
+        SIGNAL SQLSTATE '45109' SET MESSAGE_TEXT = 'Error: Invoice amount must be greater than 0.';
     END IF;
 
     -- 2. Validate Order Existence
     IF NOT EXISTS (SELECT 1 FROM orders WHERE order_id = v_orderId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Order does not exist.';
+        SIGNAL SQLSTATE '45110' SET MESSAGE_TEXT = 'Error: Order does not exist.';
     END IF;
 
     -- 3. Validate Duplicate (1 Order - 1 Invoice)
     IF EXISTS (SELECT 1 FROM invoices WHERE order_id = v_orderId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: An Invoice already exists for this Order.';
+        SIGNAL SQLSTATE '45111' SET MESSAGE_TEXT = 'Error: An Invoice already exists for this Order.';
     END IF;
     -- Chỉ insert 3 cột cốt lõi. 
     -- Cột 'status' sẽ tự động nhận giá trị 'PENDING' từ Default của bảng.
@@ -55,12 +55,12 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_id = v_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Invoice does not exist.';
+        SIGNAL SQLSTATE '45112' SET MESSAGE_TEXT = 'Error: Invoice does not exist.';
     END IF;
 
     -- 2. Validate Transaction Info (Bắt buộc phải có)
     IF p_transId IS NULL OR p_transId = '' THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Transaction ID is required for completed payments.';
+        SIGNAL SQLSTATE '45113' SET MESSAGE_TEXT = 'Error: Transaction ID is required for completed payments.';
     END IF;
 
     -- Execute Update
@@ -88,12 +88,12 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM invoices WHERE invoice_id = v_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Invoice does not exist.';
+        SIGNAL SQLSTATE '45114' SET MESSAGE_TEXT = 'Error: Invoice does not exist.';
     END IF;
 
     -- 2. Validate Status Enum
     IF p_status NOT IN ('PENDING', 'SUCCEEDED', 'FAILED') THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Invalid status value.';
+        SIGNAL SQLSTATE '45115' SET MESSAGE_TEXT = 'Error: Invalid status value.';
     END IF;
 
     -- Execute Update

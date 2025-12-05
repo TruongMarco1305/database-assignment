@@ -16,7 +16,7 @@ BEGIN
           AND o.status = 'COMPLETED' -- Hoặc trạng thái đã hoàn thành nếu có
           AND o.endHour < NOW()      -- Phải sử dụng xong mới được review
     ) THEN
-        SIGNAL SQLSTATE '45000' 
+        SIGNAL SQLSTATE '45124' 
         SET MESSAGE_TEXT = 'Error: You can only rate a location after completing a booking there.';
     END IF;
 END$$

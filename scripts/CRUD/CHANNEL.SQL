@@ -26,7 +26,7 @@ BEGIN
 
     -- 2. Kiểm tra tồn tại (Validation)
     IF EXISTS (SELECT 1 FROM chat_channels WHERE user_1_id = v_u1 AND user_2_id = v_u2) THEN
-        SIGNAL SQLSTATE '45000' 
+        SIGNAL SQLSTATE '45125' 
         SET MESSAGE_TEXT = 'Error: Chat channel between these users already exists.';
     END IF;
 

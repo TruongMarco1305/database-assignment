@@ -12,7 +12,7 @@ BEGIN
           AND status IN ('PENDING', 'CONFIRMED') -- Chỉ chặn các đơn đang hoạt động
           AND (startHour < NEW.endHour AND endHour > NEW.startHour) -- Logic chồng lấn thời gian
     ) THEN
-        SIGNAL SQLSTATE '45000' 
+        SIGNAL SQLSTATE '45118' 
         SET MESSAGE_TEXT = 'Error: This venue is already booked for the selected time slot.';
     END IF;
 END$$
@@ -37,11 +37,11 @@ BEGIN
 
     -- Kiểm tra
     IF v_locationActive = 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: This Location is currently inactive/closed.';
+        SIGNAL SQLSTATE '45119' SET MESSAGE_TEXT = 'Error: This Location is currently inactive/closed.';
     END IF;
 
     IF v_venueActive = 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: This Venue is currently under maintenance or inactive.';
+        SIGNAL SQLSTATE '45120' SET MESSAGE_TEXT = 'Error: This Venue is currently under maintenance or inactive.';
     END IF;
 END$$
 DELIMITER ;

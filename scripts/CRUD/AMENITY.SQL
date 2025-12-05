@@ -5,10 +5,10 @@ DELIMITER $$
 CREATE PROCEDURE Amenity_Insert(
     IN p_id VARCHAR(36),
     IN p_locId VARCHAR(36),
-    IN p_category VARCHAR(50),
+    IN p_category VARCHAR(50), -- Projector, Catering, Audio Set
     IN p_desc TEXT,
     IN p_price DECIMAL(12,2),
-    IN p_compatibleSize VARCHAR(50)
+    IN p_compatibleSize VARCHAR(50), -- Small, Medium, Large, NULL
 )
 BEGIN
     DECLARE v_locId BINARY(16);
@@ -16,12 +16,12 @@ BEGIN
 
     -- 1. Validate Location Existence (Foreign Key)
     IF NOT EXISTS (SELECT 1 FROM locations WHERE location_id = v_locId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Location does not exist.';
+        SIGNAL SQLSTATE '45083' SET MESSAGE_TEXT = 'Error: Location does not exist.';
     END IF;
 
     -- 2. Validate Price
     IF p_price < 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Price cannot be negative.';
+        SIGNAL SQLSTATE '45084' SET MESSAGE_TEXT = 'Error: Price cannot be negative.';
     END IF;
 
     INSERT INTO amenities (amenity_id, location_id, category, description, price, compatibleSize)
@@ -43,12 +43,12 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM amenities WHERE amenity_id = v_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Amenity does not exist.';
+        SIGNAL SQLSTATE '45085' SET MESSAGE_TEXT = 'Error: Amenity does not exist.';
     END IF;
 
     -- 2. Validate Price
     IF p_price IS NOT NULL AND p_price < 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Price cannot be negative.';
+        SIGNAL SQLSTATE '45086' SET MESSAGE_TEXT = 'Error: Price cannot be negative.';
     END IF;
 
     UPDATE amenities 
@@ -69,13 +69,13 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM amenities WHERE amenity_id = v_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Amenity does not exist.';
+        SIGNAL SQLSTATE '45087' SET MESSAGE_TEXT = 'Error: Amenity does not exist.';
     END IF;
 
     -- 2. Constraint Check: ORDER HISTORY
     -- Không được xóa thiết bị đã từng được thuê (để bảo toàn lịch sử đơn hàng cũ)
     IF EXISTS (SELECT 1 FROM order_amenities WHERE amenity_id = v_id) THEN
-        SIGNAL SQLSTATE '45000' 
+        SIGNAL SQLSTATE '45088' 
         SET MESSAGE_TEXT = 'Error: Cannot delete amenity because it is linked to existing orders. Please set isActive=0 instead.';
     END IF;
 

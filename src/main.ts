@@ -1,5 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as fs from 'fs';
+import * as yaml from 'js-yaml';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -8,6 +11,61 @@ async function bootstrap() {
     origin: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
+
+  // Swagger Configuration
+  const config = new DocumentBuilder()
+    .setTitle('Venue Booking System API')
+    .setDescription(
+      'API documentation for the Venue Booking System - manage locations, venues, bookings, and payments',
+    )
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+
+  // Setup Swagger UI at /api
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+    customSiteTitle: 'Venue Booking API Docs',
+  });
+
+  // Serve YAML file at /swagger/yaml
+  app.use('/swagger/yaml', (req, res) => {
+    res.setHeader('Content-Type', 'text/yaml');
+    res.send(yaml.dump(document));
+  });
+
+  // Serve JSON file at /swagger/json
+  app.use('/swagger/json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(document, null, 2));
+  });
+
   await app.listen(process.env.PORT ?? 3000);
+  console.log(
+    `\n🚀 Application is running on: http://localhost:${process.env.PORT ?? 3000}`,
+  );
+  console.log(
+    `📚 Swagger UI: http://localhost:${process.env.PORT ?? 3000}/api`,
+  );
+  console.log(
+    `📄 Swagger YAML: http://localhost:${process.env.PORT ?? 3000}/swagger/yaml`,
+  );
+  console.log(
+    `📄 Swagger JSON: http://localhost:${process.env.PORT ?? 3000}/swagger/json\n`,
+  );
 }
 bootstrap();

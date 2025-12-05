@@ -12,7 +12,7 @@ BEGIN
     
     -- 1. Validate Input
     IF p_content IS NULL OR TRIM(p_content) = '' THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Message content cannot be empty.';
+        SIGNAL SQLSTATE '45065' SET MESSAGE_TEXT = 'Error: Message content cannot be empty.';
     END IF;
 
     SET v_senderBin = UUID_TO_BIN(p_senderId);
@@ -29,7 +29,7 @@ BEGIN
 
     -- 3. Kiểm tra Kênh có tồn tại không
     IF NOT EXISTS (SELECT 1 FROM chat_channels WHERE user_1_id = v_channelU1 AND user_2_id = v_channelU2) THEN
-        SIGNAL SQLSTATE '45000' 
+        SIGNAL SQLSTATE '45066' 
         SET MESSAGE_TEXT = 'Error: Chat channel does not exist. Please create a channel first.';
     END IF;
 

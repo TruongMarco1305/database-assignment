@@ -38,23 +38,23 @@ BEGIN
     -- 4. Bắt đầu kiểm tra
     -- Check 1: Thời gian hiệu lực (So với ngày tạo đơn)
     IF v_bookingDate < v_start OR v_bookingDate > v_end THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Discount code is expired or not yet active.';
+        SIGNAL SQLSTATE '45072' SET MESSAGE_TEXT = 'Error: Discount code is expired or not yet active.';
     END IF;
 
     -- Check 2: Đơn hàng tối thiểu
     IF v_minPrice IS NOT NULL AND v_orderTotal < v_minPrice THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Order amount does not meet the minimum requirement for this discount.';
+        SIGNAL SQLSTATE '45073' SET MESSAGE_TEXT = 'Error: Order amount does not meet the minimum requirement for this discount.';
     END IF;
 
     -- Check 3: Loại phòng (Nếu discount có quy định)
     IF v_venueTypeId IS NOT NULL AND v_venueTypeId != v_orderVenueType THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Discount code is not applicable for this venue type.';
+        SIGNAL SQLSTATE '45074' SET MESSAGE_TEXT = 'Error: Discount code is not applicable for this venue type.';
     END IF;
 
     -- Check 4: Hạng thành viên (Nếu discount có quy định)
     -- Dùng FIND_IN_SET vì membershipTier là kiểu SET, còn v_clientTier là chuỗi đơn
     IF v_tiers IS NOT NULL AND NOT FIND_IN_SET(v_clientTier, v_tiers) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Your membership tier is not eligible for this discount.';
+        SIGNAL SQLSTATE '45075' SET MESSAGE_TEXT = 'Error: Your membership tier is not eligible for this discount.';
     END IF;
 
 END$$

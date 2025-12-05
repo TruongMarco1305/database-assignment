@@ -13,7 +13,7 @@ BEGIN
 
     -- Nếu đã có từ 10 ảnh trở lên thì báo lỗi
     IF v_count >= 10 THEN
-        SIGNAL SQLSTATE '45000' 
+      SIGNAL SQLSTATE '45122' 
         SET MESSAGE_TEXT = 'Error: Maximum limit of 10 images per venue reached. Please delete old images before adding new ones.';
     END IF;
 END$$

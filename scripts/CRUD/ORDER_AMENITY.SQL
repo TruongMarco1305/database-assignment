@@ -13,7 +13,7 @@ BEGIN
 
     -- 1. Validate Order Existence (Kiểm tra đơn hàng có tồn tại không)
     IF NOT EXISTS (SELECT 1 FROM orders WHERE order_id = v_orderId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Order does not exist.';
+        SIGNAL SQLSTATE '45051' SET MESSAGE_TEXT = 'Error: Order does not exist.';
     END IF;
 
     -- 2. Validate Amenity Availability
@@ -23,12 +23,12 @@ BEGIN
 
     -- Nếu không tìm thấy (v_isActive vẫn là NULL) -> Báo lỗi không tồn tại
     IF v_isActive IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Amenity does not exist.';
+        SIGNAL SQLSTATE '45052' SET MESSAGE_TEXT = 'Error: Amenity does not exist.';
     END IF;
 
     -- Nếu tìm thấy nhưng đang bận/hỏng (Active = 0) -> Báo lỗi
     IF v_isActive = 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: This amenity is currently unavailable (In use or Broken).';
+        SIGNAL SQLSTATE '45053' SET MESSAGE_TEXT = 'Error: This amenity is currently unavailable (In use or Broken).';
     END IF;
 
     -- 3. Insert
@@ -57,7 +57,7 @@ BEGIN
 
     -- Kiểm tra tồn tại trước khi xóa (Optional, nhưng tốt cho UX)
     IF NOT EXISTS (SELECT 1 FROM order_amenities WHERE order_id = v_orderId AND amenity_id = v_amenityId) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: This amenity is not attached to this order.';
+        SIGNAL SQLSTATE '45054' SET MESSAGE_TEXT = 'Error: This amenity is not attached to this order.';
     END IF;
 
     -- Execute Delete

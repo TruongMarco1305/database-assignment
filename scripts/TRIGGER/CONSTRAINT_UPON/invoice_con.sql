@@ -14,7 +14,7 @@ BEGIN
 
     -- So sánh (Cho phép lệch 0 đồng, bắt buộc khớp chính xác)
     IF NEW.amount != v_orderTotal THEN
-        SIGNAL SQLSTATE '45000' 
+        SIGNAL SQLSTATE '45116' 
         SET MESSAGE_TEXT = 'Error: Invoice amount must match the Order total price.';
     END IF;
 END$$

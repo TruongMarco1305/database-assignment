@@ -21,12 +21,12 @@ BEGIN
 
     -- 1. Validate Owner Existence (Foreign Key)
     IF NOT EXISTS (SELECT 1 FROM owners WHERE user_id = v_ownerUuid) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Owner does not exist.';
+        SIGNAL SQLSTATE '45067' SET MESSAGE_TEXT = 'Error: Owner does not exist.';
     END IF;
 
     -- Thêm vào Location_Insert và Location_Update
     IF p_phoneNo IS NOT NULL AND p_phoneNo NOT REGEXP '^[0-9]+$' THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Location phone number must contain only digits.';
+        SIGNAL SQLSTATE '45068' SET MESSAGE_TEXT = 'Error: Location phone number must contain only digits.';
     END IF;
 
     INSERT INTO locations (location_id, owner_id, name, description, addrNo, ward, city, phoneNo, policy, mapURL, thumbnailURL)
@@ -53,11 +53,11 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM locations WHERE location_id = v_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Location does not exist.';
+        SIGNAL SQLSTATE '45069' SET MESSAGE_TEXT = 'Error: Location does not exist.';
     END IF;
 
     IF p_phoneNo IS NOT NULL AND p_phoneNo NOT REGEXP '^[0-9]+$' THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Location phone number must contain only digits.';
+        SIGNAL SQLSTATE '45070' SET MESSAGE_TEXT = 'Error: Location phone number must contain only digits.';
     END IF;
     
     UPDATE locations 
@@ -83,7 +83,7 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM locations WHERE location_id = v_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Location does not exist.';
+        SIGNAL SQLSTATE '45071' SET MESSAGE_TEXT = 'Error: Location does not exist.';
     END IF;
     DELETE FROM locations WHERE location_id = v_id;
 END$$

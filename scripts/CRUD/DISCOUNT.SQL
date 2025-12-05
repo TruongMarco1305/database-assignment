@@ -21,22 +21,22 @@ BEGIN
 
     -- 1. Validate Percentage
     IF p_percent < 0 OR p_percent > 100 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Percentage must be between 0 and 100.';
+        SIGNAL SQLSTATE '45094' SET MESSAGE_TEXT = 'Error: Percentage must be between 0 and 100.';
     END IF;
 
     -- 2. Validate Dates
     IF p_end <= p_start THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: End date must be after Start date.';
+        SIGNAL SQLSTATE '45095' SET MESSAGE_TEXT = 'Error: End date must be after Start date.';
     END IF;
 
     -- 3. Validate Prices
     IF (p_maxDisc IS NOT NULL AND p_maxDisc < 0) OR (p_minPrice IS NOT NULL AND p_minPrice < 0) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Discount prices cannot be negative.';
+        SIGNAL SQLSTATE '45096' SET MESSAGE_TEXT = 'Error: Discount prices cannot be negative.';
     END IF;
 
     -- 4. Validate Venue Type Existence (Nếu có truyền ID)
     IF v_venueTypeBin IS NOT NULL AND NOT EXISTS (SELECT 1 FROM venue_types WHERE venueType_id = v_venueTypeBin) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue Type does not exist.';
+        SIGNAL SQLSTATE '45097' SET MESSAGE_TEXT = 'Error: Venue Type does not exist.';
     END IF;
 
     INSERT INTO discounts (
@@ -76,23 +76,23 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM discounts WHERE discount_id = v_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Discount does not exist.';
+        SIGNAL SQLSTATE '45098' SET MESSAGE_TEXT = 'Error: Discount does not exist.';
     END IF;
 
     -- 2. Validate Percentage (Nếu có update)
     IF p_percent IS NOT NULL AND (p_percent < 0 OR p_percent > 100) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Percentage must be between 0 and 100.';
+        SIGNAL SQLSTATE '45099' SET MESSAGE_TEXT = 'Error: Percentage must be between 0 and 100.';
     END IF;
 
     -- 3. Validate Prices (Nếu có truyền vào thì phải không âm)
     IF (p_maxDisc IS NOT NULL AND p_maxDisc < 0) OR (p_minPrice IS NOT NULL AND p_minPrice < 0) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Discount prices cannot be negative.';
+        SIGNAL SQLSTATE '45100' SET MESSAGE_TEXT = 'Error: Discount prices cannot be negative.';
     END IF;
 
     -- 4. Validate Venue Type FK (Chỉ check nếu KHÁC NULL)
     -- Nếu p_venueTypeId là NULL -> Nghĩa là user muốn gỡ bỏ điều kiện loại phòng -> Hợp lệ, không cần check FK.
     IF v_venueTypeBin IS NOT NULL AND NOT EXISTS (SELECT 1 FROM venue_types WHERE venueType_id = v_venueTypeBin) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Venue Type does not exist.';
+        SIGNAL SQLSTATE '45101' SET MESSAGE_TEXT = 'Error: Venue Type does not exist.';
     END IF;
 
     -- 5. Validate Dates Logic
@@ -103,7 +103,7 @@ BEGIN
     FROM discounts WHERE discount_id = v_id;
 
     IF v_newEnd <= v_newStart THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: End date must be after Start date.';
+        SIGNAL SQLSTATE '45102' SET MESSAGE_TEXT = 'Error: End date must be after Start date.';
     END IF;
 
     -- Execute Update
@@ -133,13 +133,13 @@ BEGIN
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM discounts WHERE discount_id = v_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Discount does not exist.';
+        SIGNAL SQLSTATE '45103' SET MESSAGE_TEXT = 'Error: Discount does not exist.';
     END IF;
 
     -- 2. Constraint Check: Usage History (APPLIES table)
     -- Không nên xóa mã giảm giá đã từng được sử dụng trong các đơn hàng cũ
     IF EXISTS (SELECT 1 FROM applies WHERE discount_id = v_id) THEN
-        SIGNAL SQLSTATE '45000' 
+        SIGNAL SQLSTATE '45104' 
         SET MESSAGE_TEXT = 'Error: Cannot delete this discount because it has been used in orders. Please modify the expiry date instead.';
     END IF;
 
