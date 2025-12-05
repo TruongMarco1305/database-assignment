@@ -117,12 +117,12 @@ CREATE TABLE orders (
 
 CREATE TABLE order_amenities (
     order_id BINARY(16) NOT NULL,
-    amenity_id BINARY(16) NOT NULL,
+    location_id BINARY(16) NOT NULL, 
+    amenity_name VARCHAR(100) NOT NULL,
     
-    PRIMARY KEY (order_id, amenity_id),
-    
+    PRIMARY KEY (order_id, location_id, amenity_name),    
     FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (amenity_id) REFERENCES amenities(amenity_id) ON DELETE RESTRICT
+    FOREIGN KEY (location_id, amenity_name) REFERENCES amenities(location_id, amenity_name) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE discounts (

@@ -91,7 +91,8 @@ WHERE
                           SELECT 1 
                           FROM order_amenities oa
                           JOIN orders o2 ON oa.order_id = o2.order_id
-                          WHERE oa.amenity_id = a.amenity_id
+                          WHERE oa.location_id = a.location_id 
+                            AND oa.amenity_name = a.amenity_name
                             AND o2.status IN ('PENDING', 'CONFIRMED')
                             AND (o2.startHour < p_endTime AND o2.endHour > p_startTime)
                       )

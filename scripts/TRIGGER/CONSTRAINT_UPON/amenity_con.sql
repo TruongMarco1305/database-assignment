@@ -11,7 +11,8 @@ BEGIN
             SELECT 1 
             FROM order_amenities oa
             JOIN orders o ON oa.order_id = o.order_id
-            WHERE oa.amenity_id = OLD.amenity_id
+            WHERE oa.location_id = OLD.location_id     -- Khớp địa điểm
+              AND oa.amenity_name = OLD.amenity_name   -- Khớp tên thiết bị
               AND o.status IN ('PENDING', 'CONFIRMED')
               AND o.endHour > NOW()
         ) THEN
