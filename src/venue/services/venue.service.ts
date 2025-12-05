@@ -134,6 +134,18 @@ export class VenueService {
     }
   }
 
+  public async previewVenue(locationId: string, name: string): Promise<any> {
+    try {
+      const [results] = await this.databaseService.execute(
+        `CALL Venue_Preview(?, ?)`,
+        [locationId, name],
+      );
+      return results;
+    } catch (error) {
+      throw new ConflictException(error.message || 'Failed to preview venue');
+    }
+  }
+
   public async deleteVenue(locationId: string, name: string): Promise<void> {
     try {
       await this.databaseService.execute(`CALL Venue_Delete(?, ?)`, [

@@ -202,4 +202,31 @@ GROUP BY
 ORDER BY
     v.createdAt DESC;
 END$$
+
+	CREATE PROCEDURE Venue_Preview(
+	    IN p_locId VARCHAR(36),
+	    IN p_name VARCHAR(100)
+	)
+	BEGIN
+	    SELECT
+	        v.name AS venue_name,
+	        v.floor,
+	        v.area,
+	        v.pricePerHour,
+	        BIN_TO_UUID(v.venueType_id) AS venueType_id,
+	        vt.name AS theme_name,
+	        vt.minCapacity,
+	        vt.maxCapacity,
+	        -- Convert the BINARY(16) location_id back to a readable VARCHAR(36) UUID
+	        BIN_TO_UUID(v.location_id) AS location_id_uuid 
+	    FROM
+	        venues v
+	    LEFT JOIN venue_types vt ON v.venueType_id = vt.venueType_id
+	    WHERE
+	        -- Convert the input VARCHAR(36) ID to BINARY(16) for comparison
+	        v.location_id = UUID_TO_BIN(p_locId)
+	        AND v.name = p_name;
+	    
+	    -- Removed GROUP BY clause as it is unnecessary when only selecting unique fields
+	END$$
 DELIMITER ;

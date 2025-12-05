@@ -90,6 +90,16 @@ export class VenueController {
     return { message: 'Venue created successfully' };
   }
 
+  @Get('/:locationId/:name/preview')
+  @UseGuards(OwnerGuard)
+  async previewVenue(
+    @Param('locationId') locationId: string,
+    @Param('name') name: string,
+  ) {
+    const result = await this.venueService.previewVenue(locationId, name);
+    return result;
+  }
+
   @Patch('/:locationId/:name')
   @UseGuards(OwnerGuard)
   @ApiBearerAuth('JWT-auth')
@@ -103,7 +113,6 @@ export class VenueController {
     @Body() dto: UpdateVenueDto,
   ) {
     await this.venueService.updateVenue(locationId, name, dto);
-    return { message: 'Venue updated successfully' };
   }
 
   @Delete('/:locationId/:name')

@@ -197,6 +197,10 @@ export class CreateVenueDto {
 export class UpdateVenueDto {
   @IsOptional()
   @IsString()
+  name?: string;
+
+  @IsOptional()
+  @IsString()
   typeId?: string;
 
   @IsOptional()
