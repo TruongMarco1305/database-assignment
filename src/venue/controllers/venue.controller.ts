@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Get,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -41,6 +42,13 @@ export class VenueController {
   async createVenueType(@Body() dto: CreateVenueTypeDto) {
     const venueTypeId = await this.venueService.createVenueType(dto);
     return { _id: venueTypeId };
+  }
+
+  @Get('/types')
+  @UseGuards(OwnerGuard)
+  async getVenueTypes() {
+    const venueTypeId = await this.venueService.getVenueTypes();
+    return { data: venueTypeId };
   }
 
   @Patch('/types/:id')

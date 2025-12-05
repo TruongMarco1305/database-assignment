@@ -132,11 +132,11 @@ export class LocationService {
     }
   }
 
-  public async getVenuesAtLocation(userid: string, id: string) {
+  public async getVenuesAtLocation(id: string) {
     try {
       const result = await this.databaseService.execute<any>(
-        `CALL listVenueOfLocation(?, ?)`,
-        [userid, id],
+        `CALL listVenueOfLocation(?)`,
+        [id],
       );
       return result;
     } catch (error) {

@@ -49,6 +49,10 @@ export class VenueService {
     }
   }
 
+  public async getVenueTypes() {
+    return await this.databaseService.execute(`CALL GetVenueTypesInfo()`);
+  }
+
   public async updateVenueType(
     id: string,
     dto: UpdateVenueTypeDto,

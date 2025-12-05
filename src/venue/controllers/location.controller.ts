@@ -52,14 +52,8 @@ export class LocationController {
 
   @Get('/:id/venues')
   @UseGuards(OwnerGuard)
-  async getVenuesAtLocation(
-    @Param('id') id: string,
-    @User() user: Express.User,
-  ) {
-    const result = await this.locationService.getVenuesAtLocation(
-      user.userId,
-      id,
-    );
+  async getVenuesAtLocation(@Param('id') id: string) {
+    const result = await this.locationService.getVenuesAtLocation(id);
     return result;
   }
 
@@ -73,7 +67,6 @@ export class LocationController {
   @ApiResponse({ status: 404, description: 'Location not found' })
   async update(@Param('id') id: string, @Body() dto: UpdateLocationDto) {
     await this.locationService.updateLocation(id, dto);
-    return { message: 'Location updated successfully' };
   }
 
   @Delete('/:id')
