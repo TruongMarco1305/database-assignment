@@ -134,10 +134,14 @@ export class LocationService {
 
   public async getVenuesAtLocation(id: string) {
     try {
-      const result = await this.databaseService.execute<any>(
+      const raw = await this.databaseService.execute<any>(
         `CALL listVenueOfLocation(?)`,
         [id],
       );
+      const result = raw.map((venue) => ({
+        ...venue,
+        venueImageURLs: venue.venueImageURLs.split(','),
+      }));
       return result;
     } catch (error) {
       throw new ConflictException(

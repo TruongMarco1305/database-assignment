@@ -99,6 +99,13 @@ export class VenueService {
           dto.pricePerHour,
         ],
       );
+      for (const url of dto.images) {
+        await this.databaseService.execute(`CALL VenueImage_Insert(?, ?, ?)`, [
+          dto.locationId,
+          dto.name,
+          url,
+        ]);
+      }
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to create venue');
     }

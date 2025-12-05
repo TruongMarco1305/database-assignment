@@ -171,20 +171,34 @@ END$$
 CREATE PROCEDURE listVenueOfLocation(
     IN p_locId VARCHAR(36)
 )
-BEGIN
-    SELECT 
-        v.name as venueName,
-        v.floor as venueFloor,
-        v.area as venueArea,
-        v.pricePerHour as venuePricePerHour,
-        v.isActive as venueIsActive,
-        vt.name as venueTypeName,
-        vt.maxCapacity as venueCapacity,
-        vi.locationImgURL as venueImageURL
-    FROM venues v
-    JOIN venue_types vt ON v.venueType_id = vt.venueType_id
-    JOIN venue_images vi ON v.location_id = vi.location_id AND v.name = vi.venueName
-    WHERE v.location_id = UUID_TO_BIN(p_locId)
-    ORDER BY v.createdAt DESC;
+SELECT
+    v.name AS venueName,
+    v.floor AS venueFloor,
+    v.area AS venueArea,
+    v.pricePerHour AS venuePricePerHour,
+    v.isActive AS venueIsActive,
+    vt.name AS venueTypeName,
+    vt.maxCapacity AS venueCapacity,
+    -- Use GROUP_CONCAT to list all image URLs for the group
+    GROUP_CONCAT(vi.locationImgURL ORDER BY vi.locationImgURL ASC SEPARATOR ', ') AS venueImageURLs
+FROM
+    venues v
+JOIN
+    venue_types vt ON v.venueType_id = vt.venueType_id
+JOIN
+    venue_images vi ON v.location_id = vi.location_id AND v.name = vi.venueName
+WHERE
+    v.location_id = UUID_TO_BIN(p_locId)
+-- Group by all non-aggregated columns
+GROUP BY
+    v.name,
+    v.floor,
+    v.area,
+    v.pricePerHour,
+    v.isActive,
+    vt.name,
+    vt.maxCapacity
+ORDER BY
+    v.createdAt DESC;
 END$$
 DELIMITER ;
