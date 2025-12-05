@@ -295,12 +295,16 @@ export class CreateAmenityDto {
   @Min(0)
   price: number;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  compatibleSize?: string;
+  name: string;
 }
 
 export class UpdateAmenityDto {
+  @IsOptional()
+  @IsString()
+  name?: string;
+
   @IsOptional()
   @IsString()
   category?: string;
@@ -313,10 +317,6 @@ export class UpdateAmenityDto {
   @IsNumber()
   @Min(0)
   price?: number;
-
-  @IsOptional()
-  @IsString()
-  compatibleSize?: string;
 
   @IsOptional()
   isActive?: boolean;

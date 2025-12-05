@@ -9,7 +9,8 @@ BEGIN
         category,
         description,
         price,
-        createdAt
+        createdAt,
+        isActive
     FROM amenities
     WHERE location_id = UUID_TO_BIN(p_locationId)
       AND isActive = 1 -- Chỉ lấy đồ đang rảnh
@@ -20,4 +21,20 @@ BEGIN
     ORDER BY category ASC, price ASC;
 END$$
 
+CREATE PROCEDURE Get_Amenity_Details(
+    IN p_locationId VARCHAR(36),
+    IN p_name VARCHAR(100)
+)
+BEGIN
+    SELECT 
+        amenity_name, -- Sửa: Lấy trực tiếp tên (Khóa chính mới)
+        category,
+        description,
+        price,
+        createdAt,
+        isActive
+    FROM amenities
+    WHERE location_id = UUID_TO_BIN(p_locationId)
+      AND amenity_name = p_name;
+END$$
 DELIMITER ;

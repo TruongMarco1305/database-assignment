@@ -118,10 +118,11 @@ export class VenueService {
   ): Promise<void> {
     try {
       await this.databaseService.execute(
-        `CALL Venue_Update(?, ?, ?, ?, ?, ?, ?)`,
+        `CALL Venue_Update(?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           locationId,
           name,
+          dto.name || null,
           dto.typeId || null,
           dto.floor || null,
           dto.area || null,

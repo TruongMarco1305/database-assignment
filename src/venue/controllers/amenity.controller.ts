@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   UseGuards,
+  Get,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -25,31 +26,70 @@ export class AmenityController {
   constructor(private readonly amenityService: AmenityService) {}
 
   @Post()
+  @UseGuards(OwnerGuard)
   @ApiOperation({ summary: 'Create a new amenity' })
   @ApiResponse({ status: 201, description: 'Amenity created successfully' })
   @ApiResponse({ status: 403, description: 'Forbidden - Owner role required' })
   async create(@Body() dto: CreateAmenityDto) {
-    const amenityId = await this.amenityService.createAmenity(dto);
-    return { _id: amenityId };
+    await this.amenityService.createAmenity(dto);
   }
 
-  @Patch('/:id')
+  @Get('/:locationId')
+  @UseGuards(OwnerGuard)
+  @ApiOperation({ summary: 'Get amenities by location ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Amenities retrieved successfully',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden - Owner role required' })
+  async getByLocation(@Param('locationId') locationId: string) {
+    const amenities =
+      await this.amenityService.getAmenitiesByLocation(locationId);
+    return { data: amenities };
+  }
+
+  @Get('/:locationId/:name')
+  @UseGuards(OwnerGuard)
+  @ApiOperation({ summary: 'Get amenity by location ID and name' })
+  @ApiResponse({
+    status: 200,
+    description: 'Amenity retrieved successfully',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden - Owner role required' })
+  async getByLocationAndName(
+    @Param('locationId') locationId: string,
+    @Param('name') name: string,
+  ) {
+    const amenity = await this.amenityService.getAmenityByLocationAndName(
+      locationId,
+      name,
+    );
+    return amenity;
+  }
+
+  @Patch('/:id/:name')
+  @UseGuards(OwnerGuard)
   @ApiOperation({ summary: 'Update amenity details' })
   @ApiResponse({ status: 200, description: 'Amenity updated successfully' })
   @ApiResponse({ status: 403, description: 'Forbidden - Owner role required' })
   @ApiResponse({ status: 404, description: 'Amenity not found' })
-  async update(@Param('id') id: string, @Body() dto: UpdateAmenityDto) {
-    await this.amenityService.updateAmenity(id, dto);
+  async update(
+    @Param('id') id: string,
+    @Param('name') name: string,
+    @Body() dto: UpdateAmenityDto,
+  ) {
+    await this.amenityService.updateAmenity(id, name, dto);
     return { message: 'Amenity updated successfully' };
   }
 
-  @Delete('/:id')
+  @Delete('/:id/:name')
+  @UseGuards(OwnerGuard)
   @ApiOperation({ summary: 'Delete an amenity' })
   @ApiResponse({ status: 200, description: 'Amenity deleted successfully' })
   @ApiResponse({ status: 403, description: 'Forbidden - Owner role required' })
   @ApiResponse({ status: 404, description: 'Amenity not found' })
-  async delete(@Param('id') id: string) {
-    await this.amenityService.deleteAmenity(id);
+  async delete(@Param('id') id: string, @Param('name') name: string) {
+    await this.amenityService.deleteAmenity(id, name);
     return { message: 'Amenity deleted successfully' };
   }
 }

@@ -35,6 +35,7 @@ END$$
 -- Update Amenity
 CREATE PROCEDURE Amenity_Update(
     IN p_locId VARCHAR(36),
+    IN p_newName VARCHAR(100),
     IN p_name VARCHAR(100), -- Dùng làm khóa để tìm
     IN p_category VARCHAR(50),
     IN p_desc TEXT,
@@ -42,8 +43,8 @@ CREATE PROCEDURE Amenity_Update(
     IN p_isActive BOOLEAN
 )
 BEGIN
-    DECLARE v_id BINARY(16);
-    SET v_id = UUID_TO_BIN(p_id);
+    DECLARE v_locId BINARY(16);
+    SET v_locId = UUID_TO_BIN(p_locId);
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM amenities WHERE location_id = v_locId AND amenity_name = p_name) THEN
@@ -56,7 +57,8 @@ BEGIN
     END IF;
 
     UPDATE amenities 
-    SET 
+    SET
+        amenity_name   = COALESCE(p_newName, amenity_name),
         category       = COALESCE(p_category, category),
         description    = COALESCE(p_desc, description),
         price          = COALESCE(p_price, price),
@@ -70,8 +72,8 @@ CREATE PROCEDURE Amenity_Delete(
     IN p_name VARCHAR(100)
 )
 BEGIN
-    DECLARE v_id BINARY(16);
-    SET v_id = UUID_TO_BIN(p_id);
+    DECLARE v_locId BINARY(16);
+    SET v_locId = UUID_TO_BIN(p_locId);
 
     -- 1. Check Existence
     IF NOT EXISTS (SELECT 1 FROM amenities WHERE location_id = v_locId AND amenity_name = p_name) THEN
