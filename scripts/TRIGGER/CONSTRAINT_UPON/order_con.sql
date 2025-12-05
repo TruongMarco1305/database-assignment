@@ -58,7 +58,7 @@ BEGIN
         WHERE client_id = NEW.client_id
           AND status = 'PENDING'
     ) THEN
-        SIGNAL SQLSTATE '45000' 
+        SIGNAL SQLSTATE '45136' 
         SET MESSAGE_TEXT = 'Error: You have a pending order. Please complete payment or cancel it before booking a new one.';
     END IF;
 END$$

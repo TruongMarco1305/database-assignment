@@ -35,7 +35,7 @@ BEGIN
               AND status IN ('PENDING', 'CONFIRMED')
               AND endHour > NOW() -- Đơn hàng chưa kết thúc
         ) THEN
-            SIGNAL SQLSTATE '45000' 
+            SIGNAL SQLSTATE '45137' 
             SET MESSAGE_TEXT = 'Error: Cannot deactivate Venue. There are active or upcoming orders associated with it.';
         END IF;
         

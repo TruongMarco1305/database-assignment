@@ -16,7 +16,7 @@ BEGIN
               AND o.status IN ('PENDING', 'CONFIRMED')
               AND o.endHour > NOW()
         ) THEN
-            SIGNAL SQLSTATE '45000' 
+            SIGNAL SQLSTATE '45134' 
             SET MESSAGE_TEXT = 'Error: Cannot deactivate Amenity. It is currently assigned to an active order.';
         END IF;
         

@@ -70,18 +70,18 @@ BEGIN
 
     -- 2. Validate Price (Nếu có truyền vào)
     IF p_totalPrice IS NOT NULL AND p_totalPrice < 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Total Price cannot be negative.';
+        SIGNAL SQLSTATE '45131' SET MESSAGE_TEXT = 'Error: Total Price cannot be negative.';
     END IF;
 
     -- 3. Validate Points (Nếu có truyền vào)
     IF p_points IS NOT NULL AND p_points < 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Points cannot be negative.';
+        SIGNAL SQLSTATE '45132' SET MESSAGE_TEXT = 'Error: Points cannot be negative.';
     END IF;
 
     -- 4. Validate Status (Nếu có truyền vào)
     -- Đã thêm 'CANCELLED' vào danh sách cho phép
     IF p_status IS NOT NULL AND p_status NOT IN ('PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED') THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Invalid status value.';
+        SIGNAL SQLSTATE '45133' SET MESSAGE_TEXT = 'Error: Invalid status value.';
     END IF;
 
     -- 5. Execute Update (Partial Update)

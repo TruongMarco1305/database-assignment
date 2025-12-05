@@ -33,7 +33,7 @@ BEGIN
               AND status IN ('PENDING', 'CONFIRMED')
               AND endHour > NOW()
         ) THEN
-            SIGNAL SQLSTATE '45000' 
+            SIGNAL SQLSTATE '45135' 
             SET MESSAGE_TEXT = 'Error: Cannot deactivate Location. There are active orders in its venues.';
         END IF;
     END IF;
