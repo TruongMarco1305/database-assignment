@@ -79,21 +79,6 @@ WHERE
                   AND a.category = p_amenityCategory
                   AND a.isActive = 1
                   
-                  -- A. CHECK TƯƠNG THÍCH SIZE (Compatibility)
-                  -- Quy đổi Capacity của phòng ra Size để so sánh với thiết bị
-                  AND (
-                      a.compatibleSize IS NULL -- Thiết bị dùng chung (Universal)
-                      OR FIND_IN_SET(
-                          CASE 
-                              WHEN vt.maxCapacity <= 40 THEN 'Small'
-                              WHEN vt.maxCapacity <= 80 THEN 'Medium'
-                              WHEN vt.maxCapacity <= 120 THEN 'Large'
-                              ELSE 'Exclusive'
-                          END, 
-                          a.compatibleSize
-                      ) > 0
-                  )
-                  
                   -- B. CHECK TRÙNG GIỜ (Availability)
                   -- Đảm bảo thiết bị này chưa bị đơn hàng nào khác xí chỗ trong khung giờ tìm kiếm
                   AND (

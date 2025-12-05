@@ -7,8 +7,7 @@ CREATE PROCEDURE Amenity_Insert(
     IN p_locId VARCHAR(36),
     IN p_category VARCHAR(50), -- Projector, Catering, Audio Set
     IN p_desc TEXT,
-    IN p_price DECIMAL(12,2),
-    IN p_compatibleSize VARCHAR(50), -- Small, Medium, Large, NULL
+    IN p_price DECIMAL(12,2)
 )
 BEGIN
     DECLARE v_locId BINARY(16);
@@ -24,8 +23,8 @@ BEGIN
         SIGNAL SQLSTATE '45084' SET MESSAGE_TEXT = 'Error: Price cannot be negative.';
     END IF;
 
-    INSERT INTO amenities (amenity_id, location_id, category, description, price, compatibleSize)
-    VALUES (UUID_TO_BIN(p_id), v_locId, p_category, p_desc, p_price, p_compatibleSize);
+    INSERT INTO amenities (amenity_id, location_id, category, description, price)
+    VALUES (UUID_TO_BIN(p_id), v_locId, p_category, p_desc, p_price);
 END$$
 
 -- Update Amenity
@@ -34,7 +33,6 @@ CREATE PROCEDURE Amenity_Update(
     IN p_category VARCHAR(50),
     IN p_desc TEXT,
     IN p_price DECIMAL(12,2),
-    IN p_compatibleSize VARCHAR(50),
     IN p_isActive BOOLEAN
 )
 BEGIN
@@ -56,7 +54,6 @@ BEGIN
         category       = COALESCE(p_category, category),
         description    = COALESCE(p_desc, description),
         price          = COALESCE(p_price, price),
-        compatibleSize = COALESCE(p_compatibleSize, compatibleSize),
         isActive       = COALESCE(p_isActive, isActive)
     WHERE amenity_id = v_id;
 END$$

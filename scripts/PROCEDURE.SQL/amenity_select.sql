@@ -1,8 +1,7 @@
 DELIMITER $$
 CREATE PROCEDURE Filter_Amenities(
     IN p_locationId VARCHAR(36), -- Bắt buộc (phải biết đang xem kho của ai)
-    IN p_category VARCHAR(50),   -- NULL được (lấy tất cả loại)
-    IN p_targetSize VARCHAR(5)   -- NULL được (lấy tất cả size)
+    IN p_category VARCHAR(50)   -- NULL được (lấy tất cả loại)
 )
 BEGIN
     SELECT 
@@ -10,7 +9,6 @@ BEGIN
         category,
         description,
         price,
-        compatibleSize,
         createdAt
     FROM amenities
     WHERE location_id = UUID_TO_BIN(p_locationId)
@@ -18,13 +16,6 @@ BEGIN
       
       -- 1. Lọc theo Category (Nếu p_category NULL thì bỏ qua dòng này)
       AND (p_category IS NULL OR category = p_category)
-      
-      -- 2. Lọc theo Size (Nếu p_targetSize NULL thì bỏ qua dòng này)
-      AND (
-          p_targetSize IS NULL                       -- Không chọn size -> Lấy hết
-          OR compatibleSize IS NULL                  -- Hoặc thiết bị dùng chung cho mọi size
-          OR FIND_IN_SET(p_targetSize, compatibleSize) > 0 -- Hoặc thiết bị khớp size
-      )
       
     -- Sắp xếp: Ưu tiên gom theo loại trước, sau đó đến giá
     ORDER BY category ASC, price ASC;
