@@ -45,3 +45,22 @@ BEGIN
     END IF;
 END$$
 DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER trg_Order_CheckClientLimit_BeforeInsert
+BEFORE INSERT ON orders
+FOR EACH ROW
+BEGIN
+    -- Chỉ kiểm tra đơn đang PENDING (chưa thanh toán)
+    -- Cho phép đặt nhiều đơn CONFIRMED (đặt trước cho tương lai)
+    IF EXISTS (
+        SELECT 1 FROM orders
+        WHERE client_id = NEW.client_id
+          AND status = 'PENDING'
+    ) THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Error: You have a pending order. Please complete payment or cancel it before booking a new one.';
+    END IF;
+END$$
+
+DELIMITER ;

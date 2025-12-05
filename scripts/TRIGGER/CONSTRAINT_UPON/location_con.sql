@@ -19,3 +19,24 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER Check_DeactiveLoc
+BEFORE UPDATE ON locations
+FOR EACH ROW
+BEGIN
+    IF OLD.isActive = 1 AND NEW.isActive = 0 THEN
+        -- Kiểm tra có đơn hàng nào đang chạy ở bất kỳ phòng nào thuộc Location này không
+        IF EXISTS (
+            SELECT 1 FROM orders
+            WHERE venue_loc_id = OLD.location_id -- Orders lưu location_id này
+              AND status IN ('PENDING', 'CONFIRMED')
+              AND endHour > NOW()
+        ) THEN
+            SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Error: Cannot deactivate Location. There are active orders in its venues.';
+        END IF;
+    END IF;
+END$$
+
+DELIMITER ;

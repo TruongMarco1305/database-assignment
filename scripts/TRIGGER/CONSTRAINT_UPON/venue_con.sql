@@ -18,3 +18,31 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+DELIMITER $$
+
+DROP TRIGGER IF EXISTS trg_Venue_PreventDeactivation_BeforeUpdate$$
+
+CREATE TRIGGER trg_Venue_PreventDeactivation_BeforeUpdate
+BEFORE UPDATE ON venues
+FOR EACH ROW
+BEGIN
+    -- Chỉ kiểm tra khi chuyển từ Active (1) sang Inactive (0)
+    IF OLD.isActive = 1 AND NEW.isActive = 0 THEN
+        
+        -- Kiểm tra xem có đơn hàng nào sắp tới hoặc đang diễn ra không
+        IF EXISTS (
+            SELECT 1 FROM orders
+            WHERE venue_loc_id = OLD.location_id 
+              AND venueName = OLD.name
+              AND status IN ('PENDING', 'CONFIRMED')
+              AND endHour > NOW() -- Đơn hàng chưa kết thúc
+        ) THEN
+            SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Error: Cannot deactivate Venue. There are active or upcoming orders associated with it.';
+        END IF;
+        
+    END IF;
+END$$
+
+DELIMITER ;

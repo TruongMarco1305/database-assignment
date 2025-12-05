@@ -68,29 +68,33 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Order does not exist.';
     END IF;
 
-    -- 2. Validate Price (Nếu có truyền vào)
-    IF p_totalPrice IS NOT NULL AND p_totalPrice < 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Total Price cannot be negative.';
-    END IF;
+    -- 2. LOGIC MỚI: Nếu trạng thái là CANCELLED -> Gọi xóa luôn
+    IF p_status = 'CANCELLED' THEN
+        CALL Order_Delete(p_id);
+    ELSE
+        -- Các logic Update bình thường
+        
+        -- Validate
+        IF p_totalPrice IS NOT NULL AND p_totalPrice < 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Total Price cannot be negative.';
+        END IF;
 
-    -- 3. Validate Points (Nếu có truyền vào)
-    IF p_points IS NOT NULL AND p_points < 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Points cannot be negative.';
-    END IF;
+        IF p_points IS NOT NULL AND p_points < 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Points cannot be negative.';
+        END IF;
 
-    -- 4. Validate Status (Nếu có truyền vào)
-    -- Kiểm tra xem status có nằm trong danh sách cho phép không
-    IF p_status IS NOT NULL AND p_status NOT IN ('PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED') THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Invalid status value.';
-    END IF;
+        IF p_status IS NOT NULL AND p_status NOT IN ('PENDING', 'CONFIRMED', 'COMPLETED') THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Invalid status value.';
+        END IF;
 
-    -- 5. Execute Update (Partial Update)
-    UPDATE orders 
-    SET 
-        totalPrice = COALESCE(p_totalPrice, totalPrice),
-        points     = COALESCE(p_points, points),
-        status     = COALESCE(p_status, status)
-    WHERE order_id = v_id;
+        -- Execute Update
+        UPDATE orders 
+        SET 
+            totalPrice = COALESCE(p_totalPrice, totalPrice),
+            points     = COALESCE(p_points, points),
+            status     = COALESCE(p_status, status)
+        WHERE order_id = v_id;
+    END IF;
 END$$
 DELIMITER ;
 
