@@ -95,4 +95,32 @@ export class OrderService {
       );
     }
   }
+
+  public async getOrdersByLocation(
+    ownerId: string,
+    orderQuery: {
+      locationId?: string;
+      orderStatus?: string;
+      startDate?: string;
+      endDate?: string;
+    },
+  ) {
+    try {
+      const results = await this.databaseService.execute(
+        `CALL getOrdersForOwner(?, ?, ?, ?, ?)`,
+        [
+          ownerId,
+          orderQuery.locationId || null,
+          orderQuery.orderStatus || null,
+          orderQuery.startDate ? new Date(orderQuery.startDate) : null,
+          orderQuery.endDate ? new Date(orderQuery.endDate) : null,
+        ],
+      );
+      return results;
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to retrieve orders for owner',
+      );
+    }
+  }
 }

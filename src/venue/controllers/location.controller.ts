@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Get,
 } from '@nestjs/common';
 import { AuthGuard, OwnerGuard } from 'src/auth/guards';
 import {
@@ -28,6 +29,26 @@ export class LocationController {
       dto,
     );
     return { _id: locationId };
+  }
+
+  @Get('/:id/details')
+  @UseGuards(OwnerGuard)
+  async previewLocation(@Param('id') id: string, @User() user: Express.User) {
+    const result = await this.locationService.previewLocation(user.userId, id);
+    return result;
+  }
+
+  @Get('/:id/venues')
+  @UseGuards(OwnerGuard)
+  async getVenuesAtLocation(
+    @Param('id') id: string,
+    @User() user: Express.User,
+  ) {
+    const result = await this.locationService.getVenuesAtLocation(
+      user.userId,
+      id,
+    );
+    return result;
   }
 
   @Patch('/:id')
@@ -56,5 +77,12 @@ export class LocationController {
       dto,
     );
     return results;
+  }
+
+  @Get('/owner')
+  @UseGuards(OwnerGuard)
+  async getLocationsOfOwner(@User() user: Express.User) {
+    const result = await this.locationService.getLocationsOfOwner(user.userId);
+    return result;
   }
 }

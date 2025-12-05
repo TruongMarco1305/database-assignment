@@ -5,10 +5,10 @@ DELIMITER $$
 CREATE PROCEDURE Amenity_Insert(
     IN p_id VARCHAR(36),
     IN p_locId VARCHAR(36),
-    IN p_category VARCHAR(50),
+    IN p_category VARCHAR(50), -- Projector, Catering, Audio Set
     IN p_desc TEXT,
     IN p_price DECIMAL(12,2),
-    IN p_compatibleSize VARCHAR(50)
+    IN p_compatibleSize VARCHAR(50), -- Small, Medium, Large, NULL
 )
 BEGIN
     DECLARE v_locId BINARY(16);

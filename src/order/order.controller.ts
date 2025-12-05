@@ -6,6 +6,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import {
@@ -56,5 +58,24 @@ export class OrderController {
   async removeAmenity(@Body() dto: RemoveOrderAmenityDto) {
     await this.orderService.removeOrderAmenity(dto);
     return { message: 'Amenity removed from order successfully' };
+  }
+
+  @Get('/owner')
+  @UseGuards(OwnerGuard)
+  async getOrdersByLocation(
+    @Query()
+    orderQuery: {
+      locationId?: string;
+      orderStatus?: string;
+      startDate?: string;
+      endDate?: string;
+    },
+    @User() user: Express.User,
+  ) {
+    const orders = await this.orderService.getOrdersByLocation(
+      user.userId,
+      orderQuery,
+    );
+    return orders;
   }
 }
