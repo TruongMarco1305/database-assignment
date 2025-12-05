@@ -73,7 +73,7 @@ BEGIN
     -- Không được xóa thiết bị đã từng được thuê (để bảo toàn lịch sử đơn hàng cũ)
     IF EXISTS (SELECT 1 FROM order_amenities WHERE amenity_id = v_id) THEN
         SIGNAL SQLSTATE '45088' 
-        SET MESSAGE_TEXT = 'Error: Cannot delete amenity because it is linked to existing orders. Please set isActive=0 instead.';
+        SET MESSAGE_TEXT = 'Error: Cannot delete amenity because it is linked to existing orders. Please deactivate it instead.';
     END IF;
 
     DELETE FROM amenities WHERE amenity_id = v_id;

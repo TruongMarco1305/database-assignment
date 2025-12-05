@@ -40,6 +40,9 @@ SELECT
     vt.minCapacity,
     vt.maxCapacity
 
+    -- 4. Images List (MỚI: Gom tất cả ảnh thành chuỗi)
+    GROUP_CONCAT(DISTINCT vi.locationImgURL SEPARATOR ',') AS image_urls,
+
     -- CỘT MỚI: Đánh dấu yêu thích (1 = Có, 0 = Không)
     -- Logic: Kiểm tra xem User này có like Location này chưa
     EXISTS (
@@ -50,6 +53,7 @@ FROM
     locations l
     JOIN venues v ON v.location_id = l.location_id
     LEFT JOIN venue_types vt ON v.venueType_id = vt.venueType_id
+    LEFT JOIN venue_images vi ON vi.location_id = v.location_id AND vi.venueName = v.name
     -- LEFT JOIN FAVORS favourite ON favourite.location_id = location.location_id
     -- AND favourite.client_id = p_clientId
 WHERE
@@ -126,6 +130,10 @@ WHERE
             )
         )
     -- Sort by price (tăng dần)
+    
+    -- GROUP BY BẮT BUỘC KHI DÙNG GROUP_CONCAT
+    -- Phải group theo khóa chính của Venue (LocationID + VenueName)
+    GROUP BY l.location_id, v.name
 -- Sắp xếp kết quả
     ORDER BY
         -- 1. ƯU TIÊN SỐ 1: Đưa địa điểm yêu thích lên đầu

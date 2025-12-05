@@ -83,7 +83,7 @@ CREATE TABLE venue_images (
 );
 
 CREATE TABLE amenities (
-    amenity_id BINARY(16) PRIMARY KEY,
+    amenity_name VARCHAR(50) NOT NULL,
     location_id BINARY(16) NOT NULL, 
     category VARCHAR(50) NOT NULL, -- Projector, Catering, Audio Set
     description TEXT,
@@ -91,8 +91,8 @@ CREATE TABLE amenities (
     isActive BOOLEAN DEFAULT 1, -- 1 là đang trong kho sẵn sàng phục vụ, 0 thì là đang dùng hoặc hỏng
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY(amenity_name, location_id),
     FOREIGN KEY (location_id) REFERENCES locations(location_id) ON DELETE CASCADE
-    -- FOREIGN KEY (location_id, venueName) REFERENCES venues(location_id, name) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE orders (
