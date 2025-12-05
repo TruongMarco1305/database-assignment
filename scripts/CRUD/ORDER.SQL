@@ -68,55 +68,29 @@ BEGIN
         SIGNAL SQLSTATE '45059' SET MESSAGE_TEXT = 'Error: Order does not exist.';
     END IF;
 
-    -- 2. LOGIC MỚI: Nếu trạng thái là CANCELLED -> Gọi xóa luôn
-    IF p_status = 'CANCELLED' THEN
-        CALL Order_Delete(p_id);
-    ELSE
-        -- Các logic Update bình thường
-        
-        -- Validate
-        IF p_totalPrice IS NOT NULL AND p_totalPrice < 0 THEN
-            SIGNAL SQLSTATE '45060' SET MESSAGE_TEXT = 'Error: Total Price cannot be negative.';
-        END IF;
-
-        IF p_points IS NOT NULL AND p_points < 0 THEN
-            SIGNAL SQLSTATE '45061' SET MESSAGE_TEXT = 'Error: Points cannot be negative.';
-        END IF;
-
-        IF p_status IS NOT NULL AND p_status NOT IN ('PENDING', 'CONFIRMED', 'COMPLETED') THEN
-            SIGNAL SQLSTATE '45062' SET MESSAGE_TEXT = 'Error: Invalid status value.';
-        END IF;
-
-        -- Execute Update
-        UPDATE orders 
-        SET 
-            totalPrice = COALESCE(p_totalPrice, totalPrice),
-            points     = COALESCE(p_points, points),
-            status     = COALESCE(p_status, status)
-        WHERE order_id = v_id;
+    -- 2. Validate Price (Nếu có truyền vào)
+    IF p_totalPrice IS NOT NULL AND p_totalPrice < 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Total Price cannot be negative.';
     END IF;
+
+    -- 3. Validate Points (Nếu có truyền vào)
+    IF p_points IS NOT NULL AND p_points < 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Points cannot be negative.';
+    END IF;
+
+    -- 4. Validate Status (Nếu có truyền vào)
+    -- Đã thêm 'CANCELLED' vào danh sách cho phép
+    IF p_status IS NOT NULL AND p_status NOT IN ('PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED') THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Invalid status value.';
+    END IF;
+
+    -- 5. Execute Update (Partial Update)
+    -- Cập nhật trực tiếp, bao gồm cả trạng thái CANCELLED
+    UPDATE orders 
+    SET 
+        totalPrice = COALESCE(p_totalPrice, totalPrice),
+        points     = COALESCE(p_points, points),
+        status     = COALESCE(p_status, status)
+    WHERE order_id = v_id;
 END$$
-DELIMITER ;
-
--- Delete Order
-DELIMITER $$
-CREATE PROCEDURE Order_Delete(IN p_id VARCHAR(36))
-BEGIN
-    DECLARE v_id BINARY(16);
-    SET v_id = UUID_TO_BIN(p_id);
-
-    -- 1. Check Existence
-    IF NOT EXISTS (SELECT 1 FROM orders WHERE order_id = v_id) THEN
-        SIGNAL SQLSTATE '45063' SET MESSAGE_TEXT = 'Error: Order does not exist.';
-    END IF;
-
-    -- 2. Constraint Check: INVOICE
-    -- Không cho xóa đơn hàng đã xuất hóa đơn (đảm bảo tính toàn vẹn tài chính)
-    IF EXISTS (SELECT 1 FROM invoices WHERE order_id = v_id) THEN
-        SIGNAL SQLSTATE '45064' SET MESSAGE_TEXT = 'Error: Cannot delete Order. An Invoice has been generated.';
-    END IF;
-
-    DELETE FROM orders WHERE order_id = v_id;
-END$$
-
 DELIMITER ;

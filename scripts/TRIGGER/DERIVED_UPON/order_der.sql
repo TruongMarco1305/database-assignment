@@ -5,27 +5,6 @@ AFTER UPDATE ON orders
 FOR EACH ROW
 BEGIN
     -- =================================================================
-    -- PHẦN 1: GIẢI PHÓNG TÀI NGUYÊN (AMENITIES & VENUE)
-    -- Chạy khi đơn hàng kết thúc (Dù là Hoàn thành hay Hủy)
-    -- =================================================================
-    -- IF NEW.status IN ('COMPLETED', 'CANCELLED') AND OLD.status NOT IN ('COMPLETED', 'CANCELLED') THEN
-        
-    --     -- 1.1. Trả Amenities về trạng thái sẵn sàng (isActive = 1)
-    --     UPDATE amenities a
-    --     INNER JOIN order_amenities oa ON a.amenity_id = oa.amenity_id
-    --     SET a.isActive = 1
-    --     WHERE oa.order_id = NEW.order_id;
-
-    --     -- 1.2. Trả Venue về trạng thái sẵn sàng (isActive = 1)
-    --     -- (Lưu ý: Chỉ cần thiết nếu quy trình của bạn có bước set isActive=0 khi đặt phòng)
-    --     UPDATE venues
-    --     SET isActive = 1
-    --     WHERE location_id = NEW.venue_loc_id 
-    --       AND name = NEW.venueName;
-          
-    -- END IF;
-
-    -- =================================================================
     -- PHẦN 2: TÍCH ĐIỂM THÀNH VIÊN
     -- Chỉ chạy khi đơn hàng HOÀN TẤT (COMPLETED)
     -- =================================================================
