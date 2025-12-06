@@ -6,7 +6,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { UserService } from './services/user.service';
-import { UpdateOwnerDto, UpdateUserDto } from './user.dto';
+import { UpdateOwnerDto, UpdateUserDto, UserProfileDto } from './user.dto';
 import { AuthGuard, OwnerGuard } from 'src/auth/guards';
 import { User } from 'src/auth/decorators';
 import { OwnerService } from './services';
@@ -39,6 +39,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'User profile retrieved successfully',
+    type: UserProfileDto,
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   getProfile(@User() user: Express.User) {

@@ -19,6 +19,9 @@ import {
   CreateLocationDto,
   SearchLocationsDto,
   UpdateLocationDto,
+  LocationSearchResultDto,
+  LocationDetailsResponseDto,
+  LocationListItemDto,
 } from '../dto/create-venue.dto';
 import { User } from 'src/auth/decorators';
 import { LocationService } from '../services/location.service';
@@ -27,6 +30,22 @@ import { LocationService } from '../services/location.service';
 @Controller('location')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
+
+  // ===== GET ALL LOCATIONS ENDPOINT =====
+  @Get()
+  @ApiOperation({ summary: 'Get all active locations (public)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Locations retrieved successfully',
+    type: [LocationListItemDto],
+  })
+  async getAllLocations(@User() user?: Express.User) {
+    // If user is authenticated, pass their ID to check favorites
+    // Otherwise pass null for public access
+    const clientId = user?.userId || null;
+    const result = await this.locationService.getAllLocations(clientId);
+    return result;
+  }
 
   @Post()
   @UseGuards(OwnerGuard)
@@ -41,6 +60,29 @@ export class LocationController {
       dto,
     );
     return { _id: locationId };
+  }
+
+  // ===== PUBLIC LOCATION DETAILS ENDPOINT =====
+  @Get('/:id')
+  @ApiOperation({ summary: 'Get complete location details by ID (public)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Location details retrieved successfully',
+    type: LocationDetailsResponseDto,
+  })
+  @ApiResponse({ status: 404, description: 'Location not found' })
+  async getLocationDetails(
+    @Param('id') id: string,
+    @User() user?: Express.User,
+  ) {
+    // If user is authenticated, pass their ID to check favorites
+    // Otherwise pass null for public access
+    const clientId = user?.userId || null;
+    const result = await this.locationService.getLocationDetailsById(
+      id,
+      clientId,
+    );
+    return result;
   }
 
   @Get('/:id/details')
@@ -90,6 +132,7 @@ export class LocationController {
   @ApiResponse({
     status: 200,
     description: 'Search results returned successfully',
+    type: [LocationSearchResultDto],
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async searchLocations(
