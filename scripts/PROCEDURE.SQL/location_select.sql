@@ -10,7 +10,7 @@ CREATE PROCEDURE getListLocations(
     IN p_theme VARCHAR(50),    -- Lọc theo Theme (VD: 'Luxury', 'Minimalist')
     IN p_size VARCHAR(20),     -- Lọc theo Size (Input: 'Small', 'Medium', 'Large')
     IN p_amenityCategory VARCHAR(50), -- VD: 'Projector_Kit' (Check trong kho Location)
-    IN p_sort VARCHAR(20)
+    IN p_sort VARCHAR(20),
 
     IN p_clientId VARCHAR(36)  -- <--- Tham số mới: ID của người đang search
 )
@@ -38,7 +38,7 @@ SELECT
     BIN_TO_UUID(vt.venueType_id) AS venueType_id,
     vt.name AS theme_name,
     vt.minCapacity,
-    vt.maxCapacity
+    vt.maxCapacity,
 
     -- 4. Images List (MỚI: Gom tất cả ảnh thành chuỗi)
     GROUP_CONCAT(DISTINCT vi.locationImgURL SEPARATOR ',') AS image_urls,
