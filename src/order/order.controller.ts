@@ -38,8 +38,30 @@ export class OrderController {
   @ApiResponse({ status: 201, description: 'Order created successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async create(@Body() dto: CreateOrderDto, @User() user: Express.User) {
-    const orderId = await this.orderService.createOrder(user.userId, dto);
-    return { _id: orderId };
+    const { orderId, expiredTime } = await this.orderService.createOrder(
+      user.userId,
+      dto,
+    );
+    return { _id: orderId, expiredTime };
+  }
+
+  @Get('/metadata')
+  @UseGuards(AuthGuard)
+  async getDiscountsByVenue(
+    @Query('locationId') locationId: string,
+    @Query('venueName') venueName: string,
+    @Query('startTime') startTime: string,
+    @Query('endTime') endTime: string,
+    @User() user: Express.User,
+  ) {
+    const data = await this.orderService.getPreviewOrderMetadata(
+      locationId,
+      venueName,
+      startTime,
+      endTime,
+      user.userId,
+    );
+    return data;
   }
 
   @Patch('/:id')
@@ -78,7 +100,6 @@ export class OrderController {
   @ApiResponse({ status: 403, description: 'Forbidden - Owner role required' })
   async addAmenity(@Body() dto: AddOrderAmenityDto) {
     await this.orderService.addOrderAmenity(dto);
-    return { message: 'Amenity added to order successfully' };
   }
 
   @Delete('/amenities')

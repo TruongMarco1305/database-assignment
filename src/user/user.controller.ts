@@ -43,7 +43,6 @@ export class UserController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   getProfile(@User() user: Express.User) {
-    console.log(user);
     if (user.role === 'client') {
       return this.userService.findUserById(user.userId);
     } else {

@@ -62,8 +62,43 @@ export class LocationController {
     return { _id: locationId };
   }
 
+  // ===== GET LOCATIONS OF OWNER ENDPOINT =====
+  @Get('owner')
+  @UseGuards(OwnerGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get all locations owned by current user' })
+  @ApiResponse({ status: 200, description: 'Locations retrieved successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Owner role required' })
+  async getLocationsOfOwner(@User() user: Express.User) {
+    const result = await this.locationService.getLocationsOfOwner(user.userId);
+    return result;
+  }
+
+  // ===== SEARCH LOCATIONS ENDPOINT =====
+  @Post('search')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Search for available locations with filters' })
+  @ApiResponse({
+    status: 200,
+    description: 'Search results returned successfully',
+    type: [LocationSearchResultDto],
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async searchLocations(
+    @Body() dto: SearchLocationsDto,
+    @User() user: Express.User,
+  ) {
+    const results = await this.locationService.searchLocations(
+      user.userId,
+      dto,
+    );
+    return results;
+  }
+
   // ===== PUBLIC LOCATION DETAILS ENDPOINT =====
-  @Get('/:id')
+  @Get(':id')
   @ApiOperation({ summary: 'Get complete location details by ID (public)' })
   @ApiResponse({
     status: 200,
@@ -85,21 +120,21 @@ export class LocationController {
     return result;
   }
 
-  @Get('/:id/details')
+  @Get(':id/details')
   @UseGuards(OwnerGuard)
   async previewLocation(@Param('id') id: string, @User() user: Express.User) {
     const result = await this.locationService.previewLocation(user.userId, id);
     return result;
   }
 
-  @Get('/:id/venues')
+  @Get(':id/venues')
   @UseGuards(OwnerGuard)
   async getVenuesAtLocation(@Param('id') id: string) {
     const result = await this.locationService.getVenuesAtLocation(id);
     return result;
   }
 
-  @Patch('/:id')
+  @Patch(':id')
   @UseGuards(OwnerGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update location details' })
@@ -111,7 +146,7 @@ export class LocationController {
     await this.locationService.updateLocation(id, dto);
   }
 
-  @Delete('/:id')
+  @Delete(':id')
   @UseGuards(OwnerGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete a location' })
@@ -124,37 +159,8 @@ export class LocationController {
     return { message: 'Location deleted successfully' };
   }
 
-  // ===== SEARCH LOCATIONS ENDPOINT =====
-  @Post('/search')
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Search for available locations with filters' })
-  @ApiResponse({
-    status: 200,
-    description: 'Search results returned successfully',
-    type: [LocationSearchResultDto],
-  })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async searchLocations(
-    @Body() dto: SearchLocationsDto,
-    @User() user: Express.User,
-  ) {
-    const results = await this.locationService.searchLocations(
-      user.userId,
-      dto,
-    );
-    return results;
-  }
-
-  @Get('/owner')
-  @UseGuards(OwnerGuard)
-  async getLocationsOfOwner(@User() user: Express.User) {
-    const result = await this.locationService.getLocationsOfOwner(user.userId);
-    return result;
-  }
-
   // ===== FAVOR ENDPOINTS =====
-  @Post('/:locationId/favors')
+  @Post(':locationId/favors')
   @UseGuards(AuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Add location to favorites' })
@@ -167,7 +173,7 @@ export class LocationController {
     await this.locationService.createFavor(user.userId, locationId);
   }
 
-  @Delete('/:locationId/favors')
+  @Delete(':locationId/favors')
   @UseGuards(AuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Remove location from favorites' })

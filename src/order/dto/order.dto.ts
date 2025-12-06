@@ -33,6 +33,9 @@ export class CreateOrderDto {
   @IsOptional()
   @IsArray()
   amenityIds?: string[];
+
+  @IsOptional()
+  discountIds?: string[];
 }
 
 export class UpdateOrderDto {

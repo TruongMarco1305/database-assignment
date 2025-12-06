@@ -19,14 +19,22 @@ export class PaymentService {
   // ===== INVOICE OPERATIONS =====
   public async createInvoice(dto: CreateInvoiceDto): Promise<string> {
     const invoiceId = uuidv4();
-
     try {
+      const data = await this.databaseService.execute<{
+        totalPrice: string;
+        accountNo: string;
+        accountName: string;
+        bankId: string;
+      }>(`CALL GetInvoiceCreateData(?)`, [dto.orderId]);
+      const { totalPrice, accountNo, accountName, bankId } = data[0];
       await this.databaseService.execute(`CALL Invoice_Insert(?, ?, ?)`, [
         invoiceId,
         dto.orderId,
-        dto.amount,
+        totalPrice,
       ]);
-      return invoiceId;
+      return encodeURI(
+        `https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${totalPrice}&addInfo=Pay%20for%20booking%20${invoiceId}&accountName=${accountName}`,
+      );
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to create invoice');
     }
@@ -70,7 +78,6 @@ export class PaymentService {
   // ===== DISCOUNT OPERATIONS =====
   public async createDiscount(dto: CreateDiscountDto): Promise<string> {
     const discountId = uuidv4();
-    console.log(dto.membershipTier.toString());
     try {
       await this.databaseService.execute(
         `CALL Discount_Insert(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -90,10 +97,6 @@ export class PaymentService {
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to create discount');
     }
-  }
-
-  public async previewDiscounts() {
-    return await this.databaseService.execute(`CALL GetDiscountInfo()`);
   }
 
   public async updateDiscount(

@@ -14,11 +14,6 @@ export class CreateInvoiceDto {
   @IsNotEmpty()
   @IsString()
   orderId: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @Min(0.01)
-  amount: number;
 }
 
 export class CompleteInvoicePaymentDto {

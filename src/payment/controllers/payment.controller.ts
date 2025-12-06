@@ -6,7 +6,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  Get,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -78,12 +77,12 @@ export class PaymentController {
     return { _id: discountId };
   }
 
-  @Get('/discounts/preview')
-  @UseGuards(AdminGuard)
-  async previewDiscounts() {
-    const discounts = await this.paymentService.previewDiscounts();
-    return { data: discounts };
-  }
+  // @Get('/discounts/:code')
+  // @UseGuards(AdminGuard)
+  // async getDiscountByCode(@Param('code') code: string) {
+  //   const discount = await this.paymentService.getDiscountByCode(code);
+  //   return discount;
+  // }
 
   @Patch('/discounts/:id')
   @UseGuards(AdminGuard)

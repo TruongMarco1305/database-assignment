@@ -114,6 +114,7 @@ export class LocationService {
   }
 
   public async getLocationsOfOwner(userId: string) {
+    console.log(userId);
     try {
       const result = await this.databaseService.execute<any>(
         `CALL listLocationOfOwner(?)`,

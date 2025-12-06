@@ -7,6 +7,7 @@ import {
 } from './dto/order.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class OrderService {
@@ -16,7 +17,7 @@ export class OrderService {
   public async createOrder(
     clientId: string,
     dto: CreateOrderDto,
-  ): Promise<string> {
+  ): Promise<{ expiredTime: Date; orderId: string }> {
     const orderId = uuidv4();
 
     try {
@@ -32,6 +33,8 @@ export class OrderService {
         ],
       );
 
+      const expiredTime: Date = dayjs().add(15, 'minute').toDate();
+
       // Add amenities if provided
       if (dto.amenityIds && dto.amenityIds.length > 0) {
         for (const amenityId of dto.amenityIds) {
@@ -42,9 +45,42 @@ export class OrderService {
         }
       }
 
-      return orderId;
+      if (dto.discountIds && dto.discountIds.length > 0) {
+        for (const discountId of dto.discountIds) {
+          await this.databaseService.execute(
+            `CALL OrderDiscount_Insert(?, ?)`,
+            [orderId, discountId],
+          );
+        }
+      }
+
+      return { expiredTime, orderId };
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to create order');
+    }
+  }
+
+  public async getPreviewOrderMetadata(
+    locationId: string,
+    venueName: string,
+    startTime: string,
+    endTime: string,
+    userId: string,
+  ): Promise<any> {
+    try {
+      const amenities = await this.databaseService.execute(
+        `CALL Get_Valid_Amenities(?, ?, ?, ?)`,
+        [locationId, venueName, new Date(startTime), new Date(endTime)],
+      );
+      const discounts = await this.databaseService.execute(
+        `CALL Get_Valid_Discounts(?, ?, ?, ?, ?)`,
+        [userId, locationId, venueName, new Date(startTime), new Date(endTime)],
+      );
+      return { discounts, amenities };
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to get discounts by venue',
+      );
     }
   }
 

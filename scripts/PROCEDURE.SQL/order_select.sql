@@ -133,4 +133,29 @@ BEGIN
     ORDER BY o.createdAt DESC;
 END$$
 
+CREATE PROCEDURE GetInvoiceCreateData(
+    IN in_orderId VARCHAR(36)
+)
+BEGIN
+    SELECT 
+        -- Order Information
+        ord.totalPrice as totalPrice,
+        
+        -- Owner Information
+        -- Converting Binary ID back to String for readability
+        BIN_TO_UUID(own.user_id) AS owner_id, 
+        own.bankId as bankId,
+        own.bankName as bankName,
+        own.accountName as accountName,
+        own.accountNo as accountNo
+        
+    FROM orders ord
+    -- Join Orders to Locations using the venue location ID
+    JOIN locations loc ON ord.venue_loc_id = loc.location_id
+    -- Join Locations to Owners using the owner ID
+    JOIN owners own ON loc.owner_id = own.user_id
+    
+    -- Filter by the specific Order ID (Converting input string to binary)
+    WHERE ord.order_id = UUID_TO_BIN(in_orderId);
+END $$
 DELIMITER ;
