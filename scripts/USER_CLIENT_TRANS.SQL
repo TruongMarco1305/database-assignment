@@ -19,7 +19,7 @@ BEGIN
     DECLARE EXIT HANDLER FOR SQLEXCEPTION
     BEGIN
         ROLLBACK;
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Registration failed. Transaction rolled back.';
+        SIGNAL SQLSTATE '45138' SET MESSAGE_TEXT = 'Error: Registration failed. Transaction rolled back.';
     END;
 
     -- 1. Tạo UUID mới

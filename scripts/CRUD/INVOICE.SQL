@@ -104,12 +104,4 @@ BEGIN
     WHERE invoice_id = v_id;
 END$$
 
--- 4. Invoice_Delete (Giữ nguyên)
--- CREATE PROCEDURE Invoice_Delete(IN p_id VARCHAR(36))
--- BEGIN
---     SIGNAL SQLSTATE '45000' 
---     SET MESSAGE_TEXT = 'Error: STRICT POLICY - Invoices cannot be deleted under any circumstances to maintain financial audit trails. Please update status to FAILED instead.';
---     DELETE FROM invoices WHERE invoice_id = UUID_TO_BIN(p_id);
--- END$$
-
 DELIMITER ;

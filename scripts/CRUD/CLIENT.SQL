@@ -55,38 +55,4 @@ BEGIN
     WHERE user_id = v_uuid;
 END$$
 
--- -- Delete Client
--- CREATE PROCEDURE Client_Delete(IN p_userId VARCHAR(36))
--- BEGIN
---     DECLARE v_uuid BINARY(16);
---     SET v_uuid = UUID_TO_BIN(p_userId);
-
---     -- 1. Check Existence
---     IF NOT EXISTS (SELECT 1 FROM clients WHERE user_id = v_uuid) THEN
---         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Client does not exist.';
---     END IF;
-
---     -- 2. Constraint Check: ORDERS
---     -- Reason: Cannot delete client who has placed orders (Financial history integrity).
---     IF EXISTS (SELECT 1 FROM orders WHERE client_id = v_uuid) THEN
---         SIGNAL SQLSTATE '45000' 
---         SET MESSAGE_TEXT = 'Error: Cannot delete client. Associated Orders exist.';
---     END IF;
-
---     -- 3. Constraint Check: RATES & FAVORS
---     -- Reason: The table schema uses ON DELETE RESTRICT for these tables.
---     IF EXISTS (SELECT 1 FROM rates WHERE client_id = v_uuid) THEN
---         SIGNAL SQLSTATE '45000' 
---         SET MESSAGE_TEXT = 'Error: Cannot delete client. Associated Ratings exist. Please remove ratings first.';
---     END IF;
-
---     IF EXISTS (SELECT 1 FROM favors WHERE client_id = v_uuid) THEN
---         SIGNAL SQLSTATE '45000' 
---         SET MESSAGE_TEXT = 'Error: Cannot delete client. Associated Favors exist. Please remove favors first.';
---     END IF;
-
---     -- Execute Delete
---     DELETE FROM clients WHERE user_id = v_uuid;
--- END$$
-
 DELIMITER ;

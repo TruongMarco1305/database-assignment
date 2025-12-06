@@ -20,10 +20,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-
-DROP TRIGGER IF EXISTS trg_Venue_PreventDeactivation_BeforeUpdate$$
-
-CREATE TRIGGER trg_Venue_PreventDeactivation_BeforeUpdate
+CREATE TRIGGER Check_DeactiveVen
 BEFORE UPDATE ON venues
 FOR EACH ROW
 BEGIN
@@ -38,7 +35,7 @@ BEGIN
               AND status IN ('PENDING', 'CONFIRMED')
               AND endHour > NOW() -- Đơn hàng chưa kết thúc
         ) THEN
-            SIGNAL SQLSTATE '45000' 
+            SIGNAL SQLSTATE '45137' 
             SET MESSAGE_TEXT = 'Error: Cannot deactivate Venue. There are active or upcoming orders associated with it.';
         END IF;
         

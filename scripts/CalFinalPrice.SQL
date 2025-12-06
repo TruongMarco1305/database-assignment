@@ -27,7 +27,8 @@ BEGIN
     -- Vì bảng order_amenities không lưu giá, ta lấy giá hiện tại từ bảng amenities
     SELECT IFNULL(SUM(a.price), 0) INTO v_amenityPrice
     FROM order_amenities oa
-    JOIN amenities a ON oa.amenity_id = a.amenity_id
+    JOIN amenities a ON oa.location_id = a.location_id 
+                    AND oa.amenity_name = a.amenity_name
     WHERE oa.order_id = p_orderId;
 
     -- >> TỔNG GIÁ GỐC

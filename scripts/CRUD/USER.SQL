@@ -120,33 +120,4 @@ DECLARE v_id BINARY(16);
     WHERE id = v_id;
 END$$
 
--- -- Delete User (Hard Delete)
--- CREATE PROCEDURE User_Delete(IN p_id VARCHAR(36))
--- BEGIN
---     DECLARE v_id BINARY(16);
---     SET v_id = UUID_TO_BIN(p_id);
-
---     -- 1. Check Existence
---     IF NOT EXISTS (SELECT 1 FROM users WHERE id = v_id) THEN
---         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: User does not exist.';
---     END IF;
-
---     -- 2. Constraint Check: Client Data
---     -- Purpose: Prevent deleting users who have booking history or membership points.
---     IF EXISTS (SELECT 1 FROM clients WHERE user_id = v_id) THEN
---         SIGNAL SQLSTATE '45000' 
---         SET MESSAGE_TEXT = 'Error: Cannot delete this user because they are a registered Client. Please deactivate the account instead.';
---     END IF;
-
---     -- 3. Constraint Check: Owner Data
---     -- Purpose: Prevent deleting owners who have registered locations/venues.
---     IF EXISTS (SELECT 1 FROM owners WHERE user_id = v_id) THEN
---         SIGNAL SQLSTATE '45000' 
---         SET MESSAGE_TEXT = 'Error: Cannot delete this user because they are a registered Owner. Please deactivate the account instead.';
---     END IF;
-
---     -- Execute Delete (Only allowed if user is not linked to Client/Owner tables)
---     DELETE FROM users WHERE id = v_id;
--- END$$
-
 DELIMITER ;

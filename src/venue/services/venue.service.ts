@@ -101,6 +101,13 @@ export class VenueService {
           dto.pricePerHour,
         ],
       );
+      for (const url of dto.images) {
+        await this.databaseService.execute(`CALL VenueImage_Insert(?, ?, ?)`, [
+          dto.locationId,
+          dto.name,
+          url,
+        ]);
+      }
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to create venue');
     }
@@ -113,10 +120,11 @@ export class VenueService {
   ): Promise<void> {
     try {
       await this.databaseService.execute(
-        `CALL Venue_Update(?, ?, ?, ?, ?, ?, ?)`,
+        `CALL Venue_Update(?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           locationId,
           name,
+          dto.name || null,
           dto.typeId || null,
           dto.floor || null,
           dto.area || null,
@@ -126,6 +134,18 @@ export class VenueService {
       );
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to update venue');
+    }
+  }
+
+  public async previewVenue(locationId: string, name: string): Promise<any> {
+    try {
+      const [results] = await this.databaseService.execute(
+        `CALL Venue_Preview(?, ?)`,
+        [locationId, name],
+      );
+      return results;
+    } catch (error) {
+      throw new ConflictException(error.message || 'Failed to preview venue');
     }
   }
 

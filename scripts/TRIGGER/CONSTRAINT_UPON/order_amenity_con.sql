@@ -17,7 +17,8 @@ BEGIN
         SELECT 1 
         FROM order_amenities oa
         JOIN orders o ON oa.order_id = o.order_id
-        WHERE oa.amenity_id = NEW.amenity_id      -- Cùng là thiết bị này
+        WHERE oa.location_id = NEW.location_id     -- SỬA: So sánh Location
+          AND oa.amenity_name = NEW.amenity_name   -- SỬA: So sánh Tên
           AND o.order_id != NEW.order_id          -- Không tính chính đơn hàng này (nếu update)
           AND o.status IN ('PENDING', 'CONFIRMED') -- Chỉ tính các đơn đang giữ chỗ
           AND (

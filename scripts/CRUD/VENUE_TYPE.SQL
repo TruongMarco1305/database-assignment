@@ -101,7 +101,7 @@ BEGIN
     -- Không cho xóa Loại phòng nếu đang có Phòng (Venue) thuộc loại này
     IF EXISTS (SELECT 1 FROM venues WHERE venueType_id = v_id) THEN
         SIGNAL SQLSTATE '45013' 
-        SET MESSAGE_TEXT = 'Error: Cannot delete Venue Type. There are Venues using this type. Please reassign them first.';
+        SET MESSAGE_TEXT = 'Error: Cannot delete Venue Type. There are Venues using this type.';
     END IF;
 
     DELETE FROM venue_types WHERE venueType_id = v_id;

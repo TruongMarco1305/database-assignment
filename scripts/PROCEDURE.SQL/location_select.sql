@@ -40,6 +40,9 @@ SELECT
     vt.minCapacity,
     vt.maxCapacity,
 
+    -- 4. Images List (MỚI: Gom tất cả ảnh thành chuỗi)
+    GROUP_CONCAT(DISTINCT vi.locationImgURL SEPARATOR ',') AS image_urls,
+
     -- CỘT MỚI: Đánh dấu yêu thích (1 = Có, 0 = Không)
     -- Logic: Kiểm tra xem User này có like Location này chưa
     EXISTS (
@@ -50,6 +53,7 @@ FROM
     locations l
     JOIN venues v ON v.location_id = l.location_id
     LEFT JOIN venue_types vt ON v.venueType_id = vt.venueType_id
+    LEFT JOIN venue_images vi ON vi.location_id = v.location_id AND vi.venueName = v.name
     -- LEFT JOIN FAVORS favourite ON favourite.location_id = location.location_id
     -- AND favourite.client_id = p_clientId
 WHERE
@@ -87,7 +91,8 @@ WHERE
                           SELECT 1 
                           FROM order_amenities oa
                           JOIN orders o2 ON oa.order_id = o2.order_id
-                          WHERE oa.amenity_id = a.amenity_id
+                          WHERE oa.location_id = a.location_id 
+                            AND oa.amenity_name = a.amenity_name
                             AND o2.status IN ('PENDING', 'CONFIRMED')
                             AND (o2.startHour < p_endTime AND o2.endHour > p_startTime)
                       )
@@ -126,6 +131,10 @@ WHERE
             )
         )
     -- Sort by price (tăng dần)
+    
+    -- GROUP BY BẮT BUỘC KHI DÙNG GROUP_CONCAT
+    -- Phải group theo khóa chính của Venue (LocationID + VenueName)
+    GROUP BY l.location_id, v.name
 -- Sắp xếp kết quả
     ORDER BY
         -- 1. ƯU TIÊN SỐ 1: Đưa địa điểm yêu thích lên đầu
@@ -163,20 +172,61 @@ END$$
 CREATE PROCEDURE listVenueOfLocation(
     IN p_locId VARCHAR(36)
 )
-BEGIN
-    SELECT 
-        v.name as venueName,
-        v.floor as venueFloor,
-        v.area as venueArea,
-        v.pricePerHour as venuePricePerHour,
-        v.isActive as venueIsActive,
-        vt.name as venueTypeName,
-        vt.maxCapacity as venueCapacity,
-        vi.locationImgURL as venueImageURL
-    FROM venues v
-    JOIN venue_types vt ON v.venueType_id = vt.venueType_id
-    JOIN venue_images vi ON v.location_id = vi.location_id AND v.name = vi.venueName
-    WHERE v.location_id = UUID_TO_BIN(p_locId)
-    ORDER BY v.createdAt DESC;
+SELECT
+    v.name AS venueName,
+    v.floor AS venueFloor,
+    v.area AS venueArea,
+    v.pricePerHour AS venuePricePerHour,
+    v.isActive AS venueIsActive,
+    vt.name AS venueTypeName,
+    vt.maxCapacity AS venueCapacity,
+    -- Use GROUP_CONCAT to list all image URLs for the group
+    GROUP_CONCAT(vi.locationImgURL ORDER BY vi.locationImgURL ASC SEPARATOR ', ') AS venueImageURLs
+FROM
+    venues v
+JOIN
+    venue_types vt ON v.venueType_id = vt.venueType_id
+JOIN
+    venue_images vi ON v.location_id = vi.location_id AND v.name = vi.venueName
+WHERE
+    v.location_id = UUID_TO_BIN(p_locId)
+-- Group by all non-aggregated columns
+GROUP BY
+    v.name,
+    v.floor,
+    v.area,
+    v.pricePerHour,
+    v.isActive,
+    vt.name,
+    vt.maxCapacity
+ORDER BY
+    v.createdAt DESC;
 END$$
+
+	CREATE PROCEDURE Venue_Preview(
+	    IN p_locId VARCHAR(36),
+	    IN p_name VARCHAR(100)
+	)
+	BEGIN
+	    SELECT
+	        v.name AS venue_name,
+	        v.floor,
+	        v.area,
+	        v.pricePerHour,
+	        BIN_TO_UUID(v.venueType_id) AS venueType_id,
+	        vt.name AS theme_name,
+	        vt.minCapacity,
+	        vt.maxCapacity,
+	        -- Convert the BINARY(16) location_id back to a readable VARCHAR(36) UUID
+	        BIN_TO_UUID(v.location_id) AS location_id_uuid 
+	    FROM
+	        venues v
+	    LEFT JOIN venue_types vt ON v.venueType_id = vt.venueType_id
+	    WHERE
+	        -- Convert the input VARCHAR(36) ID to BINARY(16) for comparison
+	        v.location_id = UUID_TO_BIN(p_locId)
+	        AND v.name = p_name;
+	    
+	    -- Removed GROUP BY clause as it is unnecessary when only selecting unique fields
+	END$$
 DELIMITER ;

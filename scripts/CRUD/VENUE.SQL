@@ -49,6 +49,7 @@ END$$
 CREATE PROCEDURE Venue_Update(
     IN p_locId VARCHAR(36),
     IN p_name VARCHAR(100),
+    In p_newName VARCHAR(100),
     IN p_typeId VARCHAR(36), -- <--- Bổ sung tham số này
     IN p_floor VARCHAR(10),
     IN p_area DECIMAL(10,1),
@@ -83,6 +84,7 @@ BEGIN
     SET 
         -- Nếu p_typeId là NULL, giữ nguyên giá trị cũ. 
         -- Nếu muốn set NULL cho loại phòng, cần quy ước khác (ví dụ chuỗi 'NULL'), nhưng ở đây ta dùng logic đơn giản.
+        name         = COALESCE(p_newName, name),
         venueType_id = COALESCE(UUID_TO_BIN(p_typeId), venueType_id), 
         floor        = COALESCE(p_floor, floor),
         area         = COALESCE(p_area, area), 

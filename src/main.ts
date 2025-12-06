@@ -1,15 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const frontendOrigin = 'http://localhost:3000';
   app.enableCors({
-    credentials: true,
-    origin: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    origin: frontendOrigin, // The specific domain/port of your frontend
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // <--- THIS IS THE KEY FIX
   });
 
   // Swagger Configuration
@@ -54,18 +54,18 @@ async function bootstrap() {
     res.send(JSON.stringify(document, null, 2));
   });
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3001);
   console.log(
-    `\n🚀 Application is running on: http://localhost:${process.env.PORT ?? 3000}`,
+    `\n🚀 Application is running on: http://localhost:${process.env.PORT ?? 3001}`,
   );
   console.log(
-    `📚 Swagger UI: http://localhost:${process.env.PORT ?? 3000}/api`,
+    `📚 Swagger UI: http://localhost:${process.env.PORT ?? 3001}/api`,
   );
   console.log(
-    `📄 Swagger YAML: http://localhost:${process.env.PORT ?? 3000}/swagger/yaml`,
+    `📄 Swagger YAML: http://localhost:${process.env.PORT ?? 3001}/swagger/yaml`,
   );
   console.log(
-    `📄 Swagger JSON: http://localhost:${process.env.PORT ?? 3000}/swagger/json\n`,
+    `📄 Swagger JSON: http://localhost:${process.env.PORT ?? 3001}/swagger/json\n`,
   );
 }
 bootstrap();
