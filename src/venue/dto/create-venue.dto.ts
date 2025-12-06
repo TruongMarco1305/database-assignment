@@ -503,6 +503,13 @@ export class LocationSearchResultDto {
   @ApiProperty({ example: 40 })
   maxCapacity: number;
 
+  @ApiProperty({
+    example: ['https://cloud.com/image1.jpg', 'https://cloud.com/image2.jpg'],
+    description: 'Array of image URLs',
+    type: [String],
+  })
+  image_urls: string[];
+
   @ApiProperty({ example: 0 })
   is_favor: number;
 }
@@ -625,8 +632,11 @@ export class VenueImageDto {
 }
 
 export class AmenityDetailDto {
-  @ApiProperty({ example: 'amenity-uuid', description: 'Amenity ID' })
-  amenity_id: string;
+  @ApiProperty({ example: 'Projector 4K', description: 'Amenity name' })
+  amenity_name: string;
+
+  @ApiProperty({ example: 'location-uuid', description: 'Location ID' })
+  location_id: string;
 
   @ApiProperty({ example: 'Projector', description: 'Amenity category' })
   category: string;

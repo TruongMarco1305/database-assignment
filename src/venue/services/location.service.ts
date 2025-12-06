@@ -98,7 +98,14 @@ export class LocationService {
           clientId,
         ],
       );
-      return result;
+
+      // Transform image_urls from comma-separated string to array
+      return result.map((location: any) => ({
+        ...location,
+        image_urls: location.image_urls
+          ? location.image_urls.split(',').map((url: string) => url.trim())
+          : [],
+      }));
     } catch (error) {
       throw new ConflictException(
         error.message || 'Failed to search locations',

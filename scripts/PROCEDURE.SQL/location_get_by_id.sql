@@ -63,7 +63,8 @@ BEGIN
     
     -- 4. Get all amenities available at this location
     SELECT 
-        BIN_TO_UUID(a.amenity_id) AS amenity_id,
+        a.amenity_name,
+        BIN_TO_UUID(a.location_id) AS location_id,
         a.category,
         a.description,
         a.price,
