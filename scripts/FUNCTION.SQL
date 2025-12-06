@@ -142,76 +142,129 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE FUNCTION GetLocationStatusReport(
-    p_locationId VARCHAR(36)
+CREATE FUNCTION Owner_MonthlyReport(
+    p_ownerId VARCHAR(36),
+    p_month INT,
+    p_year INT
 )
 RETURNS TEXT
+DETERMINISTIC
 READS SQL DATA
 BEGIN
-    -- 1. Khai báo biến
+    -- 1. Khai báo biến quản lý
+    DECLARE v_ownerUuid BINARY(16);
     DECLARE v_report TEXT DEFAULT '';
-    DECLARE v_venueName VARCHAR(100);
-    DECLARE v_status VARCHAR(20);
-    DECLARE v_isBusy INT;
     DECLARE done INT DEFAULT FALSE;
-    DECLARE v_loc_uuid BINARY(16);
 
-    -- 2. Khai báo Cursor: Lấy danh sách tên các phòng trong Location
-    DECLARE cur_venues CURSOR FOR 
-        SELECT name 
-        FROM venues 
-        WHERE location_id = v_loc_uuid
+    -- Biến thông tin Owner
+    DECLARE v_ownerName VARCHAR(100);
+    DECLARE v_ownerEmail VARCHAR(100);
+
+    -- Biến trong vòng lặp (Location Details)
+    DECLARE v_locId BINARY(16);
+    DECLARE v_locName VARCHAR(150);
+    DECLARE v_addr VARCHAR(255); -- Địa chỉ ghép
+    DECLARE v_rating DECIMAL(2,1);
+    DECLARE v_venueCount INT;    -- Số lượng phòng
+
+    -- Biến tính toán doanh thu (như cũ)
+    DECLARE v_locRevenue DECIMAL(15, 2);
+    DECLARE v_locOrders INT;
+    
+    -- Biến tổng hợp tài chính
+    DECLARE v_totalGross DECIMAL(15, 2) DEFAULT 0;
+    DECLARE v_totalFee DECIMAL(15, 2) DEFAULT 0;
+    DECLARE v_totalNet DECIMAL(15, 2) DEFAULT 0;
+
+    -- 2. Khai báo Cursor: Lấy nhiều thông tin hơn từ Location
+    DECLARE cur_locations CURSOR FOR 
+        SELECT 
+            location_id, 
+            name, 
+            CONCAT(addrNo, ', ', ward, ', ', city), -- Ghép địa chỉ cho gọn
+            avgRating
+        FROM locations 
+        WHERE owner_id = v_ownerUuid
         ORDER BY name;
 
-    -- 3. Handler kết thúc loop
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-    -- 4. Validate Input
-    IF p_locationId IS NULL THEN
-        SIGNAL SQLSTATE '45004' SET MESSAGE_TEXT = 'Error: locationId is required.';
-    END IF;
-    
-    SET v_loc_uuid = UUID_TO_BIN(p_locationId);
-    
-    IF v_loc_uuid IS NULL OR NOT EXISTS (SELECT 1 FROM locations WHERE location_id = v_loc_uuid) THEN
-        SIGNAL SQLSTATE '45005' SET MESSAGE_TEXT = 'Error: Location not found or invalid locationId.';
+    -- 3. Validate & Convert
+    SET v_ownerUuid = UUID_TO_BIN(p_ownerId);
+
+    -- Lấy thêm tên và email Owner
+    SELECT CONCAT(u.firstName, ' ', u.lastName), u.email 
+    INTO v_ownerName, v_ownerEmail
+    FROM owners o
+    JOIN users u ON o.user_id = u.id
+    WHERE o.user_id = v_ownerUuid;
+
+    IF v_ownerName IS NULL THEN
+        RETURN 'Error: Owner does not exist.';
     END IF;
 
-    -- 5. Mở Cursor
-    SET done = FALSE;
-    OPEN cur_venues;
+    IF p_month < 1 OR p_month > 12 THEN
+        RETURN 'Error: Invalid month.';
+    END IF;
 
-    -- Khởi tạo tiêu đề báo cáo
-    SET v_report = CONCAT('Status Report for Location (', p_locationId, ') at (', NOW(), '): \n');
+    -- 4. Header Báo Cáo (Thêm thông tin cá nhân)
+    SET v_report = CONCAT('--- MONTHLY REPORT (', p_month, '/', p_year, ') ---\n');
+    SET v_report = CONCAT(v_report, 'Owner: ', v_ownerName, ' (', v_ownerEmail, ')\n');
+    SET v_report = CONCAT(v_report, 'ID: ', p_ownerId, '\n');
+    SET v_report = CONCAT(v_report, '======================================\n');
+    SET v_report = CONCAT(v_report, 'DETAILS BY LOCATION:\n');
+
+    -- 5. Duyệt từng địa điểm
+    OPEN cur_locations;
 
     read_loop: LOOP
-        FETCH cur_venues INTO v_venueName;
+        FETCH cur_locations INTO v_locId, v_locName, v_addr, v_rating;
         
-        IF done THEN
-            LEAVE read_loop;
+        IF done THEN LEAVE read_loop; END IF;
+
+        -- Lấy số lượng phòng (Venue) của địa điểm này
+        SELECT COUNT(*) INTO v_venueCount 
+        FROM venues WHERE location_id = v_locId;
+
+        -- Tính doanh thu & số đơn
+        SELECT 
+            IFNULL(SUM(totalPrice), 0), 
+            COUNT(order_id)
+        INTO v_locRevenue, v_locOrders
+        FROM orders 
+        WHERE venue_loc_id = v_locId 
+          AND status = 'COMPLETED'
+          AND MONTH(endHour) = p_month
+          AND YEAR(endHour) = p_year;
+
+        SET v_totalGross = v_totalGross + v_locRevenue;
+
+        -- Ghi chi tiết (Bổ sung Address, Rating, Venue Count)
+        IF v_locRevenue > 0 OR v_locOrders > 0 THEN
+            SET v_report = CONCAT(v_report, '> ', v_locName, ' [', v_rating, '★]\n');
+            SET v_report = CONCAT(v_report, '   Address: ', v_addr, '\n');
+            SET v_report = CONCAT(v_report, '   Scale  : ', v_venueCount, ' venues\n');
+            SET v_report = CONCAT(v_report, '   Performance: ', v_locOrders, ' orders | ', FORMAT(v_locRevenue, 0), ' VND\n');
+            SET v_report = CONCAT(v_report, '- - - - - - - - - - - -\n');
         END IF;
 
-        -- Logic kiểm tra xem phòng có đang bận không
-        -- Phòng bận nếu có đơn hàng CONFIRMED hoặc PENDING mà (Start <= NOW <= End)
-        SELECT COUNT(*) INTO v_isBusy
-        FROM orders
-        WHERE venue_loc_id = v_loc_uuid 
-          AND venueName = v_venueName
-          AND status IN ('CONFIRMED', 'PENDING')
-          AND NOW() BETWEEN startHour AND endHour;
-
-        IF v_isBusy > 0 THEN
-            SET v_status = 'BUSY';
-        ELSE
-            SET v_status = 'AVAILABLE';
-        END IF;
-
-        -- Nối chuỗi kết quả
-        SET v_report = CONCAT(v_report, '- ', v_venueName, ': ', v_status, '\n');
-        
     END LOOP;
 
-    CLOSE cur_venues;
+    CLOSE cur_locations;
+
+    -- 6. TÍNH TOÁN TÀI CHÍNH TỔNG HỢP
+    SET v_totalFee = Calc_OwnerFee(p_ownerId, p_month, p_year);
+    IF v_totalFee IS NULL THEN SET v_totalFee = 0; END IF;
+    SET v_totalNet = v_totalGross - v_totalFee;
+
+    -- 7. Footer Báo Cáo
+    SET v_report = CONCAT(v_report, '======================================\n');
+    SET v_report = CONCAT(v_report, 'FINANCIAL SUMMARY:\n');
+    SET v_report = CONCAT(v_report, '1. Gross Revenue :  ', FORMAT(v_totalGross, 0), ' VND\n');
+    SET v_report = CONCAT(v_report, '2. Platform Fee  : -', FORMAT(v_totalFee, 0), ' VND\n');
+    SET v_report = CONCAT(v_report, '--------------------------------------\n');
+    SET v_report = CONCAT(v_report, '3. NET INCOME    :  ', FORMAT(v_totalNet, 0), ' VND\n');
+    SET v_report = CONCAT(v_report, '======================================');
 
     RETURN v_report;
 END$$
