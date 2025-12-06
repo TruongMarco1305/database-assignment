@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Get,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -75,6 +76,13 @@ export class PaymentController {
   async createDiscount(@Body() dto: CreateDiscountDto) {
     const discountId = await this.paymentService.createDiscount(dto);
     return { _id: discountId };
+  }
+
+  @Get('/discounts/preview')
+  @UseGuards(AdminGuard)
+  async previewDiscounts() {
+    const discounts = await this.paymentService.previewDiscounts();
+    return { data: discounts };
   }
 
   @Patch('/discounts/:id')
