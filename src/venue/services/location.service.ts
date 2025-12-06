@@ -4,6 +4,8 @@ import {
   CreateLocationDto,
   SearchLocationsDto,
   UpdateLocationDto,
+  LocationDetailsResponseDto,
+  LocationListItemDto,
 } from '../dto/create-venue.dto';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -142,6 +144,74 @@ export class LocationService {
     } catch (error) {
       throw new ConflictException(
         error.message || 'Failed to get location detail',
+      );
+    }
+  }
+
+  // ===== GET LOCATION DETAILS BY ID =====
+  public async getLocationDetailsById(
+    locationId: string,
+    clientId: string | null,
+  ): Promise<LocationDetailsResponseDto> {
+    try {
+      // Use getConnection to execute stored procedure that returns multiple result sets
+      const connection = await this.databaseService.getConnection();
+
+      try {
+        const [results] = await connection.query(
+          `CALL getLocationDetailsById(?, ?)`,
+          [locationId, clientId],
+        );
+
+        // The stored procedure returns 6 result sets:
+        // [0] = Location basic info
+        // [1] = Venues list
+        // [2] = Venue images
+        // [3] = Amenities
+        // [4] = Reviews
+        // [5] = Rating statistics
+
+        return {
+          location: results[0][0] || null,
+          venues: results[1] || [],
+          images: results[2] || [],
+          amenities: results[3] || [],
+          reviews: results[4] || [],
+          statistics: results[5][0] || {
+            total_ratings: 0,
+            avg_rating: 0,
+            five_stars: 0,
+            four_stars: 0,
+            three_stars: 0,
+            two_stars: 0,
+            one_star: 0,
+          },
+        };
+      } finally {
+        connection.release();
+      }
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to get location details',
+      );
+    }
+  }
+
+  // ===== GET ALL LOCATIONS =====
+  public async getAllLocations(
+    clientId: string | null,
+  ): Promise<LocationListItemDto[]> {
+    try {
+      const result = await this.databaseService.execute<any>(
+        `CALL getAllLocations(?)`,
+        [clientId],
+      );
+
+      // result is already an array of rows from the stored procedure
+      return result || [];
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to get all locations',
       );
     }
   }

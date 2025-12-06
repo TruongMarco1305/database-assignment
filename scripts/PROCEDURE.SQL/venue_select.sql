@@ -1,23 +1,8 @@
 DELIMITER $$
-CREATE PROCEDURE getListLocations(
-    IN p_city VARCHAR(50),
-    -- IN p_minCapacity INT,
-    IN p_startTime DATETIME,
-    IN p_endTime DATETIME,
-    IN p_minPrice DECIMAL(10, 2),
-    IN p_maxPrice DECIMAL(10, 2),
-    IN p_minAvgRating DECIMAL(2, 1),
-    IN p_theme VARCHAR(50),    -- Lọc theo Theme (VD: 'Luxury', 'Minimalist')
-    IN p_size VARCHAR(20),     -- Lọc theo Size (Input: 'Small', 'Medium', 'Large')
-    IN p_amenityCategory VARCHAR(50), -- VD: 'Projector_Kit' (Check trong kho Location)
-    IN p_sort VARCHAR(20),
-
-    IN p_clientId VARCHAR(36)  -- <--- Tham số mới: ID của người đang search
+CREATE PROCEDURE getDetailLocationById(
+    IN location_id VARCHAR(50),
 )
 BEGIN
-DECLARE v_clientId BINARY(16);
-    -- Nếu không truyền clientId (khách vãng lai), gán NULL để tránh lỗi convert
-SET v_clientId = IF(p_clientId IS NULL, NULL, UUID_TO_BIN(p_clientId));
 SELECT
     -- 1. Thông tin Location (Địa điểm cha)
     BIN_TO_UUID(l.location_id) AS location_id,
@@ -141,42 +126,3 @@ WHERE
         -- Mặc định sắp xếp theo tên Location nếu không chọn gì
         l.name ASC;
 END$$
-
-CREATE PROCEDURE listLocationOfOwner(
-    IN p_owner VARCHAR(36)
-)
-BEGIN
-    SELECT * FROM locations
-    WHERE UUID_TO_BIN(p_owner) = owner_id
-    ORDER BY avgRating DESC;
-END$$
-
-CREATE PROCEDURE getLocationDetailById(
-    IN p_userId VARCHAR(36),
-    IN p_id VARCHAR(36)
-)
-BEGIN
-    SELECT p_id as id, description, addrNo, ward, city, avgRating, policy, phoneNo, mapURL, thumbnailURL FROM locations
-    WHERE UUID_TO_BIN(p_id) = location_id AND UUID_TO_BIN(p_userId) = owner_id;
-END$$
-
-CREATE PROCEDURE listVenueOfLocation(
-    IN p_locId VARCHAR(36)
-)
-BEGIN
-    SELECT 
-        v.name as venueName,
-        v.floor as venueFloor,
-        v.area as venueArea,
-        v.pricePerHour as venuePricePerHour,
-        v.isActive as venueIsActive,
-        vt.name as venueTypeName,
-        vt.maxCapacity as venueCapacity,
-        vi.locationImgURL as venueImageURL
-    FROM venues v
-    JOIN venue_types vt ON v.venueType_id = vt.venueType_id
-    JOIN venue_images vi ON v.location_id = vi.location_id AND v.name = vi.venueName
-    WHERE v.location_id = UUID_TO_BIN(p_locId)
-    ORDER BY v.createdAt DESC;
-END$$
-DELIMITER ;
