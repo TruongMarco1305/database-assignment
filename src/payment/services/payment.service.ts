@@ -70,7 +70,7 @@ export class PaymentService {
   // ===== DISCOUNT OPERATIONS =====
   public async createDiscount(dto: CreateDiscountDto): Promise<string> {
     const discountId = uuidv4();
-
+    console.log(dto.membershipTier.toString());
     try {
       await this.databaseService.execute(
         `CALL Discount_Insert(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -90,6 +90,10 @@ export class PaymentService {
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to create discount');
     }
+  }
+
+  public async previewDiscounts() {
+    return await this.databaseService.execute(`CALL GetDiscountInfo()`);
   }
 
   public async updateDiscount(
