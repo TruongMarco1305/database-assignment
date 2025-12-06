@@ -10,7 +10,7 @@ CALL Location_Insert(
     'Spacious conference hall with AV system and stage. Capacity up to 200.', -- p_desc
     '12A',                                        -- p_addrNo
     'Ward 1',                                     -- p_ward
-    'Ho Chi Minh City',                           -- p_city
+    'Hồ Chí Minh',                           -- p_city
     '0901234001',                                 -- p_phoneNo
     'No smoking. No outside catering without permission.', -- p_policy
     'https://maps.example.com/?q=Sunrise+Conference+Hall', -- p_mapURL
@@ -25,7 +25,7 @@ CALL Location_Insert(
     'Smaller meeting rooms and breakout spaces adjacent to the main hall.',
     '14B',
     'Ward 1',
-    'Ho Chi Minh City',
+    'Hồ Chí Minh',
     '0901234002',
     'Equipment rental extra. Booking deposit required.',
     'https://maps.example.com/?q=Sunrise+Annex',
@@ -112,7 +112,7 @@ CALL Location_Insert(
     'Open-air rooftop venue perfect for evening events and parties.',
     '22',
     'Ward 10',
-    'Ho Chi Minh City',
+    'Hồ Chí Minh',
     '0901234301',
     'Outdoor events subject to weather; backup indoors recommended.',
     'https://maps.example.com/?q=Ivan+Rooftop+Venue',
@@ -127,7 +127,7 @@ CALL Location_Insert(
     'Air-conditioned conference rooms with projector and seating for 50–120.',
     '24',
     'Ward 10',
-    'Ho Chi Minh City',
+    'Hồ Chí Minh',
     '0901234302',
     'Projector included; drinks allowed in designated areas.',
     'https://maps.example.com/?q=Ivan+Conference+Rooms',

@@ -1,9 +1,26 @@
 -- client
 DELIMITER $$
-CREATE TRIGGER Update_OrderCompleted
+CREATE TRIGGER Update_OrderStatus
 AFTER UPDATE ON orders
 FOR EACH ROW
 BEGIN
+    -- =================================================================
+    -- TRƯỜNG HỢP 1: ĐƠN HÀNG BỊ HỦY (CANCELLED)
+    -- Hành động: Dọn dẹp dữ liệu liên quan
+    -- =================================================================
+    IF NEW.status = 'CANCELLED' AND OLD.status != 'CANCELLED' THEN
+        
+        -- 1. Tháo gỡ tiện nghi (Amenities)
+        -- Lưu ý: Việc delete này sẽ kích hoạt Trigger 'trg_OrderAmenity_Delete_UpdateOrder'
+        -- Trigger đó sẽ tự động set Amenities.isActive = 1 (Trả về kho)
+        DELETE FROM order_amenities 
+        WHERE order_id = NEW.order_id;
+
+        -- 2. Tháo gỡ mã giảm giá (Discounts)
+        DELETE FROM applies 
+        WHERE order_id = NEW.order_id;
+        
+    END IF;
     -- =================================================================
     -- PHẦN 2: TÍCH ĐIỂM THÀNH VIÊN
     -- Chỉ chạy khi đơn hàng HOÀN TẤT (COMPLETED)

@@ -4,12 +4,12 @@
 -- =============================================================================
 
 -- Venue: Grand Sunrise Hall
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000001', '10101010-1010-1010-1010-101010101001', 'Grand Sunrise Hall', 'https://cloud.com/sunrise/grand_hall_main.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000002', '10101010-1010-1010-1010-101010101001', 'Grand Sunrise Hall', 'https://cloud.com/sunrise/grand_hall_stage.jpg');
+CALL VenueImage_Insert('10101010-1010-1010-1010-101010101001', 'Grand Sunrise Hall', 'https://cloud.com/sunrise/grand_hall_main.jpg');
+CALL VenueImage_Insert('10101010-1010-1010-1010-101010101001', 'Grand Sunrise Hall', 'https://cloud.com/sunrise/grand_hall_stage.jpg');
 
 -- Venue: Sunrise VIP Suite
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000003', '10101010-1010-1010-1010-101010101001', 'Sunrise VIP Suite', 'https://cloud.com/sunrise/vip_suite_view.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000004', '10101010-1010-1010-1010-101010101001', 'Sunrise VIP Suite', 'https://cloud.com/sunrise/vip_suite_table.jpg');
+CALL VenueImage_Insert('10101010-1010-1010-1010-101010101001', 'Sunrise VIP Suite', 'https://cloud.com/sunrise/vip_suite_view.jpg');
+CALL VenueImage_Insert('10101010-1010-1010-1010-101010101001', 'Sunrise VIP Suite', 'https://cloud.com/sunrise/vip_suite_table.jpg');
 
 
 -- =============================================================================
@@ -18,12 +18,12 @@ CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000004', '10101010-1010-10
 -- =============================================================================
 
 -- Venue: Training Room A
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000005', '10101010-1010-1010-1010-101010101002', 'Training Room A', 'https://cloud.com/sunrise/training_a_front.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000006', '10101010-1010-1010-1010-101010101002', 'Training Room A', 'https://cloud.com/sunrise/training_a_back.jpg');
+CALL VenueImage_Insert('10101010-1010-1010-1010-101010101002', 'Training Room A', 'https://cloud.com/sunrise/training_a_front.jpg');
+CALL VenueImage_Insert('10101010-1010-1010-1010-101010101002', 'Training Room A', 'https://cloud.com/sunrise/training_a_back.jpg');
 
 -- Venue: Training Room B
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000007', '10101010-1010-1010-1010-101010101002', 'Training Room B', 'https://cloud.com/sunrise/training_b_setup.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000008', '10101010-1010-1010-1010-101010101002', 'Training Room B', 'https://cloud.com/sunrise/training_b_whiteboard.jpg');
+CALL VenueImage_Insert('10101010-1010-1010-1010-101010101002', 'Training Room B', 'https://cloud.com/sunrise/training_b_setup.jpg');
+CALL VenueImage_Insert('10101010-1010-1010-1010-101010101002', 'Training Room B', 'https://cloud.com/sunrise/training_b_whiteboard.jpg');
 
 
 -- =============================================================================
@@ -32,12 +32,12 @@ CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000008', '10101010-1010-10
 -- =============================================================================
 
 -- Venue: Grace Ballroom
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000009', '20202020-2020-2020-2020-202020202001', 'Grace Ballroom', 'https://cloud.com/grace/ballroom_wedding.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000010', '20202020-2020-2020-2020-202020202001', 'Grace Ballroom', 'https://cloud.com/grace/ballroom_lights.jpg');
+CALL VenueImage_Insert('20202020-2020-2020-2020-202020202001', 'Grace Ballroom', 'https://cloud.com/grace/ballroom_wedding.jpg');
+CALL VenueImage_Insert('20202020-2020-2020-2020-202020202001', 'Grace Ballroom', 'https://cloud.com/grace/ballroom_lights.jpg');
 
 -- Venue: Garden Foyer
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000011', '20202020-2020-2020-2020-202020202001', 'Garden Foyer', 'https://cloud.com/grace/foyer_day.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000012', '20202020-2020-2020-2020-202020202001', 'Garden Foyer', 'https://cloud.com/grace/foyer_night.jpg');
+CALL VenueImage_Insert('20202020-2020-2020-2020-202020202001', 'Garden Foyer', 'https://cloud.com/grace/foyer_day.jpg');
+CALL VenueImage_Insert('20202020-2020-2020-2020-202020202001', 'Garden Foyer', 'https://cloud.com/grace/foyer_night.jpg');
 
 
 -- =============================================================================
@@ -46,12 +46,12 @@ CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000012', '20202020-2020-20
 -- =============================================================================
 
 -- Venue: Photo Studio 1
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000013', '20202020-2020-2020-2020-202020202002', 'Photo Studio 1', 'https://cloud.com/grace/studio_1_cyc.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000014', '20202020-2020-2020-2020-202020202002', 'Photo Studio 1', 'https://cloud.com/grace/studio_1_equipment.jpg');
+CALL VenueImage_Insert('20202020-2020-2020-2020-202020202002', 'Photo Studio 1', 'https://cloud.com/grace/studio_1_cyc.jpg');
+CALL VenueImage_Insert('20202020-2020-2020-2020-202020202002', 'Photo Studio 1', 'https://cloud.com/grace/studio_1_equipment.jpg');
 
 -- Venue: Creative Hub
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000015', '20202020-2020-2020-2020-202020202002', 'Creative Hub', 'https://cloud.com/grace/hub_overview.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000016', '20202020-2020-2020-2020-202020202002', 'Creative Hub', 'https://cloud.com/grace/hub_tables.jpg');
+CALL VenueImage_Insert('20202020-2020-2020-2020-202020202002', 'Creative Hub', 'https://cloud.com/grace/hub_overview.jpg');
+CALL VenueImage_Insert('20202020-2020-2020-2020-202020202002', 'Creative Hub', 'https://cloud.com/grace/hub_tables.jpg');
 
 
 -- =============================================================================
@@ -60,12 +60,12 @@ CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000016', '20202020-2020-20
 -- =============================================================================
 
 -- Venue: Royal Banquet Hall
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000017', '30303030-3030-3030-3030-303030303001', 'Royal Banquet Hall', 'https://cloud.com/heidi/royal_hall_setup.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000018', '30303030-3030-3030-3030-303030303001', 'Royal Banquet Hall', 'https://cloud.com/heidi/royal_hall_entrance.jpg');
+CALL VenueImage_Insert('30303030-3030-3030-3030-303030303001', 'Royal Banquet Hall', 'https://cloud.com/heidi/royal_hall_setup.jpg');
+CALL VenueImage_Insert('30303030-3030-3030-3030-303030303001', 'Royal Banquet Hall', 'https://cloud.com/heidi/royal_hall_entrance.jpg');
 
 -- Venue: Private Dining Room
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000019', '30303030-3030-3030-3030-303030303001', 'Private Dining Room', 'https://cloud.com/heidi/private_dining_table.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000020', '30303030-3030-3030-3030-303030303001', 'Private Dining Room', 'https://cloud.com/heidi/private_dining_decor.jpg');
+CALL VenueImage_Insert('30303030-3030-3030-3030-303030303001', 'Private Dining Room', 'https://cloud.com/heidi/private_dining_table.jpg');
+CALL VenueImage_Insert('30303030-3030-3030-3030-303030303001', 'Private Dining Room', 'https://cloud.com/heidi/private_dining_decor.jpg');
 
 
 -- =============================================================================
@@ -74,12 +74,12 @@ CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000020', '30303030-3030-30
 -- =============================================================================
 
 -- Venue: Meeting Suite A
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000021', '30303030-3030-3030-3030-303030303002', 'Meeting Suite A', 'https://cloud.com/heidi/suite_a_meeting.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000022', '30303030-3030-3030-3030-303030303002', 'Meeting Suite A', 'https://cloud.com/heidi/suite_a_screen.jpg');
+CALL VenueImage_Insert('30303030-3030-3030-3030-303030303002', 'Meeting Suite A', 'https://cloud.com/heidi/suite_a_meeting.jpg');
+CALL VenueImage_Insert('30303030-3030-3030-3030-303030303002', 'Meeting Suite A', 'https://cloud.com/heidi/suite_a_screen.jpg');
 
 -- Venue: Interview Room
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000023', '30303030-3030-3030-3030-303030303002', 'Interview Room', 'https://cloud.com/heidi/interview_room_chairs.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000024', '30303030-3030-3030-3030-303030303002', 'Interview Room', 'https://cloud.com/heidi/interview_room_window.jpg');
+CALL VenueImage_Insert('30303030-3030-3030-3030-303030303002', 'Interview Room', 'https://cloud.com/heidi/interview_room_chairs.jpg');
+CALL VenueImage_Insert('30303030-3030-3030-3030-303030303002', 'Interview Room', 'https://cloud.com/heidi/interview_room_window.jpg');
 
 
 -- =============================================================================
@@ -88,12 +88,12 @@ CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000024', '30303030-3030-30
 -- =============================================================================
 
 -- Venue: Sky Bar Area
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000025', '40404040-4040-4040-4040-404040404001', 'Sky Bar Area', 'https://cloud.com/ivan/skybar_night.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000026', '40404040-4040-4040-4040-404040404001', 'Sky Bar Area', 'https://cloud.com/ivan/skybar_cocktails.jpg');
+CALL VenueImage_Insert('40404040-4040-4040-4040-404040404001', 'Sky Bar Area', 'https://cloud.com/ivan/skybar_night.jpg');
+CALL VenueImage_Insert('40404040-4040-4040-4040-404040404001', 'Sky Bar Area', 'https://cloud.com/ivan/skybar_cocktails.jpg');
 
 -- Venue: BBQ Corner
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000027', '40404040-4040-4040-4040-404040404001', 'BBQ Corner', 'https://cloud.com/ivan/bbq_grill.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000028', '40404040-4040-4040-4040-404040404001', 'BBQ Corner', 'https://cloud.com/ivan/bbq_seating.jpg');
+CALL VenueImage_Insert('40404040-4040-4040-4040-404040404001', 'BBQ Corner', 'https://cloud.com/ivan/bbq_grill.jpg');
+CALL VenueImage_Insert('40404040-4040-4040-4040-404040404001', 'BBQ Corner', 'https://cloud.com/ivan/bbq_seating.jpg');
 
 
 -- =============================================================================
@@ -102,12 +102,12 @@ CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000028', '40404040-4040-40
 -- =============================================================================
 
 -- Venue: Conference Hall B
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000029', '40404040-4040-4040-4040-404040404002', 'Conference Hall B', 'https://cloud.com/ivan/conf_hall_b_seats.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000030', '40404040-4040-4040-4040-404040404002', 'Conference Hall B', 'https://cloud.com/ivan/conf_hall_b_stage.jpg');
+CALL VenueImage_Insert('40404040-4040-4040-4040-404040404002', 'Conference Hall B', 'https://cloud.com/ivan/conf_hall_b_seats.jpg');
+CALL VenueImage_Insert('40404040-4040-4040-4040-404040404002', 'Conference Hall B', 'https://cloud.com/ivan/conf_hall_b_stage.jpg');
 
 -- Venue: Board Room
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000031', '40404040-4040-4040-4040-404040404002', 'Board Room', 'https://cloud.com/ivan/board_room_table.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000032', '40404040-4040-4040-4040-404040404002', 'Board Room', 'https://cloud.com/ivan/board_room_screen.jpg');
+CALL VenueImage_Insert('40404040-4040-4040-4040-404040404002', 'Board Room', 'https://cloud.com/ivan/board_room_table.jpg');
+CALL VenueImage_Insert('40404040-4040-4040-4040-404040404002', 'Board Room', 'https://cloud.com/ivan/board_room_screen.jpg');
 
 
 -- =============================================================================
@@ -116,12 +116,12 @@ CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000032', '40404040-4040-40
 -- =============================================================================
 
 -- Venue: Main Gallery
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000033', '50505050-5050-5050-5050-505050505001', 'Main Gallery', 'https://cloud.com/judy/gallery_art.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000034', '50505050-5050-5050-5050-505050505001', 'Main Gallery', 'https://cloud.com/judy/gallery_space.jpg');
+CALL VenueImage_Insert('50505050-5050-5050-5050-505050505001', 'Main Gallery', 'https://cloud.com/judy/gallery_art.jpg');
+CALL VenueImage_Insert('50505050-5050-5050-5050-505050505001', 'Main Gallery', 'https://cloud.com/judy/gallery_space.jpg');
 
 -- Venue: Pop-up Store Area
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000035', '50505050-5050-5050-5050-505050505001', 'Pop-up Store Area', 'https://cloud.com/judy/popup_booths.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000036', '50505050-5050-5050-5050-505050505001', 'Pop-up Store Area', 'https://cloud.com/judy/popup_entrance.jpg');
+CALL VenueImage_Insert('50505050-5050-5050-5050-505050505001', 'Pop-up Store Area', 'https://cloud.com/judy/popup_booths.jpg');
+CALL VenueImage_Insert('50505050-5050-5050-5050-505050505001', 'Pop-up Store Area', 'https://cloud.com/judy/popup_entrance.jpg');
 
 
 -- =============================================================================
@@ -130,9 +130,9 @@ CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000036', '50505050-5050-50
 -- =============================================================================
 
 -- Venue: Pottery Studio
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000037', '50505050-5050-5050-5050-505050505002', 'Pottery Studio', 'https://cloud.com/judy/pottery_wheels.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000038', '50505050-5050-5050-5050-505050505002', 'Pottery Studio', 'https://cloud.com/judy/pottery_shelves.jpg');
+CALL VenueImage_Insert('50505050-5050-5050-5050-505050505002', 'Pottery Studio', 'https://cloud.com/judy/pottery_wheels.jpg');
+CALL VenueImage_Insert('50505050-5050-5050-5050-505050505002', 'Pottery Studio', 'https://cloud.com/judy/pottery_shelves.jpg');
 
 -- Venue: Art Garden
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000039', '50505050-5050-5050-5050-505050505002', 'Art Garden', 'https://cloud.com/judy/art_garden_easels.jpg');
-CALL VenueImage_Insert('eeeeeeee-eeee-eeee-eeee-000000000040', '50505050-5050-5050-5050-505050505002', 'Art Garden', 'https://cloud.com/judy/art_garden_fountain.jpg');
+CALL VenueImage_Insert('50505050-5050-5050-5050-505050505002', 'Art Garden', 'https://cloud.com/judy/art_garden_easels.jpg');
+CALL VenueImage_Insert('50505050-5050-5050-5050-505050505002', 'Art Garden', 'https://cloud.com/judy/art_garden_fountain.jpg');
