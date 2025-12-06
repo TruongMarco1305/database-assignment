@@ -219,7 +219,7 @@ CREATE TABLE messages (
     FOREIGN KEY (channel_user_1_id, channel_user_2_id) 
         REFERENCES chat_channels(user_1_id, user_2_id)
         ON DELETE RESTRICT
-        ON UPDATE RESTRICT,
+        ON UPDATE CASCADE,
 
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE RESTRICT
 );

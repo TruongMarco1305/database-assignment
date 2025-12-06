@@ -30,119 +30,8 @@ END$$
 
 DELIMITER ;
 
-DELIMITER $$
-
-CREATE FUNCTION Calc_TotalPrice(
-    p_locId BINARY(16),
-    p_venueName VARCHAR(100),
-    p_start DATETIME,
-    p_end DATETIME
-)
-RETURNS DECIMAL(12, 2)
-READS SQL DATA
-BEGIN
-    DECLARE v_pricePerHour DECIMAL(10,2);
-    DECLARE v_hours INT;
-    DECLARE v_total DECIMAL(12,2);
-
-    IF p_start IS NULL OR p_end IS NULL THEN 
-        SIGNAL SQLSTATE '45001' SET MESSAGE_TEXT='Invalid dates'; 
-    END IF;
-
-    IF p_start >= p_end THEN 
-        SIGNAL SQLSTATE '45002' SET MESSAGE_TEXT='start must be before end'; 
-    END IF;
-
-    -- 1. Lấy giá phòng
-    SELECT pricePerHour INTO v_pricePerHour
-    FROM venues 
-    WHERE location_id = p_locId AND name = p_venueName;
-
-    -- Nếu không tìm thấy phòng (phòng sai tên hoặc id), trả về 0 hoặc báo lỗi
-    IF v_pricePerHour IS NULL THEN
-        SIGNAL SQLSTATE '45003' SET MESSAGE_TEXT='Venue not found';
-    END IF;
-
-    -- 2. Tính số giờ (Làm tròn logic như cũ)
-    SET v_hours = TIMESTAMPDIFF(HOUR, p_start, p_end);
-    IF v_hours <= 0 THEN SET v_hours = 1; END IF;
-
-    -- 3. Tính tổng tiền
-    SET v_total = v_pricePerHour * v_hours;
-
-    RETURN v_total;
-END$$
-
-DELIMITER ;
-
 -- function phức tạp
--- DELIMITER $$
--- CREATE FUNCTION Calc_OwnerRevenue(
---     p_ownerId VARCHAR(36),
---     p_startDate DATETIME,
---     p_endDate DATETIME
--- )
--- RETURNS DECIMAL(15, 2)
--- READS SQL DATA
--- BEGIN
---     -- 1. Khai báo biến
---     DECLARE v_totalRevenue DECIMAL(15, 2) DEFAULT 0;
---     DECLARE v_amount DECIMAL(12, 2);
---     DECLARE done INT DEFAULT FALSE;
---     DECLARE v_owner_uuid BINARY(16);
-
---     -- 2. Khai báo Cursor: Lấy danh sách tiền từ các hóa đơn thành công
---     -- Join từ: Owner -> Location -> Venue -> Order -> Invoice
---     DECLARE cur_invoices CURSOR FOR 
---         SELECT i.amount
---         FROM invoices i
---         JOIN orders o ON i.order_id = o.order_id
---         JOIN venues v ON o.venue_loc_id = v.location_id AND o.venueName = v.name
---         JOIN locations l ON v.location_id = l.location_id
---         WHERE l.owner_id = v_owner_uuid
---           AND i.status = 'SUCCEEDED'
---           AND i.paidOn BETWEEN p_startDate AND p_endDate;
-
---     -- 3. Khai báo Handler để nhận biết khi nào hết dữ liệu
---     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
---     -- 4. Validate Input
---     IF p_startDate IS NULL OR p_endDate IS NULL THEN
---         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: startDate and endDate must be provided.';
---     END IF;
-
---     IF p_startDate >= p_endDate THEN
---         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: startDate must be earlier than endDate.';
---     END IF;
-
---     SET v_owner_uuid = UUID_TO_BIN(p_ownerId);
-
---     IF v_owner_uuid IS NULL OR NOT EXISTS (SELECT 1 FROM owners WHERE user_id = v_owner_uuid) THEN
---         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Owner not found or invalid ownerId.';
---     END IF;
-
---     -- 5. Mở Cursor và lặp
---     SET done = FALSE;
---     OPEN cur_invoices;
-
---     read_loop: LOOP
---         FETCH cur_invoices INTO v_amount;
-        
---         IF done THEN
---             LEAVE read_loop;
---         END IF;
-
---         -- Cộng dồn doanh thu
---         SET v_totalRevenue = v_totalRevenue + v_amount;
---     END LOOP;
-
---     CLOSE cur_invoices;
-
---     RETURN v_totalRevenue;
--- END$$
-
 -- DELIMITER ;
-
 DELIMITER $$
 CREATE FUNCTION Calc_OwnerFee(
     p_ownerId VARCHAR(36),
@@ -156,92 +45,92 @@ BEGIN
     -- 1. Khai báo biến
     DECLARE v_owner_uuid BINARY(16);
     DECLARE done INT DEFAULT FALSE;
-    
-    -- Biến cho từng dòng đơn hàng
     DECLARE v_orderPrice DECIMAL(12, 2);
+
+    -- Biến kiểm tra tồn tại
+    DECLARE v_ownerExists INT;
+    DECLARE v_joinDate DATETIME;
     
-    -- Biến theo dõi trạng thái tích lũy (Quan trọng)
-    DECLARE v_runningRevenue DECIMAL(15, 2) DEFAULT 0; -- Doanh thu tích lũy trước đơn hiện tại
-    DECLARE v_newRevenue DECIMAL(15, 2) DEFAULT 0;     -- Doanh thu tích lũy sau đơn hiện tại
+    -- Biến theo dõi doanh thu tích lũy
+    DECLARE v_revenue_OLD DECIMAL(15, 2) DEFAULT 0;
+    DECLARE v_revenue_NEW DECIMAL(15, 2) DEFAULT 0;
     
-    -- Biến tính toán
+    -- Biến tính phí tích lũy
+    DECLARE v_fee_OLD DECIMAL(15, 2) DEFAULT 0;
+    DECLARE v_fee_NEW DECIMAL(15, 2) DEFAULT 0;
+    
     DECLARE v_totalCommission DECIMAL(15, 2) DEFAULT 0;
-    DECLARE v_orderCommission DECIMAL(12, 2) DEFAULT 0;
     
-    -- Các mốc giới hạn (Hardcode hoặc lấy từ bảng cấu hình)
-    DECLARE C_LIMIT_1 DECIMAL(15, 2) DEFAULT 10000000;
-    DECLARE C_LIMIT_2 DECIMAL(15, 2) DEFAULT 50000000;
-    
-    -- 2. Khai báo Cursor: Lấy danh sách tiền của các đơn hàng ĐÃ HOÀN THÀNH trong tháng
+    -- 2. Cursor: Lấy tất cả đơn hàng hoàn tất của Owner (từ mọi Location)
     DECLARE cur_orders CURSOR FOR 
         SELECT o.totalPrice
         FROM orders o
         JOIN venues v ON o.venue_loc_id = v.location_id AND o.venueName = v.name
         JOIN locations l ON v.location_id = l.location_id
         WHERE l.owner_id = v_owner_uuid
-          AND MONTH(o.createdAt) = p_month
-          AND YEAR(o.createdAt) = p_year
-          AND o.status = 'COMPLETED' -- Chỉ tính đơn đã hoàn thành
-        ORDER BY o.createdAt ASC;    -- Quan trọng: Phải duyệt theo thứ tự thời gian
+          AND o.status = 'COMPLETED'
+          AND MONTH(o.endHour) = p_month
+          AND YEAR(o.endHour) = p_year
+        ORDER BY o.createdAt ASC; -- Duyệt theo thời gian để tính lũy tiến chính xác
 
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-    -- 3. Validate Input
-    IF p_month < 1 OR p_month > 12 THEN RETURN 0; END IF;
+    -- 3. Validate
+    -- A. Kiểm tra Tháng/Năm hợp lệ
+    IF p_month < 1 OR p_month > 12 THEN 
+        RETURN NULL; -- Tháng sai
+    END IF;
+
+    -- B. Kiểm tra Owner có tồn tại không
+    -- (Lưu ý: Phải convert trước khi select)
     SET v_owner_uuid = UUID_TO_BIN(p_ownerId);
 
-    -- 4. Mở Cursor và duyệt
+    SELECT COUNT(*), MAX(u.createdAt) INTO v_ownerExists, v_joinDate
+    FROM owners o
+    JOIN users u ON o.user_id = u.id
+    WHERE o.user_id = v_owner_uuid;
+
+    IF v_ownerExists = 0 THEN
+        RETURN NULL; -- Owner không tồn tại
+    END IF;
+
+    -- C. Kiểm tra Logic thời gian tham gia (Optional)
+    -- Nếu tháng tính phí nhỏ hơn tháng tham gia hệ thống -> Trả về 0
+    IF (p_year * 12 + p_month) < (YEAR(v_joinDate) * 12 + MONTH(v_joinDate)) THEN
+        RETURN 0;
+    END IF;
+
+    -- 4. Duyệt và Tính toán
     OPEN cur_orders;
 
     read_loop: LOOP
         FETCH cur_orders INTO v_orderPrice;
-        
         IF done THEN LEAVE read_loop; END IF;
 
-        -- Tính toán "Vị trí" của đơn hàng này trong dòng doanh thu
-        SET v_newRevenue = v_runningRevenue + v_orderPrice;
-        SET v_orderCommission = 0;
+        -- Cập nhật trạng thái doanh thu
+        SET v_revenue_NEW = v_revenue_OLD + v_orderPrice;
 
-        -- --- LOGIC TÍNH HOA HỒNG LŨY TIẾN (IF lồng nhau) ---
-        
-        -- Giai đoạn 1: Toàn bộ đơn hàng nằm trong khoảng 0 - 10tr
-        IF v_newRevenue <= C_LIMIT_1 THEN
-            SET v_orderCommission = v_orderPrice * 0.10;
-            
-        -- Giai đoạn 2: Đơn hàng vắt qua mốc 10tr (Một phần 10%, một phần 8%)
-        ELSEIF v_runningRevenue < C_LIMIT_1 AND v_newRevenue <= C_LIMIT_2 THEN
-            -- Phần chịu 10%
-            SET v_orderCommission = (C_LIMIT_1 - v_runningRevenue) * 0.10;
-            -- Phần chịu 8%
-            SET v_orderCommission = v_orderCommission + (v_newRevenue - C_LIMIT_1) * 0.08;
-            
-        -- Giai đoạn 3: Toàn bộ đơn hàng nằm trong khoảng 10tr - 50tr
-        ELSEIF v_runningRevenue >= C_LIMIT_1 AND v_newRevenue <= C_LIMIT_2 THEN
-            SET v_orderCommission = v_orderPrice * 0.08;
-            
-        -- Giai đoạn 4: Đơn hàng vắt qua mốc 50tr (Một phần 8%, một phần 5%)
-        ELSEIF v_runningRevenue < C_LIMIT_2 AND v_newRevenue > C_LIMIT_2 THEN
-            -- Trường hợp đặc biệt: Đơn hàng khủng, vắt qua cả 2 mốc (từ dưới 10tr lên trên 50tr)
-            IF v_runningRevenue < C_LIMIT_1 THEN
-                 SET v_orderCommission = (C_LIMIT_1 - v_runningRevenue) * 0.10; -- Khúc đầu
-                 SET v_orderCommission = v_orderCommission + (C_LIMIT_2 - C_LIMIT_1) * 0.08; -- Khúc giữa
-                 SET v_orderCommission = v_orderCommission + (v_newRevenue - C_LIMIT_2) * 0.05; -- Khúc đuôi
-            ELSE
-                -- Vắt qua mốc 50tr bình thường
-                SET v_orderCommission = (C_LIMIT_2 - v_runningRevenue) * 0.08;
-                SET v_orderCommission = v_orderCommission + (v_newRevenue - C_LIMIT_2) * 0.05;
-            END IF;
-            
-        -- Giai đoạn 5: Toàn bộ đơn hàng nằm trên mốc 50tr
-        ELSE
-            SET v_orderCommission = v_orderPrice * 0.05;
-        END IF;
+        -- A. Tính tổng phí cho mức doanh thu CŨ
+        SET v_fee_OLD = CASE 
+            WHEN v_revenue_OLD <= 5000000 THEN 0
+            WHEN v_revenue_OLD <= 10000000 THEN (v_revenue_OLD - 5000000) * 0.10
+            WHEN v_revenue_OLD <= 50000000 THEN 500000 + (v_revenue_OLD - 10000000) * 0.08
+            ELSE 3700000 + (v_revenue_OLD - 50000000) * 0.05
+        END;
 
-        -- Cộng dồn vào tổng hoa hồng
-        SET v_totalCommission = v_totalCommission + v_orderCommission;
+        -- B. Tính tổng phí cho mức doanh thu MỚI
+        SET v_fee_NEW = CASE 
+            WHEN v_revenue_NEW <= 5000000 THEN 0
+            WHEN v_revenue_NEW <= 10000000 THEN (v_revenue_NEW - 5000000) * 0.10
+            WHEN v_revenue_NEW <= 50000000 THEN 500000 + (v_revenue_NEW - 10000000) * 0.08
+            ELSE 3700000 + (v_revenue_NEW - 50000000) * 0.05
+        END;
+
+        -- Phí của đơn hàng này = Chênh lệch
+        SET v_totalCommission = v_totalCommission + (v_fee_NEW - v_fee_OLD);
         
-        -- Cập nhật doanh thu tích lũy để dùng cho vòng lặp sau
-        SET v_runningRevenue = v_newRevenue;
+        -- Gán lại cho vòng lặp sau
+        SET v_revenue_OLD = v_revenue_NEW;
         
     END LOOP;
 
