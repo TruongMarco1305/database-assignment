@@ -24,8 +24,12 @@ import {
   CreateRateDto,
   UpdateRateDto,
   CreateFavorDto,
+  RateResponseDto,
+  LocationRatingsDto,
+  FavorResponseDto,
 } from '../dto/create-venue.dto';
 import { AdminGuard, AuthGuard, OwnerGuard } from 'src/auth/guards';
+import { User } from 'src/auth/decorators';
 
 @ApiTags('Venues')
 @Controller('venue')
@@ -159,11 +163,28 @@ export class VenueController {
   }
 
   // ===== RATE ENDPOINTS =====
+  @Get('/rates/:locationId')
+  @ApiOperation({ summary: 'Get all ratings for a location' })
+  @ApiResponse({
+    status: 200,
+    description: 'Ratings retrieved successfully',
+    type: LocationRatingsDto,
+  })
+  @ApiResponse({ status: 404, description: 'Location not found' })
+  async getLocationRatings(@Param('locationId') locationId: string) {
+    const ratings = await this.venueService.getLocationRatings(locationId);
+    return ratings;
+  }
+
   @Post('/rates')
   @UseGuards(AuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Rate a location' })
-  @ApiResponse({ status: 201, description: 'Rating created successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Rating created successfully',
+    type: RateResponseDto,
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async createRate(@Body() dto: CreateRateDto) {
     await this.venueService.createRate(dto);
@@ -174,7 +195,11 @@ export class VenueController {
   @UseGuards(AuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update an existing rating' })
-  @ApiResponse({ status: 200, description: 'Rating updated successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Rating updated successfully',
+    type: RateResponseDto,
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Rating not found' })
   async updateRate(
@@ -226,5 +251,35 @@ export class VenueController {
   ) {
     await this.venueService.deleteFavor(clientId, locationId);
     return { message: 'Favorite removed successfully' };
+  }
+
+  @Get('/client/rates')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get all ratings by current user' })
+  @ApiResponse({
+    status: 200,
+    description: 'User ratings retrieved successfully',
+    type: [RateResponseDto],
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getClientRates(@User() user: Express.User) {
+    const ratings = await this.venueService.getClientRates(user.userId);
+    return ratings;
+  }
+
+  @Get('/client/favors')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get all favorited locations by current user' })
+  @ApiResponse({
+    status: 200,
+    description: 'User favorites retrieved successfully',
+    type: [FavorResponseDto],
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getClientFavors(@User() user: Express.User) {
+    const favors = await this.venueService.getClientFavors(user.userId);
+    return favors;
   }
 }

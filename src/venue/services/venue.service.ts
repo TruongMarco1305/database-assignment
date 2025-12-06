@@ -12,6 +12,8 @@ import {
   CreateRateDto,
   UpdateRateDto,
   CreateFavorDto,
+  LocationRatingsDto,
+  RateResponseDto,
 } from '../dto/create-venue.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { v4 as uuidv4 } from 'uuid';
@@ -234,6 +236,46 @@ export class VenueService {
     }
   }
 
+  public async getLocationRatings(
+    locationId: string,
+  ): Promise<LocationRatingsDto> {
+    try {
+      // Call stored procedure to fetch all ratings for the location
+      const result = await this.databaseService.execute(
+        `CALL getLocationRatings(?)`,
+        [locationId],
+      );
+
+      const ratings: RateResponseDto[] = result.map((row: any) => ({
+        clientId: row.clientId,
+        locationId: row.locationId,
+        stars: row.stars,
+        comment: row.comment || undefined,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt || undefined,
+        clientName: row.clientName,
+        avatarURL: row.avatarURL || undefined,
+      }));
+
+      // Calculate average rating
+      const avgRating =
+        ratings.length > 0
+          ? ratings.reduce((sum, r) => sum + r.stars, 0) / ratings.length
+          : 0;
+
+      return {
+        locationId,
+        avgRating: Math.round(avgRating * 10) / 10, // Round to 1 decimal
+        totalRatings: ratings.length,
+        ratings,
+      };
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to get location ratings',
+      );
+    }
+  }
+
   // ===== FAVOR OPERATIONS =====
   public async createFavor(dto: CreateFavorDto): Promise<void> {
     try {
@@ -257,6 +299,46 @@ export class VenueService {
       ]);
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to delete favor');
+    }
+  }
+
+  public async getClientFavors(clientId: string): Promise<any[]> {
+    try {
+      const result = await this.databaseService.execute(
+        `CALL getClientFavors(?)`,
+        [clientId],
+      );
+      return result || [];
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to get client favors',
+      );
+    }
+  }
+
+  public async getClientRates(clientId: string): Promise<RateResponseDto[]> {
+    try {
+      const result = await this.databaseService.execute(
+        `CALL getClientRates(?)`,
+        [clientId],
+      );
+
+      return (result || []).map((row: any) => ({
+        clientId: row.clientId,
+        locationId: row.locationId,
+        stars: row.stars,
+        comment: row.comment || undefined,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt || undefined,
+        clientName: '', // Not needed when fetching own ratings
+        locationName: row.locationName,
+        city: row.city,
+        thumbnailURL: row.thumbnailURL,
+      }));
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to get client rates',
+      );
     }
   }
 
