@@ -80,3 +80,57 @@ BEGIN
   ORDER BY o.startHour DESC;
 END$$
 DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE Client_GetOrders(
+    IN p_clientId VARCHAR(36), -- ID khách hàng
+    IN p_status VARCHAR(20)    -- Trạng thái muốn lọc (Truyền NULL để lấy tất cả)
+)
+BEGIN
+    SELECT 
+        -- Thông tin Đơn hàng
+        BIN_TO_UUID(o.order_id) AS order_id,
+        o.status,
+        o.totalPrice,
+        o.points,
+        o.startHour,
+        o.endHour,
+        o.createdAt AS booking_created_at,
+        
+        -- Thông tin Phòng (Venue)
+        v.name AS venue_name,
+        v.floor,
+        v.pricePerHour,
+        
+        -- Thông tin Loại phòng (Type/Theme)
+        vt.name AS venue_theme, -- VD: Luxury, Minimalist...,
+        vt.minCapacity,
+        vt.maxCapacity,
+        
+        -- Thông tin Địa điểm (Location)
+        l.name AS location_name,
+        l.addrNo,
+        l.ward,
+        l.city,
+        l.thumbnailURL
+        
+    FROM orders o
+    -- Join với Venue để lấy thông tin phòng
+    JOIN venues v ON o.venue_loc_id = v.location_id AND o.venueName = v.name
+    -- Join với Location để lấy địa chỉ
+    JOIN locations l ON v.location_id = l.location_id
+    -- Join với Type để lấy Theme
+    LEFT JOIN venue_types vt ON v.venueType_id = vt.venueType_id
+    
+    WHERE 
+        -- 1. Lọc theo khách hàng
+        o.client_id = UUID_TO_BIN(p_clientId)
+        
+        -- 2. Lọc theo trạng thái (Nếu p_status NULL thì bỏ qua điều kiện này -> Lấy hết)
+        AND (p_status IS NULL OR o.status = p_status)
+        
+    -- Sắp xếp: Đơn mới nhất lên đầu
+    ORDER BY o.createdAt DESC;
+END$$
+
+DELIMITER ;
