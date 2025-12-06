@@ -374,10 +374,6 @@ export class LocationRatingsDto {
 export class CreateFavorDto {
   @IsNotEmpty()
   @IsString()
-  clientId: string;
-
-  @IsNotEmpty()
-  @IsString()
   locationId: string;
 }
 

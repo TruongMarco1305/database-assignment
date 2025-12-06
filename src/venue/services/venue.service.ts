@@ -11,7 +11,6 @@ import {
   UpdateVenueTypeDto,
   CreateRateDto,
   UpdateRateDto,
-  CreateFavorDto,
   LocationRatingsDto,
   RateResponseDto,
 } from '../dto/create-venue.dto';
@@ -275,33 +274,6 @@ export class VenueService {
       );
     }
   }
-
-  // ===== FAVOR OPERATIONS =====
-  public async createFavor(dto: CreateFavorDto): Promise<void> {
-    try {
-      await this.databaseService.execute(`CALL Favor_Insert(?, ?)`, [
-        dto.clientId,
-        dto.locationId,
-      ]);
-    } catch (error) {
-      throw new ConflictException(error.message || 'Failed to create favor');
-    }
-  }
-
-  public async deleteFavor(
-    clientId: string,
-    locationId: string,
-  ): Promise<void> {
-    try {
-      await this.databaseService.execute(`CALL Favor_Delete(?, ?)`, [
-        clientId,
-        locationId,
-      ]);
-    } catch (error) {
-      throw new ConflictException(error.message || 'Failed to delete favor');
-    }
-  }
-
   public async getClientFavors(clientId: string): Promise<any[]> {
     try {
       const result = await this.databaseService.execute(

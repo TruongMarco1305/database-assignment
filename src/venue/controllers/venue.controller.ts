@@ -23,7 +23,6 @@ import {
   UpdateVenueTypeDto,
   CreateRateDto,
   UpdateRateDto,
-  CreateFavorDto,
   RateResponseDto,
   LocationRatingsDto,
   FavorResponseDto,
@@ -49,7 +48,7 @@ export class VenueController {
   }
 
   @Get('/types')
-  @UseGuards(OwnerGuard)
+  @UseGuards(AuthGuard)
   async getVenueTypes() {
     const venueTypeId = await this.venueService.getVenueTypes();
     return { data: venueTypeId };
@@ -104,6 +103,7 @@ export class VenueController {
     return result;
   }
 
+  @Get('/:locationId')
   @Patch('/:locationId/:name')
   @UseGuards(OwnerGuard)
   @ApiBearerAuth('JWT-auth')
@@ -227,31 +227,6 @@ export class VenueController {
   }
 
   // ===== FAVOR ENDPOINTS =====
-  @Post('/favors')
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Add location to favorites' })
-  @ApiResponse({ status: 201, description: 'Favorite added successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async createFavor(@Body() dto: CreateFavorDto) {
-    await this.venueService.createFavor(dto);
-    return { message: 'Favorite added successfully' };
-  }
-
-  @Delete('/favors/:clientId/:locationId')
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Remove location from favorites' })
-  @ApiResponse({ status: 200, description: 'Favorite removed successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'Favorite not found' })
-  async deleteFavor(
-    @Param('clientId') clientId: string,
-    @Param('locationId') locationId: string,
-  ) {
-    await this.venueService.deleteFavor(clientId, locationId);
-    return { message: 'Favorite removed successfully' };
-  }
 
   @Get('/client/rates')
   @UseGuards(AuthGuard)

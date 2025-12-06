@@ -152,4 +152,32 @@ export class LocationController {
     const result = await this.locationService.getLocationsOfOwner(user.userId);
     return result;
   }
+
+  // ===== FAVOR ENDPOINTS =====
+  @Post('/:locationId/favors')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Add location to favorites' })
+  @ApiResponse({ status: 201, description: 'Favorite added successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async createFavor(
+    @Param('locationId') locationId: string,
+    @User() user: Express.User,
+  ) {
+    await this.locationService.createFavor(user.userId, locationId);
+  }
+
+  @Delete('/:locationId/favors')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Remove location from favorites' })
+  @ApiResponse({ status: 200, description: 'Favorite removed successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Favorite not found' })
+  async deleteFavor(
+    @Param('locationId') locationId: string,
+    @User() user: Express.User,
+  ) {
+    await this.locationService.deleteFavor(user.userId, locationId);
+  }
 }

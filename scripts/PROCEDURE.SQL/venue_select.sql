@@ -125,4 +125,27 @@ WHERE
         CASE WHEN p_sort = 'AREA_DESC' THEN v.area END DESC,
         -- Mặc định sắp xếp theo tên Location nếu không chọn gì
         l.name ASC;
+
+CREATE PROCEDURE Get_Venue_Details(
+    IN p_locationId VARCHAR(36),
+    IN p_venueName VARCHAR(100)
+)
+BEGIN
+    SELECT 
+        v.name AS venue_name,
+        v.floor,
+        v.area,
+        v.pricePerHour,
+        v.createdAt,
+        v.isActive,
+        -- Thông tin Venue Type (Chi tiết kỹ thuật)
+        BIN_TO_UUID(vt.venueType_id) AS venueType_id,
+        vt.name AS theme_name,
+        vt.minCapacity,
+        vt.maxCapacity,
+        vt.description AS venueType_description
+    FROM venues v
+    LEFT JOIN venue_types vt ON v.venueType_id = vt.venueType_id
+    WHERE v.location_id = UUID_TO_BIN(p_locationId)
+      AND v.name = p_venueName;
 END$$

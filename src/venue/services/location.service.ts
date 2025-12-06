@@ -226,4 +226,33 @@ export class LocationService {
       );
     }
   }
+
+  // ===== FAVOR OPERATIONS =====
+  public async createFavor(
+    clientId: string,
+    locationId: string,
+  ): Promise<void> {
+    try {
+      await this.databaseService.execute(`CALL Favor_Insert(?, ?)`, [
+        clientId,
+        locationId,
+      ]);
+    } catch (error) {
+      throw new ConflictException(error.message || 'Failed to create favor');
+    }
+  }
+
+  public async deleteFavor(
+    clientId: string,
+    locationId: string,
+  ): Promise<void> {
+    try {
+      await this.databaseService.execute(`CALL Favor_Delete(?, ?)`, [
+        clientId,
+        locationId,
+      ]);
+    } catch (error) {
+      throw new ConflictException(error.message || 'Failed to delete favor');
+    }
+  }
 }
