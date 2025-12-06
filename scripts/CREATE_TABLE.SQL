@@ -109,7 +109,7 @@ CREATE TABLE orders (
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (client_id) REFERENCES clients(user_id) ON DELETE RESTRICT,
-    FOREIGN KEY (venue_loc_id, venueName) REFERENCES venues(location_id, name) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (venue_loc_id, venueName) REFERENCES venues(location_id, name) ON DELETE RESTRICT ON UPDATE CASCADE,
     CHECK (HOUR(startHour) >= 6 AND HOUR(endHour) <= 23 AND DATE(startHour) = DATE(endHour)),
     CHECK (endHour > startHour),
     CHECK (startHour >= DATE_ADD(createdAt, INTERVAL 4 HOUR)) -- phải được đặt trước 4 tiếng
@@ -121,12 +121,12 @@ CREATE TABLE order_amenities (
     amenity_name VARCHAR(100) NOT NULL,
     
     PRIMARY KEY (order_id, location_id, amenity_name),    
-    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE RESTRICT,
     
     FOREIGN KEY (amenity_name, location_id) 
     REFERENCES amenities(amenity_name, location_id) 
 
-    ON DELETE CASCADE ON UPDATE CASCADE
+    ON DELETE RESTRICT ON UPDATE CASCADE
 );
 CREATE TABLE discounts (
     discount_id BINARY(16) PRIMARY KEY,
@@ -139,7 +139,7 @@ CREATE TABLE discounts (
     startedAt DATETIME NOT NULL,
     expiredAt DATETIME NOT NULL,
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (venueTypeId) REFERENCES venue_types(venueType_id) ON DELETE CASCADE,
+    FOREIGN KEY (venueTypeId) REFERENCES venue_types(venueType_id) ON DELETE RESTRICT,
     CHECK (expiredAt > startedAt),
     CHECK (maxDiscountPrice IS NULL OR maxDiscountPrice >= 0),
     CHECK (minPrice IS NULL OR minPrice >= 0)
@@ -149,8 +149,8 @@ CREATE TABLE applies (
     order_id BINARY(16) NOT NULL,
     discount_id BINARY(16) NOT NULL,
     PRIMARY KEY (order_id, discount_id),
-    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (discount_id) REFERENCES discounts(discount_id) ON DELETE CASCADE
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE RESTRICT,
+    FOREIGN KEY (discount_id) REFERENCES discounts(discount_id) ON DELETE RESTRICT
 );
 
 CREATE TABLE invoices (
@@ -163,7 +163,7 @@ CREATE TABLE invoices (
     transaction_id VARCHAR(50),
     paidOn DATETIME,
     description TEXT,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE SET NULL
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE RESTRICT
 );
 
 CREATE TABLE rates (
@@ -175,7 +175,7 @@ CREATE TABLE rates (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (client_id, location_id),
     FOREIGN KEY (client_id) REFERENCES clients(user_id) ON DELETE RESTRICT,
-    FOREIGN KEY (location_id) REFERENCES locations(location_id) ON DELETE CASCADE
+    FOREIGN KEY (location_id) REFERENCES locations(location_id) ON DELETE RESTRICT
 );
 
 CREATE TABLE favors (
@@ -196,8 +196,8 @@ CREATE TABLE chat_channels (
     PRIMARY KEY (user_1_id, user_2_id),
     
     -- Tham chiếu về bảng Users (giả sử PK là id)
-    FOREIGN KEY (user_1_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_2_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_1_id) REFERENCES users(id) ON DELETE RESTRICT,
+    FOREIGN KEY (user_2_id) REFERENCES users(id) ON DELETE RESTRICT,
     
     -- Ràng buộc để tránh trùng lặp (VD: A-B và B-A là một)
     CHECK (user_1_id < user_2_id)
@@ -218,8 +218,8 @@ CREATE TABLE messages (
     -- Khóa ngoại phức hợp
     FOREIGN KEY (channel_user_1_id, channel_user_2_id) 
         REFERENCES chat_channels(user_1_id, user_2_id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
+        ON DELETE RESTRICT
+        ON UPDATE RESTRICT,
 
-    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE RESTRICT
 );
