@@ -94,7 +94,7 @@ export class VenueController {
   }
 
   @Get('/:locationId/:name/preview')
-  @UseGuards(OwnerGuard)
+  @UseGuards(AuthGuard)
   async previewVenue(
     @Param('locationId') locationId: string,
     @Param('name') name: string,
