@@ -334,6 +334,27 @@ export class RateResponseDto {
     required: false,
   })
   avatarURL?: string;
+
+  @ApiProperty({
+    example: 'Sky Garden Event Space',
+    description: 'Location name (when fetching client ratings)',
+    required: false,
+  })
+  locationName?: string;
+
+  @ApiProperty({
+    example: 'Ho Chi Minh City',
+    description: 'City (when fetching client ratings)',
+    required: false,
+  })
+  city?: string;
+
+  @ApiProperty({
+    example: 'https://example.com/thumbnail.jpg',
+    description: 'Thumbnail URL (when fetching client ratings)',
+    required: false,
+  })
+  thumbnailURL?: string;
 }
 
 export class LocationRatingsDto {
@@ -358,6 +379,38 @@ export class CreateFavorDto {
   @IsNotEmpty()
   @IsString()
   locationId: string;
+}
+
+export class FavorResponseDto {
+  @ApiProperty({ example: 'client-uuid', description: 'Client user ID' })
+  clientId: string;
+
+  @ApiProperty({ example: 'location-uuid', description: 'Location ID' })
+  locationId: string;
+
+  @ApiProperty({
+    example: 'Sky Garden Event Space',
+    description: 'Location name',
+  })
+  locationName: string;
+
+  @ApiProperty({ example: 'Ho Chi Minh City', description: 'City' })
+  city: string;
+
+  @ApiProperty({ example: 4.5, description: 'Average rating' })
+  avgRating: number;
+
+  @ApiProperty({
+    example: 'https://example.com/thumbnail.jpg',
+    description: 'Thumbnail URL',
+  })
+  thumbnailURL: string;
+
+  @ApiProperty({
+    example: '2024-12-05T10:30:00Z',
+    description: 'When favorited',
+  })
+  createdAt: string;
 }
 
 export class CreateAmenityDto {

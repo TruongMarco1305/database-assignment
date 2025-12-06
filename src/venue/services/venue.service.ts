@@ -302,6 +302,46 @@ export class VenueService {
     }
   }
 
+  public async getClientFavors(clientId: string): Promise<any[]> {
+    try {
+      const result = await this.databaseService.execute(
+        `CALL getClientFavors(?)`,
+        [clientId],
+      );
+      return result || [];
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to get client favors',
+      );
+    }
+  }
+
+  public async getClientRates(clientId: string): Promise<RateResponseDto[]> {
+    try {
+      const result = await this.databaseService.execute(
+        `CALL getClientRates(?)`,
+        [clientId],
+      );
+
+      return (result || []).map((row: any) => ({
+        clientId: row.clientId,
+        locationId: row.locationId,
+        stars: row.stars,
+        comment: row.comment || undefined,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt || undefined,
+        clientName: '', // Not needed when fetching own ratings
+        locationName: row.locationName,
+        city: row.city,
+        thumbnailURL: row.thumbnailURL,
+      }));
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to get client rates',
+      );
+    }
+  }
+
   // ===== AMENITY OPERATIONS =====
   // Amenity operations are handled by AmenityService
 }
