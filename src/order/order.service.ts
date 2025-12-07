@@ -9,6 +9,10 @@ import {
   AddOrderAmenityDto,
   RemoveOrderAmenityDto,
 } from './dto/order.dto';
+import {
+  ClientOrderResponseDto,
+  InvoiceCreateDataResponseDto,
+} from './dto/order-response.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { v4 as uuidv4 } from 'uuid';
 import * as dayjs from 'dayjs';
@@ -213,6 +217,46 @@ export class OrderService {
     } catch (error) {
       throw new ConflictException(
         error.message || 'Failed to retrieve orders for owner',
+      );
+    }
+  }
+
+  // ===== CLIENT ORDER OPERATIONS =====
+  public async getClientOrders(
+    clientId: string,
+    status?: string,
+  ): Promise<ClientOrderResponseDto[]> {
+    try {
+      const results = await this.databaseService.execute<any>(
+        `CALL Client_GetOrders(?, ?)`,
+        [clientId, status || null],
+      );
+
+      return results || [];
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to get client orders',
+      );
+    }
+  }
+
+  public async getInvoiceCreateData(
+    orderId: string,
+  ): Promise<InvoiceCreateDataResponseDto> {
+    try {
+      const results = await this.databaseService.execute<any>(
+        `CALL GetInvoiceCreateData(?)`,
+        [orderId],
+      );
+
+      if (!results || results.length === 0) {
+        throw new ConflictException('Order not found or has no invoice data');
+      }
+
+      return results[0];
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to get invoice create data',
       );
     }
   }
