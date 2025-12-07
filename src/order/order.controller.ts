@@ -22,6 +22,10 @@ import {
   AddOrderAmenityDto,
   RemoveOrderAmenityDto,
 } from './dto/order.dto';
+import {
+  CreateOrderResponseDto,
+  OrderMetadataResponseDto,
+} from './dto/order-response.dto';
 import { AuthGuard, OwnerGuard } from 'src/auth/guards';
 import { User } from 'src/auth/decorators';
 
@@ -35,7 +39,11 @@ export class OrderController {
   @UseGuards(AuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create a new booking order' })
-  @ApiResponse({ status: 201, description: 'Order created successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Order created successfully',
+    type: CreateOrderResponseDto,
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async create(@Body() dto: CreateOrderDto, @User() user: Express.User) {
     const { orderId, expiredTime } = await this.orderService.createOrder(
@@ -71,6 +79,16 @@ export class OrderController {
 
   @Get('/metadata')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Get available amenities and discounts for booking',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Metadata retrieved successfully',
+    type: OrderMetadataResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getDiscountsByVenue(
     @Query('locationId') locationId: string,
     @Query('venueName') venueName: string,

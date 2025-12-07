@@ -893,5 +893,9 @@ export class LocationListItemDto {
   total_reviews: number;
 }
 
-// Export VenuePreviewResponseDto from separate file
+// Export DTOs from separate files
 export { VenuePreviewResponseDto } from './venue-preview-response.dto';
+export {
+  AdminOwnerFeesQueryDto,
+  AdminOwnerFeesResponseDto,
+} from './admin-owner-fees.dto';
