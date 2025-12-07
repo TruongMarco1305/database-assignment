@@ -53,8 +53,8 @@ export class OrderController {
   @Get('/uncompleted')
   @UseGuards(AuthGuard)
   async getUncompletedOrders(@User() user: Express.User) {
-    const orders = await this.orderService.getUncompletedOrders(user.userId);
-    return orders;
+    const data = await this.orderService.getUncompletedOrders(user.userId);
+    return data;
   }
 
   @Patch('/cancelled')

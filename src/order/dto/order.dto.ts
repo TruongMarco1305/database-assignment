@@ -59,7 +59,7 @@ export class CreateOrderDto {
   })
   @IsOptional()
   @IsArray()
-  amenityNames?: string[]; // Changed from amenityIds to match DB schema
+  amenityIds?: string[]; // Changed from amenityIds to match DB schema
 
   @ApiProperty({
     example: ['discount-uuid-1'],
