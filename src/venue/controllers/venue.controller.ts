@@ -27,6 +27,7 @@ import {
   LocationRatingsDto,
   FavorResponseDto,
 } from '../dto/create-venue.dto';
+import { VenuePreviewResponseDto } from '../dto/venue-preview-response.dto';
 import { AdminGuard, AuthGuard, OwnerGuard } from 'src/auth/guards';
 import { User } from 'src/auth/decorators';
 
@@ -95,10 +96,19 @@ export class VenueController {
 
   @Get('/:locationId/:name/preview')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Preview venue details' })
+  @ApiResponse({
+    status: 200,
+    description: 'Venue preview retrieved successfully',
+    type: VenuePreviewResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Venue not found' })
   async previewVenue(
     @Param('locationId') locationId: string,
     @Param('name') name: string,
-  ) {
+  ): Promise<VenuePreviewResponseDto[]> {
     const result = await this.venueService.previewVenue(locationId, name);
     return result;
   }

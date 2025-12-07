@@ -892,3 +892,6 @@ export class LocationListItemDto {
   @ApiProperty({ example: 42, description: 'Total number of reviews' })
   total_reviews: number;
 }
+
+// Export VenuePreviewResponseDto from separate file
+export { VenuePreviewResponseDto } from './venue-preview-response.dto';
