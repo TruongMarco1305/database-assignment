@@ -7,7 +7,7 @@ import {
 } from './dto/order.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { v4 as uuidv4 } from 'uuid';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class OrderService {
@@ -36,11 +36,11 @@ export class OrderService {
       const expiredTime: Date = dayjs().add(15, 'minute').toDate();
 
       // Add amenities if provided
-      if (dto.amenityIds && dto.amenityIds.length > 0) {
-        for (const amenityId of dto.amenityIds) {
+      if (dto.amenityNames && dto.amenityNames.length > 0) {
+        for (const amenityName of dto.amenityNames) {
           await this.addOrderAmenity({
             orderId,
-            amenityId,
+            amenityName,
           });
         }
       }
@@ -48,7 +48,7 @@ export class OrderService {
       if (dto.discountIds && dto.discountIds.length > 0) {
         for (const discountId of dto.discountIds) {
           await this.databaseService.execute(
-            `CALL OrderDiscount_Insert(?, ?)`,
+            `CALL Applies_Insert(?, ?)`,
             [orderId, discountId],
           );
         }
@@ -110,7 +110,7 @@ export class OrderService {
     try {
       await this.databaseService.execute(`CALL OrderAmenity_Insert(?, ?)`, [
         dto.orderId,
-        dto.amenityId,
+        dto.amenityName,
       ]);
     } catch (error) {
       throw new ConflictException(
@@ -123,7 +123,7 @@ export class OrderService {
     try {
       await this.databaseService.execute(`CALL OrderAmenity_Delete(?, ?)`, [
         dto.orderId,
-        dto.amenityId,
+        dto.amenityName,
       ]);
     } catch (error) {
       throw new ConflictException(
