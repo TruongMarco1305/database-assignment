@@ -17,7 +17,9 @@ export class PaymentService {
   constructor(private databaseService: DatabaseService) {}
 
   // ===== INVOICE OPERATIONS =====
-  public async createInvoice(dto: CreateInvoiceDto): Promise<string> {
+  public async createInvoice(
+    dto: CreateInvoiceDto,
+  ): Promise<{ id: string; url: string; totalPrice: string }> {
     const invoiceId = uuidv4();
     try {
       const data = await this.databaseService.execute<{
@@ -32,9 +34,13 @@ export class PaymentService {
         dto.orderId,
         totalPrice,
       ]);
-      return encodeURI(
-        `https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${totalPrice}&addInfo=Pay%20for%20booking%20${invoiceId}&accountName=${accountName}`,
-      );
+      return {
+        totalPrice,
+        id: invoiceId,
+        url: encodeURI(
+          `https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${totalPrice}&addInfo=Payment for order ${dto.orderId}&accountName=${accountName}`,
+        ),
+      };
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to create invoice');
     }

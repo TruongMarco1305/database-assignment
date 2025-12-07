@@ -1,4 +1,8 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   CreateOrderDto,
   UpdateOrderDto,
@@ -36,21 +40,23 @@ export class OrderService {
       const expiredTime: Date = dayjs().add(15, 'minute').toDate();
 
       // Add amenities if provided
-      if (dto.amenityNames && dto.amenityNames.length > 0) {
-        for (const amenityName of dto.amenityNames) {
-          await this.addOrderAmenity({
+      if (dto.amenityIds && dto.amenityIds.length > 0) {
+        console.log(dto.amenityIds);
+        console.log(orderId);
+        for (const amenityName of dto.amenityIds) {
+          await this.databaseService.execute(`CALL OrderAmenity_Insert(?, ?)`, [
             orderId,
             amenityName,
-          });
+          ]);
         }
       }
 
       if (dto.discountIds && dto.discountIds.length > 0) {
         for (const discountId of dto.discountIds) {
-          await this.databaseService.execute(
-            `CALL Applies_Insert(?, ?)`,
-            [orderId, discountId],
-          );
+          await this.databaseService.execute(`CALL Applies_Insert(?, ?)`, [
+            orderId,
+            discountId,
+          ]);
         }
       }
 
@@ -118,12 +124,15 @@ export class OrderService {
     }
   }
 
-  public async getUncompletedOrders(clientId: string): Promise<string> {
+  public async getUncompletedOrders(clientId: string): Promise<any> {
     try {
       const results = await this.databaseService.execute<{
         orderId: string;
         invoiceId: string;
       }>(`CALL Get_Uncompleted_Orders(?)`, [clientId]);
+      if (!results[0]) {
+        throw new NotFoundException('No order incomplete');
+      }
       const { orderId, invoiceId } = results[0];
       const data = await this.databaseService.execute<{
         totalPrice: string;
@@ -132,9 +141,12 @@ export class OrderService {
         bankId: string;
       }>(`CALL GetInvoiceCreateData(?)`, [orderId]);
       const { totalPrice, accountNo, accountName, bankId } = data[0];
-      return encodeURI(
-        `https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${totalPrice}&addInfo=Pay%20for%20booking%20${invoiceId}&accountName=${accountName}`,
-      );
+      return {
+        totalPrice,
+        url: encodeURI(
+          `https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${totalPrice}&addInfo=Pay%20for%20booking%20${invoiceId}&accountName=${accountName}`,
+        ),
+      };
     } catch (error) {
       throw new ConflictException(
         error.message || 'Failed to retrieve uncompleted orders',

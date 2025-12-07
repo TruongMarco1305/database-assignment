@@ -16,7 +16,6 @@ import {
 import { PaymentService } from '../services/payment.service';
 import {
   CreateInvoiceDto,
-  CompleteInvoicePaymentDto,
   UpdateInvoiceStatusDto,
   CreateDiscountDto,
   UpdateDiscountDto,
@@ -37,21 +36,21 @@ export class PaymentController {
   @ApiResponse({ status: 201, description: 'Invoice created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   async createInvoice(@Body() dto: CreateInvoiceDto) {
-    const invoiceId = await this.paymentService.createInvoice(dto);
-    return { _id: invoiceId };
+    const data = await this.paymentService.createInvoice(dto);
+    return data;
   }
 
-  @Patch('/invoices/complete')
-  @ApiOperation({ summary: 'Mark invoice as paid with transaction details' })
-  @ApiResponse({
-    status: 200,
-    description: 'Invoice payment completed successfully',
-  })
-  @ApiResponse({ status: 404, description: 'Invoice not found' })
-  async completeInvoicePayment(@Body() dto: CompleteInvoicePaymentDto) {
-    await this.paymentService.completeInvoicePayment(dto);
-    return { message: 'Invoice payment completed successfully' };
-  }
+  // @Patch('/invoices/complete')
+  // @ApiOperation({ summary: 'Mark invoice as paid with transaction details' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Invoice payment completed successfully',
+  // })
+  // @ApiResponse({ status: 404, description: 'Invoice not found' })
+  // async completeInvoicePayment(@Body() dto: CompleteInvoicePaymentDto) {
+  //   await this.paymentService.completeInvoicePayment(dto);
+  //   return { message: 'Invoice payment completed successfully' };
+  // }
 
   @Patch('/webhook')
   @ApiOperation({ summary: 'Webhook to update order status' })
