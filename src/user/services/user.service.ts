@@ -117,4 +117,19 @@ export class UserService extends TableService {
       ],
     );
   }
+
+  public async getUsers(status?: string, role?: string) {
+    try {
+      const result = await this.databaseService.execute(
+        `CALL GetUsersByRoleAndStatus(?, ?)`,
+        [
+          role === undefined ? null : role,
+          status === undefined ? null : status === 'active' ? 1 : 0,
+        ],
+      );
+      return result;
+    } catch {
+      throw new BadRequestException('Error');
+    }
+  }
 }

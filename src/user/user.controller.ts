@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -7,7 +7,7 @@ import {
 } from '@nestjs/swagger';
 import { UserService } from './services/user.service';
 import { UpdateOwnerDto, UpdateUserDto, UserProfileDto } from './user.dto';
-import { AuthGuard, OwnerGuard } from 'src/auth/guards';
+import { AdminGuard, AuthGuard, OwnerGuard } from 'src/auth/guards';
 import { User } from 'src/auth/decorators';
 import { OwnerService } from './services';
 
@@ -62,5 +62,15 @@ export class UserController {
   @ApiResponse({ status: 403, description: 'Forbidden - Owner role required' })
   updateOwner(@User() user: Express.User, @Body() dto: UpdateOwnerDto) {
     return this.ownerService.updateOwner(user.userId, dto);
+  }
+
+  @Get('/list')
+  @UseGuards(AdminGuard)
+  async getUsers(
+    @Query('status') isActive?: string,
+    @Query('role') role?: string,
+  ) {
+    const data = this.userService.getUsers(isActive, role);
+    return data;
   }
 }

@@ -159,6 +159,10 @@ export class PaymentService {
     }
   }
 
+  public async previewDiscounts() {
+    return await this.databaseService.execute(`CALL GetDiscountInfo()`);
+  }
+
   public async deleteDiscount(id: string): Promise<void> {
     try {
       await this.databaseService.execute(`CALL Discount_Delete(?)`, [id]);

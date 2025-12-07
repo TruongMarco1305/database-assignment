@@ -53,4 +53,51 @@ BEGIN
 
 END$$
 
+CREATE PROCEDURE GetUsersByRoleAndStatus(
+    IN in_role VARCHAR(20),   -- Optional: 'ADMIN', 'OWNER', 'CLIENT', or NULL
+    IN in_status BOOLEAN      -- Optional: 1 (Active), 0 (Inactive), or NULL
+)
+BEGIN
+    -- Common Table Expression to calculate the role priority first
+    WITH UserRoles AS (
+        SELECT 
+            u.id,
+            u.email,
+            u.firstName,
+            u.lastName,
+            u.phoneNo,
+            u.isActive,
+            u.createdAt,
+            -- Determine Highest Role Priority
+            CASE 
+                WHEN u.isAdmin = 1 THEN 'ADMIN'
+                WHEN o.user_id IS NOT NULL THEN 'OWNER'
+                WHEN c.user_id IS NOT NULL THEN 'CLIENT'
+                ELSE 'USER'
+            END AS type
+        FROM users u
+        -- Left join to check existence in other tables
+        LEFT JOIN owners o ON u.id = o.user_id
+        LEFT JOIN clients c ON u.id = c.user_id
+    )
+    SELECT 
+        BIN_TO_UUID(id) as id,
+        email, 
+        firstName, 
+        lastName, 
+        phoneNo, 
+        type as userType, 
+        isActive, 
+        createdAt
+    FROM UserRoles
+    WHERE 
+        -- Handle Optional Role Filter (Case insensitive)
+        (in_role IS NULL OR type = UPPER(in_role))
+        
+        -- Handle Optional Status Filter
+        AND (in_status IS NULL OR isActive = in_status)
+        
+    ORDER BY createdAt DESC;
+END //
+
 DELIMITER ;

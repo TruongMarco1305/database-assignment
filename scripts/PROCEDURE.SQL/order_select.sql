@@ -72,7 +72,7 @@ BEGIN
   JOIN users u ON o.client_id = u.id
   JOIN locations l ON o.venue_loc_id = l.location_id
   JOIN invoices i ON o.order_id = i.order_id
-  WHERE l.owner_id = p_ownerId
+  WHERE l.owner_id = UUID_TO_BIN(p_ownerId)
     AND (p_locationId IS NULL OR l.location_id = UUID_TO_BIN(p_locationId))
     AND (p_orderStatus IS NULL OR o.status = p_orderStatus)
     AND (p_startTime IS NULL OR o.startHour >= p_startTime)
