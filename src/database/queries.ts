@@ -78,7 +78,8 @@ export const CREATE_USER_PROCEDURE = `
         SELECT 
             BIN_TO_UUID(id) AS id,
             email, 
-            firstName, 
+            firstName,
+            isAdmin, 
             lastName, 
             DoB, 
             isActive, 

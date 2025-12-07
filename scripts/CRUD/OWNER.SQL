@@ -72,6 +72,7 @@ END$$
             users.isActive as isActive, 
             users.phoneNo as phoneNo, 
             users.avatarUrl as avatarUrl,
+            user.isAdmin as isAdmin,
             owners.bankId as bankId,
             owners.bankName as bankName,
             owners.accountName as accountName,
