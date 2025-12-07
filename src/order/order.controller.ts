@@ -52,6 +52,23 @@ export class OrderController {
     return orders;
   }
 
+  @Patch('/cancelled')
+  @ApiOperation({ summary: 'Mark invoice as cancelled' })
+  @ApiResponse({
+    status: 200,
+    description: 'Invoice cancelled successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Invoice not found' })
+  async cancelInvoice(
+    @Body()
+    payload: {
+      orderId: string;
+      invoiceId: string;
+    },
+  ) {
+    await this.orderService.cancelOrder(payload);
+  }
+
   @Get('/metadata')
   @UseGuards(AuthGuard)
   async getDiscountsByVenue(

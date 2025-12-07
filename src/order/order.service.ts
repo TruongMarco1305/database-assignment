@@ -97,6 +97,27 @@ export class OrderService {
     }
   }
 
+  public async cancelOrder(payload: {
+    orderId: string;
+    invoiceId: string;
+  }): Promise<void> {
+    try {
+      await this.databaseService.execute(`CALL Order_Update(?, ?, ?, ?)`, [
+        payload.orderId,
+        null,
+        null,
+        'CANCELLED',
+      ]);
+      await this.databaseService.execute(`CALL Invoice_UpdateStatus(?, ?, ?)`, [
+        payload.invoiceId,
+        'FAILED',
+        `Cancel payment for order ${payload.orderId}`,
+      ]);
+    } catch (error) {
+      throw new ConflictException(error.message || 'Failed to cancel order');
+    }
+  }
+
   public async getUncompletedOrders(clientId: string): Promise<string> {
     try {
       const results = await this.databaseService.execute<{
