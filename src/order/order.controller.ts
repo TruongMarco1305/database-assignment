@@ -45,6 +45,13 @@ export class OrderController {
     return { _id: orderId, expiredTime };
   }
 
+  @Get('/uncompleted')
+  @UseGuards(AuthGuard)
+  async getUncompletedOrders(@User() user: Express.User) {
+    const orders = await this.orderService.getUncompletedOrders(user.userId);
+    return orders;
+  }
+
   @Get('/metadata')
   @UseGuards(AuthGuard)
   async getDiscountsByVenue(

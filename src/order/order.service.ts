@@ -7,7 +7,7 @@ import {
 } from './dto/order.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { v4 as uuidv4 } from 'uuid';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class OrderService {
@@ -94,6 +94,30 @@ export class OrderService {
       ]);
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to update order');
+    }
+  }
+
+  public async getUncompletedOrders(clientId: string): Promise<string> {
+    try {
+      const results = await this.databaseService.execute<{
+        orderId: string;
+        invoiceId: string;
+      }>(`CALL Get_Uncompleted_Orders(?)`, [clientId]);
+      const { orderId, invoiceId } = results[0];
+      const data = await this.databaseService.execute<{
+        totalPrice: string;
+        accountNo: string;
+        accountName: string;
+        bankId: string;
+      }>(`CALL GetInvoiceCreateData(?)`, [orderId]);
+      const { totalPrice, accountNo, accountName, bankId } = data[0];
+      return encodeURI(
+        `https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${totalPrice}&addInfo=Pay%20for%20booking%20${invoiceId}&accountName=${accountName}`,
+      );
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to retrieve uncompleted orders',
+      );
     }
   }
 
