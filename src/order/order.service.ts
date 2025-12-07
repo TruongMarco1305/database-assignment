@@ -97,6 +97,51 @@ export class OrderService {
     }
   }
 
+  public async cancelOrder(payload: {
+    orderId: string;
+    invoiceId: string;
+  }): Promise<void> {
+    try {
+      await this.databaseService.execute(`CALL Order_Update(?, ?, ?, ?)`, [
+        payload.orderId,
+        null,
+        null,
+        'CANCELLED',
+      ]);
+      await this.databaseService.execute(`CALL Invoice_UpdateStatus(?, ?, ?)`, [
+        payload.invoiceId,
+        'FAILED',
+        `Cancel payment for order ${payload.orderId}`,
+      ]);
+    } catch (error) {
+      throw new ConflictException(error.message || 'Failed to cancel order');
+    }
+  }
+
+  public async getUncompletedOrders(clientId: string): Promise<string> {
+    try {
+      const results = await this.databaseService.execute<{
+        orderId: string;
+        invoiceId: string;
+      }>(`CALL Get_Uncompleted_Orders(?)`, [clientId]);
+      const { orderId, invoiceId } = results[0];
+      const data = await this.databaseService.execute<{
+        totalPrice: string;
+        accountNo: string;
+        accountName: string;
+        bankId: string;
+      }>(`CALL GetInvoiceCreateData(?)`, [orderId]);
+      const { totalPrice, accountNo, accountName, bankId } = data[0];
+      return encodeURI(
+        `https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${totalPrice}&addInfo=Pay%20for%20booking%20${invoiceId}&accountName=${accountName}`,
+      );
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to retrieve uncompleted orders',
+      );
+    }
+  }
+
   public async deleteOrder(id: string): Promise<void> {
     try {
       await this.databaseService.execute(`CALL Order_Delete(?)`, [id]);

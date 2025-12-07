@@ -53,6 +53,22 @@ export class PaymentController {
     return { message: 'Invoice payment completed successfully' };
   }
 
+  @Patch('/webhook')
+  @ApiOperation({ summary: 'Webhook to update order status' })
+  @ApiResponse({
+    status: 200,
+    description: 'Order status updated successfully',
+  })
+  async webhookUpdateOrderStatus(
+    @Body()
+    payload: {
+      orderId: string;
+      invoiceId: string;
+    },
+  ) {
+    await this.paymentService.webhookUpdateOrderStatus(payload);
+  }
+
   @Patch('/invoices/status')
   @ApiOperation({ summary: 'Update invoice payment status' })
   @ApiResponse({

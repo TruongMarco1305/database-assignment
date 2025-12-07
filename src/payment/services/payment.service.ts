@@ -40,6 +40,36 @@ export class PaymentService {
     }
   }
 
+  public async webhookUpdateOrderStatus(payload: {
+    orderId: string;
+    invoiceId: string;
+  }): Promise<void> {
+    // Simulate a transaction ID from webhook
+    const transactionId = uuidv4();
+    try {
+      await this.databaseService.execute(`CALL Order_Update(?, ?, ?, ?)`, [
+        payload.orderId,
+        null,
+        null,
+        'CONFIRMED',
+      ]);
+      await this.databaseService.execute(
+        `CALL Invoice_CompletePayment(?, ?, ?, ?, ?)`,
+        [
+          payload.invoiceId,
+          'BANK001',
+          'BANK002',
+          transactionId,
+          `Pay for order ${payload.orderId}`,
+        ],
+      );
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to update order status via webhook',
+      );
+    }
+  }
+
   public async completeInvoicePayment(
     dto: CompleteInvoicePaymentDto,
   ): Promise<void> {

@@ -53,6 +53,30 @@ export class OrderController {
     return { _id: orderId, expiredTime };
   }
 
+  @Get('/uncompleted')
+  @UseGuards(AuthGuard)
+  async getUncompletedOrders(@User() user: Express.User) {
+    const orders = await this.orderService.getUncompletedOrders(user.userId);
+    return orders;
+  }
+
+  @Patch('/cancelled')
+  @ApiOperation({ summary: 'Mark invoice as cancelled' })
+  @ApiResponse({
+    status: 200,
+    description: 'Invoice cancelled successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Invoice not found' })
+  async cancelInvoice(
+    @Body()
+    payload: {
+      orderId: string;
+      invoiceId: string;
+    },
+  ) {
+    await this.orderService.cancelOrder(payload);
+  }
+
   @Get('/metadata')
   @UseGuards(AuthGuard)
   @ApiBearerAuth('JWT-auth')
