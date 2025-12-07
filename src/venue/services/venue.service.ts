@@ -14,6 +14,7 @@ import {
   LocationRatingsDto,
   RateResponseDto,
 } from '../dto/create-venue.dto';
+import { VenuePreviewResponseDto } from '../dto/venue-preview-response.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -136,13 +137,16 @@ export class VenueService {
     }
   }
 
-  public async previewVenue(locationId: string, name: string): Promise<any> {
+  public async previewVenue(
+    locationId: string,
+    name: string,
+  ): Promise<VenuePreviewResponseDto[]> {
     try {
       const [results] = await this.databaseService.execute(
         `CALL Venue_Preview(?, ?)`,
         [locationId, name],
       );
-      return results;
+      return results as VenuePreviewResponseDto[];
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to preview venue');
     }
