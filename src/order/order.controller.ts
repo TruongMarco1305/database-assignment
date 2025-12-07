@@ -23,8 +23,9 @@ import {
   RemoveOrderAmenityDto,
 } from './dto/order.dto';
 import {
-  CreateOrderResponseDto,
-  OrderMetadataResponseDto,
+  ClientOrderResponseDto,
+  InvoiceCreateDataResponseDto,
+  GetClientOrdersQueryDto,
 } from './dto/order-response.dto';
 import { AuthGuard, OwnerGuard } from 'src/auth/guards';
 import { User } from 'src/auth/decorators';
@@ -39,11 +40,7 @@ export class OrderController {
   @UseGuards(AuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create a new booking order' })
-  @ApiResponse({
-    status: 201,
-    description: 'Order created successfully',
-    type: CreateOrderResponseDto,
-  })
+  @ApiResponse({ status: 201, description: 'Order created successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async create(@Body() dto: CreateOrderDto, @User() user: Express.User) {
     const { orderId, expiredTime } = await this.orderService.createOrder(
@@ -86,7 +83,6 @@ export class OrderController {
   @ApiResponse({
     status: 200,
     description: 'Metadata retrieved successfully',
-    type: OrderMetadataResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getDiscountsByVenue(
@@ -175,5 +171,45 @@ export class OrderController {
       orderQuery,
     );
     return orders;
+  }
+
+  // ===== CLIENT ORDER ENDPOINTS =====
+  @Get('/client')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Get orders for current client with optional status filter',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Orders retrieved successfully',
+    type: [ClientOrderResponseDto],
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getClientOrders(
+    @Query() query: GetClientOrdersQueryDto,
+    @User() user: Express.User,
+  ) {
+    const orders = await this.orderService.getClientOrders(
+      user.userId,
+      query.status,
+    );
+    return orders;
+  }
+
+  @Get('/:orderId/invoice-data')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get invoice creation data for an order' })
+  @ApiResponse({
+    status: 200,
+    description: 'Invoice data retrieved successfully',
+    type: InvoiceCreateDataResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  async getInvoiceCreateData(@Param('orderId') orderId: string) {
+    const data = await this.orderService.getInvoiceCreateData(orderId);
+    return data;
   }
 }
