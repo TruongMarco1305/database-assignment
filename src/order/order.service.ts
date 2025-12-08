@@ -1,13 +1,21 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   CreateOrderDto,
   UpdateOrderDto,
   AddOrderAmenityDto,
   RemoveOrderAmenityDto,
 } from './dto/order.dto';
+import {
+  ClientOrderResponseDto,
+  InvoiceCreateDataResponseDto,
+} from './dto/order-response.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { v4 as uuidv4 } from 'uuid';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class OrderService {
@@ -37,20 +45,22 @@ export class OrderService {
 
       // Add amenities if provided
       if (dto.amenityIds && dto.amenityIds.length > 0) {
-        for (const amenityId of dto.amenityIds) {
-          await this.addOrderAmenity({
+        console.log(dto.amenityIds);
+        console.log(orderId);
+        for (const amenityName of dto.amenityIds) {
+          await this.databaseService.execute(`CALL OrderAmenity_Insert(?, ?)`, [
             orderId,
-            amenityId,
-          });
+            amenityName,
+          ]);
         }
       }
 
       if (dto.discountIds && dto.discountIds.length > 0) {
         for (const discountId of dto.discountIds) {
-          await this.databaseService.execute(
-            `CALL OrderDiscount_Insert(?, ?)`,
-            [orderId, discountId],
-          );
+          await this.databaseService.execute(`CALL Applies_Insert(?, ?)`, [
+            orderId,
+            discountId,
+          ]);
         }
       }
 
@@ -97,6 +107,57 @@ export class OrderService {
     }
   }
 
+  public async cancelOrder(payload: {
+    orderId: string;
+    invoiceId: string;
+  }): Promise<void> {
+    try {
+      await this.databaseService.execute(`CALL Order_Update(?, ?, ?, ?)`, [
+        payload.orderId,
+        null,
+        null,
+        'CANCELLED',
+      ]);
+      await this.databaseService.execute(`CALL Invoice_UpdateStatus(?, ?, ?)`, [
+        payload.invoiceId,
+        'FAILED',
+        `Cancel payment for order ${payload.orderId}`,
+      ]);
+    } catch (error) {
+      throw new ConflictException(error.message || 'Failed to cancel order');
+    }
+  }
+
+  public async getUncompletedOrders(clientId: string): Promise<any> {
+    try {
+      const results = await this.databaseService.execute<{
+        orderId: string;
+        invoiceId: string;
+      }>(`CALL Get_Uncompleted_Orders(?)`, [clientId]);
+      if (!results[0]) {
+        throw new NotFoundException('No order incomplete');
+      }
+      const { orderId, invoiceId } = results[0];
+      const data = await this.databaseService.execute<{
+        totalPrice: string;
+        accountNo: string;
+        accountName: string;
+        bankId: string;
+      }>(`CALL GetInvoiceCreateData(?)`, [orderId]);
+      const { totalPrice, accountNo, accountName, bankId } = data[0];
+      return {
+        totalPrice,
+        url: encodeURI(
+          `https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${totalPrice}&addInfo=Pay%20for%20booking%20${invoiceId}&accountName=${accountName}`,
+        ),
+      };
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to retrieve uncompleted orders',
+      );
+    }
+  }
+
   public async deleteOrder(id: string): Promise<void> {
     try {
       await this.databaseService.execute(`CALL Order_Delete(?)`, [id]);
@@ -110,7 +171,7 @@ export class OrderService {
     try {
       await this.databaseService.execute(`CALL OrderAmenity_Insert(?, ?)`, [
         dto.orderId,
-        dto.amenityId,
+        dto.amenityName,
       ]);
     } catch (error) {
       throw new ConflictException(
@@ -123,7 +184,7 @@ export class OrderService {
     try {
       await this.databaseService.execute(`CALL OrderAmenity_Delete(?, ?)`, [
         dto.orderId,
-        dto.amenityId,
+        dto.amenityName,
       ]);
     } catch (error) {
       throw new ConflictException(
@@ -156,6 +217,46 @@ export class OrderService {
     } catch (error) {
       throw new ConflictException(
         error.message || 'Failed to retrieve orders for owner',
+      );
+    }
+  }
+
+  // ===== CLIENT ORDER OPERATIONS =====
+  public async getClientOrders(
+    clientId: string,
+    status?: string,
+  ): Promise<ClientOrderResponseDto[]> {
+    try {
+      const results = await this.databaseService.execute<any>(
+        `CALL Client_GetOrders(?, ?)`,
+        [clientId, status || null],
+      );
+
+      return results || [];
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to get client orders',
+      );
+    }
+  }
+
+  public async getInvoiceCreateData(
+    orderId: string,
+  ): Promise<InvoiceCreateDataResponseDto> {
+    try {
+      const results = await this.databaseService.execute<any>(
+        `CALL GetInvoiceCreateData(?)`,
+        [orderId],
+      );
+
+      if (!results || results.length === 0) {
+        throw new ConflictException('Order not found or has no invoice data');
+      }
+
+      return results[0];
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to get invoice create data',
       );
     }
   }

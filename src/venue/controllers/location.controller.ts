@@ -14,7 +14,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { AuthGuard, OwnerGuard } from 'src/auth/guards';
+import { AuthGuard, OwnerGuard, AdminGuard } from 'src/auth/guards';
 import {
   CreateLocationDto,
   SearchLocationsDto,
@@ -22,6 +22,8 @@ import {
   LocationSearchResultDto,
   LocationDetailsResponseDto,
   LocationListItemDto,
+  AdminOwnerFeesQueryDto,
+  AdminOwnerFeesResponseDto,
 } from '../dto/create-venue.dto';
 import { User } from 'src/auth/decorators';
 import { LocationService } from '../services/location.service';
@@ -185,5 +187,24 @@ export class LocationController {
     @User() user: Express.User,
   ) {
     await this.locationService.deleteFavor(user.userId, locationId);
+  }
+
+  // ===== ADMIN ENDPOINTS =====
+  @Post('admin/owner-fees')
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Get owner fees statistics by month/year (Admin only)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Owner fees retrieved successfully',
+    type: [AdminOwnerFeesResponseDto],
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
+  async getOwnerFees(@Body() dto: AdminOwnerFeesQueryDto) {
+    const result = await this.locationService.getOwnerFees(dto.month, dto.year);
+    return result;
   }
 }

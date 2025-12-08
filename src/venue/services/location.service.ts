@@ -6,6 +6,7 @@ import {
   UpdateLocationDto,
   LocationDetailsResponseDto,
   LocationListItemDto,
+  AdminOwnerFeesResponseDto,
 } from '../dto/create-venue.dto';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -254,6 +255,23 @@ export class LocationService {
       ]);
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to delete favor');
+    }
+  }
+
+  // ===== ADMIN OPERATIONS =====
+  public async getOwnerFees(
+    month: number,
+    year: number,
+  ): Promise<AdminOwnerFeesResponseDto[]> {
+    try {
+      const result = await this.databaseService.execute<any>(
+        `CALL Admin_ManageOwnerFees(?, ?)`,
+        [month, year],
+      );
+
+      return result || [];
+    } catch (error) {
+      throw new ConflictException(error.message || 'Failed to get owner fees');
     }
   }
 }

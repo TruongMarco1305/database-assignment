@@ -17,7 +17,9 @@ export class PaymentService {
   constructor(private databaseService: DatabaseService) {}
 
   // ===== INVOICE OPERATIONS =====
-  public async createInvoice(dto: CreateInvoiceDto): Promise<string> {
+  public async createInvoice(
+    dto: CreateInvoiceDto,
+  ): Promise<{ id: string; url: string; totalPrice: string }> {
     const invoiceId = uuidv4();
     try {
       const data = await this.databaseService.execute<{
@@ -32,11 +34,45 @@ export class PaymentService {
         dto.orderId,
         totalPrice,
       ]);
-      return encodeURI(
-        `https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${totalPrice}&addInfo=Pay%20for%20booking%20${invoiceId}&accountName=${accountName}`,
-      );
+      return {
+        totalPrice,
+        id: invoiceId,
+        url: encodeURI(
+          `https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${totalPrice}&addInfo=Payment for order ${dto.orderId}&accountName=${accountName}`,
+        ),
+      };
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to create invoice');
+    }
+  }
+
+  public async webhookUpdateOrderStatus(payload: {
+    orderId: string;
+    invoiceId: string;
+  }): Promise<void> {
+    // Simulate a transaction ID from webhook
+    const transactionId = uuidv4();
+    try {
+      await this.databaseService.execute(`CALL Order_Update(?, ?, ?, ?)`, [
+        payload.orderId,
+        null,
+        null,
+        'CONFIRMED',
+      ]);
+      await this.databaseService.execute(
+        `CALL Invoice_CompletePayment(?, ?, ?, ?, ?)`,
+        [
+          payload.invoiceId,
+          'BANK001',
+          'BANK002',
+          transactionId,
+          `Pay for order ${payload.orderId}`,
+        ],
+      );
+    } catch (error) {
+      throw new ConflictException(
+        error.message || 'Failed to update order status via webhook',
+      );
     }
   }
 
@@ -121,6 +157,10 @@ export class PaymentService {
     } catch (error) {
       throw new ConflictException(error.message || 'Failed to update discount');
     }
+  }
+
+  public async previewDiscounts() {
+    return await this.databaseService.execute(`CALL GetDiscountInfo()`);
   }
 
   public async deleteDiscount(id: string): Promise<void> {
