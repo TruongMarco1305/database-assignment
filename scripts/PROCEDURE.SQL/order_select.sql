@@ -236,25 +236,8 @@ CREATE PROCEDURE Get_Valid_Amenities(
 )
 BEGIN
     DECLARE v_locBin BINARY(16);
-    DECLARE v_maxCapacity INT;
-    DECLARE v_venueSize VARCHAR(20);
 
     SET v_locBin = UUID_TO_BIN(p_locId);
-
-    -- 1. Lấy thông tin Sức chứa để quy đổi Size
-    SELECT vt.maxCapacity
-    INTO v_maxCapacity
-    FROM venues v
-    JOIN venue_types vt ON v.venueType_id = vt.venueType_id
-    WHERE v.location_id = v_locBin AND v.name = p_venueName;
-
-    -- Quy đổi Size
-    SET v_venueSize = CASE 
-        WHEN v_maxCapacity <= 40 THEN 'Small'
-        WHEN v_maxCapacity <= 80 THEN 'Medium'
-        WHEN v_maxCapacity <= 120 THEN 'Large'
-        ELSE 'Exclusive'
-    END;
 
     -- 2. Trả về danh sách Amenity khả dụng
     SELECT 

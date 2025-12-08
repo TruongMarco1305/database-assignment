@@ -38,30 +38,5 @@ BEGIN
 END$$
 DELIMITER ;
 
--- no update
-
-DELIMITER $$
-CREATE PROCEDURE OrderAmenity_Delete(
-    IN p_orderId VARCHAR(36),
-    IN p_amenityName VARCHAR(100)
-)
-BEGIN
-    DECLARE v_orderId BINARY(16);
-    
-    SET v_orderId = UUID_TO_BIN(p_orderId);
-
-    -- Kiểm tra tồn tại trước khi xóa
-    IF NOT EXISTS (
-        SELECT 1 FROM order_amenities 
-        WHERE order_id = v_orderId AND amenity_name = p_amenityName
-    ) THEN
-        SIGNAL SQLSTATE '45054' SET MESSAGE_TEXT = 'Error: This amenity is not attached to this order.';
-    END IF;
-
-    -- Execute Delete
-    DELETE FROM order_amenities 
-    WHERE order_id = v_orderId 
-      AND amenity_name = p_amenityName;
-END$$
 
 DELIMITER ;

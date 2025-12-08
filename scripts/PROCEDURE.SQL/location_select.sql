@@ -74,7 +74,7 @@ WHERE
             END
         )
     )
-    -- 4. Filter Amenity (NÂNG CẤP: Check Tương thích Size + Check Trùng giờ)
+    -- 4. Filter Amenity (NÂNG CẤP: Check Trùng giờ)
         AND (
             p_amenityCategory IS NULL 
             OR EXISTS (

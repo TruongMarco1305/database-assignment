@@ -80,13 +80,6 @@ BEGIN
         SIGNAL SQLSTATE '45087' SET MESSAGE_TEXT = 'Error: Amenity does not exist.';
     END IF;
 
-    -- 2. Constraint Check: ORDER HISTORY
-    -- Không được xóa thiết bị đã từng được thuê (để bảo toàn lịch sử đơn hàng cũ)
-    IF EXISTS (SELECT 1 FROM order_amenities WHERE location_id = v_locId AND amenity_name = p_name) THEN
-        SIGNAL SQLSTATE '45088' 
-        SET MESSAGE_TEXT = 'Error: Cannot delete amenity because it is linked to existing orders. Please deactivate it instead.';
-    END IF;
-
     DELETE FROM amenities WHERE location_id = v_locId AND amenity_name = p_name;
 END$$
 

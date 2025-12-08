@@ -11,7 +11,7 @@ BEGIN
         SELECT 1 
         FROM orders o
         WHERE o.venue_loc_id = OLD.location_id
-          AND o.status IN ('PENDING', 'CONFIRMED', 'COMPLETED')
+          AND o.status IN ('CANCELLED' 'PENDING', 'CONFIRMED', 'COMPLETED')
     ) THEN
         SIGNAL SQLSTATE '45117' 
         SET MESSAGE_TEXT = 'Error: Cannot delete Location. It contains venues with associated booking history (Pending, Confirmed, or Completed). Please deactivate (Soft Delete) instead.';

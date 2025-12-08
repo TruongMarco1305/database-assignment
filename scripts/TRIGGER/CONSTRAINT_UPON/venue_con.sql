@@ -10,7 +10,7 @@ BEGIN
         FROM orders o
         WHERE o.venue_loc_id = OLD.location_id 
           AND o.venueName = OLD.name
-          AND o.status IN ('PENDING', 'CONFIRMED', 'COMPLETED')
+          AND o.status IN ('CANCELLED', 'PENDING', 'CONFIRMED', 'COMPLETED')
     ) THEN
         SIGNAL SQLSTATE '45123' 
         SET MESSAGE_TEXT = 'Error: Cannot delete Venue. It has associated bookings history (Pending, Confirmed, or Completed). Please deactivate it instead.';

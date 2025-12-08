@@ -24,3 +24,21 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER Check_ExistOrderAme
+BEFORE DELETE ON amenities
+FOR EACH ROW
+BEGIN
+    -- Kiểm tra xem Tiện nghi này đã từng được đặt trong đơn hàng nào chưa
+    IF EXISTS (
+        SELECT 1 FROM order_amenities 
+        WHERE amenity_name = OLD.amenity_name 
+          AND location_id = OLD.location_id
+    ) THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Error: Cannot delete this Amenity because it exists in order history. Please deactivate instead.';
+    END IF;
+END$$
+
+DELIMITER ;

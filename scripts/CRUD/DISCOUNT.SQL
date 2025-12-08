@@ -136,12 +136,6 @@ BEGIN
         SIGNAL SQLSTATE '45103' SET MESSAGE_TEXT = 'Error: Discount does not exist.';
     END IF;
 
-    -- 2. Constraint Check: Usage History (APPLIES table)
-    -- Không nên xóa mã giảm giá đã từng được sử dụng trong các đơn hàng cũ
-    IF EXISTS (SELECT 1 FROM applies WHERE discount_id = v_id) THEN
-        SIGNAL SQLSTATE '45104' 
-        SET MESSAGE_TEXT = 'Error: Cannot delete this discount because it has been used in orders.';
-    END IF;
 
     DELETE FROM discounts WHERE discount_id = v_id;
 END$$

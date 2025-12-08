@@ -33,27 +33,4 @@ BEGIN
     VALUES (v_orderId, v_discountId);
 END$$
 
--- 3. Delete Applies (Gỡ bỏ mã giảm giá khỏi đơn hàng)
-CREATE PROCEDURE Applies_Delete(
-    IN p_orderId VARCHAR(36),
-    IN p_discountId VARCHAR(36)
-)
-BEGIN
-    DECLARE v_orderId BINARY(16);
-    DECLARE v_discountId BINARY(16);
-    
-    SET v_orderId = UUID_TO_BIN(p_orderId);
-    SET v_discountId = UUID_TO_BIN(p_discountId);
-
-    -- 1. Validate Existence
-    IF NOT EXISTS (SELECT 1 FROM applies WHERE order_id = v_orderId AND discount_id = v_discountId) THEN
-        SIGNAL SQLSTATE '45082' SET MESSAGE_TEXT = 'Error: Discount not found in this order.';
-    END IF;
-
-    -- 2. Execute Delete
-    DELETE FROM applies 
-    WHERE order_id = v_orderId 
-      AND discount_id = v_discountId;
-END$$
-
 DELIMITER ;
