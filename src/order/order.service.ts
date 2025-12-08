@@ -45,8 +45,6 @@ export class OrderService {
 
       // Add amenities if provided
       if (dto.amenityIds && dto.amenityIds.length > 0) {
-        console.log(dto.amenityIds);
-        console.log(orderId);
         for (const amenityName of dto.amenityIds) {
           await this.databaseService.execute(`CALL OrderAmenity_Insert(?, ?)`, [
             orderId,
@@ -112,15 +110,19 @@ export class OrderService {
     invoiceId: string;
   }): Promise<void> {
     try {
-      await this.databaseService.execute(`CALL Order_Update(?, ?, ?, ?)`, [
+      // await this.databaseService.execute(`CALL Order_Update(?, ?, ?, ?)`, [
+      //   payload.orderId,
+      //   null,
+      //   null,
+      //   'CANCELLED',
+      // ]);
+      // await this.databaseService.execute(`CALL Invoice_UpdateStatus(?, ?, ?)`, [
+      //   payload.invoiceId,
+      //   'FAILED',
+      //   `Cancel payment for order ${payload.orderId}`,
+      // ]);
+      await this.databaseService.execute(`CALL Order_Cancel(?, ?)`, [
         payload.orderId,
-        null,
-        null,
-        'CANCELLED',
-      ]);
-      await this.databaseService.execute(`CALL Invoice_UpdateStatus(?, ?, ?)`, [
-        payload.invoiceId,
-        'FAILED',
         `Cancel payment for order ${payload.orderId}`,
       ]);
     } catch (error) {
