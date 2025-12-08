@@ -1,20 +1,18 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { TableService } from 'src/database/table.service';
+// import { TableService } from 'src/database/table.service';
 import { CREATE_OWNER_TABLE_QUERY } from 'src/database/queries';
 import { OwnerSignupDto } from 'src/auth/auth.dto';
 import { convertUUIDtoBinaryHex } from 'src/utils';
 import { UpdateOwnerDto } from '../user.dto';
 
 @Injectable()
-export class OwnerService extends TableService {
+export class OwnerService {
   protected readonly logger = new Logger(OwnerService.name);
   protected readonly tableName = 'owners';
   protected readonly createTableQuery = CREATE_OWNER_TABLE_QUERY;
 
-  constructor(databaseService: DatabaseService) {
-    super(databaseService);
-  }
+  constructor(private databaseService: DatabaseService) {}
 
   public async createNewOwner(userId: string, ownerSignupDto: OwnerSignupDto) {
     const { bankId, bankName, accountName, accountNumber } = ownerSignupDto;

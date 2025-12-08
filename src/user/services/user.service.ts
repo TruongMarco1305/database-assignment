@@ -2,31 +2,19 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
-  Logger,
 } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
-import { TableService } from 'src/database/table.service';
 import { CreateUserInterface } from '../user.interface';
 import { LoginDto } from 'src/auth/auth.dto';
 import * as bcrypt from 'bcrypt';
-import {
-  CREATE_USER_PROCEDURE,
-  CREATE_USER_TABLE_QUERY,
-} from 'src/database/queries';
 import { v4 as uuidv4 } from 'uuid';
 import { convertBinaryHexToUUID, convertUUIDtoBinaryHex } from 'src/utils';
 import { User } from '../entities';
 import { UpdateUserDto } from '../user.dto';
 
 @Injectable()
-export class UserService extends TableService {
-  protected readonly logger = new Logger(UserService.name);
-  protected readonly tableName = 'users';
-  protected readonly createTableQuery = CREATE_USER_TABLE_QUERY;
-  protected readonly postCreationQuery = CREATE_USER_PROCEDURE;
-  constructor(databaseService: DatabaseService) {
-    super(databaseService);
-  }
+export class UserService {
+  constructor(private databaseService: DatabaseService) {}
 
   public async createUser(userData: CreateUserInterface) {
     const { email, password, DoB, firstName, lastName } = userData;

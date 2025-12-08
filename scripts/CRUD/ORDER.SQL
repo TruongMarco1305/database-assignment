@@ -93,4 +93,55 @@ BEGIN
         status     = COALESCE(p_status, status)
     WHERE order_id = v_id;
 END$$
+
+CREATE PROCEDURE Order_Cancel(
+    IN p_orderId VARCHAR(36),
+    IN p_cancelReason TEXT
+)
+BEGIN
+    DECLARE v_orderBin BINARY(16);
+    DECLARE v_invoiceBin BINARY(16);
+    DECLARE exit handler for sqlexception
+    BEGIN
+        -- Rollback if any error occurs
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Transaction failed. Order not cancelled.';
+    END;
+
+    SET v_orderBin = UUID_TO_BIN(p_orderId);
+
+    -- 1. Validations
+    -- Check if Order Exists
+    IF NOT EXISTS (SELECT 1 FROM orders WHERE order_id = v_orderBin) THEN
+        SIGNAL SQLSTATE '45059' SET MESSAGE_TEXT = 'Error: Order does not exist.';
+    END IF;
+
+    -- Optional: Check if Order is already Completed (Cannot cancel a completed order)
+    IF EXISTS (SELECT 1 FROM orders WHERE order_id = v_orderBin AND status = 'COMPLETED') THEN
+        SIGNAL SQLSTATE '45060' SET MESSAGE_TEXT = 'Error: Cannot cancel a COMPLETED order.';
+    END IF;
+
+    -- 2. Start Atomic Transaction
+    START TRANSACTION;
+
+        -- A. Update Order Status to CANCELLED
+        UPDATE orders 
+        SET status = 'CANCELLED'
+        WHERE order_id = v_orderBin;
+
+        -- B. Update Invoice Status to FAILED
+        -- logic: We find the invoice associated with this order
+        -- If no invoice exists (e.g., cancelled before payment created), this simply affects 0 rows, which is fine.
+        UPDATE invoices 
+        SET 
+            status = 'FAILED', 
+            description = CONCAT('Order Cancelled. Reason: ', COALESCE(p_cancelReason, 'User Request'))
+        WHERE order_id = v_orderBin; 
+        -- NOTE: Ensure your 'invoices' table has an 'order_id' column. 
+        -- If your relationship is different (e.g. order has invoice_id), you must SELECT the invoice_id first.
+
+    -- 3. Commit Changes
+    COMMIT;
+    
+END$$
 DELIMITER ;
