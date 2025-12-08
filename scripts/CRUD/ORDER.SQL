@@ -86,7 +86,7 @@ BEGIN
         DATE_ADD(NOW(), INTERVAL 15 MINUTE) -- Thời gian giữ đơn (để thanh toán)
     );
 END$$
-    DELIMITER ;
+DELIMITER ;
 
 -- Update Order
 DELIMITER $$

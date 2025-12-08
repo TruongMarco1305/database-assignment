@@ -7,7 +7,7 @@ CREATE PROCEDURE Amenity_Insert(
     IN p_name VARCHAR(100), -- Thay cho p_id
     IN p_category VARCHAR(50),
     IN p_desc TEXT,
-    IN p_price DECIMAL(12,2),
+    IN p_price DECIMAL(12,2)
 )
 BEGIN
     DECLARE v_locId BINARY(16);
