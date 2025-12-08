@@ -158,4 +158,125 @@ BEGIN
     -- Filter by the specific Order ID (Converting input string to binary)
     WHERE ord.order_id = UUID_TO_BIN(in_orderId);
 END $$
+DELIMITER $$
+CREATE PROCEDURE Get_Valid_Discounts(
+    IN p_clientId VARCHAR(36),
+    IN p_locId VARCHAR(36),
+    IN p_venueName VARCHAR(100),
+    IN p_start DATETIME,
+    IN p_end DATETIME
+)
+BEGIN
+    DECLARE v_locBin BINARY(16);
+    DECLARE v_clientBin BINARY(16);
+    
+    DECLARE v_venueTypeId BINARY(16);
+    DECLARE v_pricePerHour DECIMAL(10, 2);
+    DECLARE v_estimatedPrice DECIMAL(12, 2);
+    DECLARE v_hours INT;
+    
+    DECLARE v_clientPoints INT DEFAULT 0;
+    DECLARE v_clientTier VARCHAR(20) DEFAULT 'BRONZE';
+
+    -- 1. Chuẩn bị dữ liệu
+    SET v_locBin = UUID_TO_BIN(p_locId);
+    SET v_clientBin = IF(p_clientId IS NULL, NULL, UUID_TO_BIN(p_clientId));
+
+    -- Lấy thông tin giá và loại phòng
+    SELECT v.venueType_id, v.pricePerHour
+    INTO v_venueTypeId, v_pricePerHour
+    FROM venues v
+    WHERE v.location_id = v_locBin AND v.name = p_venueName;
+
+    -- Tính toán Giá ước tính (để lọc Discount theo minPrice)
+    SET v_hours = TIMESTAMPDIFF(HOUR, p_start, p_end);
+    IF v_hours <= 0 THEN SET v_hours = 1; END IF;
+    SET v_estimatedPrice = v_pricePerHour * v_hours;
+
+    -- Lấy thông tin Khách hàng & Tính hạng (nếu có đăng nhập)
+    IF v_clientBin IS NOT NULL THEN
+        SELECT membership_points INTO v_clientPoints 
+        FROM clients WHERE user_id = v_clientBin;
+        
+        -- Gọi hàm tính hạng động (đảm bảo hàm Get_Tier đã tồn tại)
+        SET v_clientTier = Get_Tier(v_clientPoints);
+    END IF;
+
+    -- 2. Trả về danh sách Discount hợp lệ
+    SELECT 
+        BIN_TO_UUID(d.discount_id) AS discount_id,
+        d.name,
+        d.percentage,
+        d.maxDiscountPrice,
+        d.minPrice,
+        d.expiredAt
+    FROM discounts d
+    WHERE 
+        -- Còn hạn sử dụng
+        NOW() BETWEEN d.startedAt AND d.expiredAt
+        
+        -- Thỏa mãn giá trị đơn hàng tối thiểu
+        AND (d.minPrice IS NULL OR v_estimatedPrice >= d.minPrice)
+        
+        -- Khớp loại phòng
+        AND (d.venueTypeId IS NULL OR d.venueTypeId = v_venueTypeId)
+        
+        -- Khớp hạng thành viên (Dùng FIND_IN_SET nếu membershipTier là SET, hoặc = nếu là ENUM)
+        AND (d.membershipTier IS NULL OR FIND_IN_SET(v_clientTier, d.membershipTier) > 0);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE Get_Valid_Amenities(
+    IN p_locId VARCHAR(36),
+    IN p_venueName VARCHAR(100),
+    IN p_start DATETIME,
+    IN p_end DATETIME
+)
+BEGIN
+    DECLARE v_locBin BINARY(16);
+    DECLARE v_maxCapacity INT;
+    DECLARE v_venueSize VARCHAR(20);
+
+    SET v_locBin = UUID_TO_BIN(p_locId);
+
+    -- 1. Lấy thông tin Sức chứa để quy đổi Size
+    SELECT vt.maxCapacity
+    INTO v_maxCapacity
+    FROM venues v
+    JOIN venue_types vt ON v.venueType_id = vt.venueType_id
+    WHERE v.location_id = v_locBin AND v.name = p_venueName;
+
+    -- Quy đổi Size
+    SET v_venueSize = CASE 
+        WHEN v_maxCapacity <= 40 THEN 'Small'
+        WHEN v_maxCapacity <= 80 THEN 'Medium'
+        WHEN v_maxCapacity <= 120 THEN 'Large'
+        ELSE 'Exclusive'
+    END;
+
+    -- 2. Trả về danh sách Amenity khả dụng
+    SELECT 
+        a.amenity_name,
+        a.category,
+        a.description,
+        a.price
+    FROM amenities a
+    WHERE 
+        a.location_id = v_locBin
+        AND a.isActive = 1 -- Đang trong kho
+        
+        -- B. Kiểm tra Trùng lịch (Availability Check)
+        AND NOT EXISTS (
+            SELECT 1 
+            FROM order_amenities oa
+            JOIN orders o ON oa.order_id = o.order_id
+            WHERE oa.location_id = a.location_id 
+              AND oa.amenity_name = a.amenity_name
+              AND o.status IN ('PENDING', 'CONFIRMED')
+              AND (o.startHour < p_end AND o.endHour > p_start)
+        );
+END$$
+
 DELIMITER ;

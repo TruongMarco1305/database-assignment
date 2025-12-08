@@ -16,7 +16,19 @@ BEGIN
     WHERE status = 'CONFIRMED' 
       AND endHour < NOW();
 
-    -- 1.2. Hủy đơn treo (Quá hạn thanh toán mà vẫn PENDING)
+    -- 2. XỬ LÝ HỦY ĐƠN TREO & HÓA ĐƠN TREO (Expired Orders)
+    -- =========================================================================
+    
+    -- 2.1. Hủy Invoice trước (Set thành FAILED hoặc CANCELLED tùy ENUM của bạn)
+    -- Logic: Tìm các Invoice đang PENDING thuộc về các Order sắp bị hủy
+    UPDATE invoices i
+    INNER JOIN orders o ON i.order_id = o.order_id
+    SET i.status = 'FAILED' 
+    WHERE o.status = 'PENDING'      -- Đơn hàng chưa thanh toán
+      AND o.expiredAt < NOW()       -- Đã quá hạn giữ chỗ
+      AND i.status = 'PENDING';     -- Hóa đơn cũng đang treo
+
+    -- 2.2. Sau đó mới hủy Order
     UPDATE orders
     SET status = 'CANCELLED'
     WHERE status = 'PENDING' 

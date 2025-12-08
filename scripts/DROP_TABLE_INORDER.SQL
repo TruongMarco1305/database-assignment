@@ -1,3 +1,5 @@
+DROP TABLE messages;
+DROP TABLE chat_channels;
 DROP TABLE order_amenities;
 DROP TABLE amenities;
 DROP TABLE venue_images;

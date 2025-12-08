@@ -47,7 +47,7 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE TRIGGER trg_Order_CheckClientLimit_BeforeInsert
+CREATE TRIGGER CheckClient_Limit
 BEFORE INSERT ON orders
 FOR EACH ROW
 BEGIN
