@@ -25,14 +25,16 @@ BEGIN
     INNER JOIN orders o ON i.order_id = o.order_id
     SET i.status = 'FAILED' 
     WHERE o.status = 'PENDING'      -- Đơn hàng chưa thanh toán
-      AND o.expiredAt < NOW()       -- Đã quá hạn giữ chỗ
+      AND DATE_SUB(o.expiredAt, INTERVAL 13 MINUTE) < NOW() -- <--- SỬA TẠI ĐÂY
+      -- AND o.expiredAt < NOW()       -- Đã quá hạn giữ chỗ
       AND i.status = 'PENDING';     -- Hóa đơn cũng đang treo
 
     -- 2.2. Sau đó mới hủy Order
     UPDATE orders
     SET status = 'CANCELLED'
     WHERE status = 'PENDING' 
-      AND expiredAt < NOW();
+      -- AND expiredAt < NOW();
+      AND DATE_SUB(expiredAt, INTERVAL 13 MINUTE) < NOW(); -- <--- SỬA TẠI ĐÂY
 END$$
 
 DELIMITER ;
